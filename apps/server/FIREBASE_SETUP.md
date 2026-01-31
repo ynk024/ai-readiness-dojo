@@ -441,27 +441,38 @@ try {
 
 ## Future Enhancements
 
-### Optional Tasks (Not Yet Implemented)
+### Completed Optional Tasks ✅
 
-1. **ESLint Boundary Enforcement**
-   - Configure ESLint to enforce layer dependencies
-   - Prevent domain from importing infrastructure code
+1. **ESLint Boundary Enforcement** ✅
+   - Configured ESLint to enforce hexagonal architecture layer dependencies
+   - Domain layer cannot import infrastructure or presentation code
+   - Presentation layer cannot import infrastructure directly
+   - Shared layer remains isolated from all other layers
+   - Test files and composition root can import from all layers
+   - See `eslint.config.js` for boundary configuration
 
-2. **Firestore Emulator Setup**
-   - Add firebase.json configuration
-   - Add npm scripts for emulator management
-   - Configure automatic emulator startup for tests
+2. **Firestore Emulator Setup** ✅
+   - Added `firebase.json` configuration for Firestore emulator
+   - Emulator runs on port 8080, UI on port 4000
+   - Added npm scripts: `emulator:start`, `emulator:export`, `emulator:import`
+   - Configured automatic emulator startup for integration tests
+   - Added emulator data to `.gitignore`
 
-3. **Integration Tests**
-   - Test Firestore repository with emulator
-   - Test full API flow end-to-end
-   - Test concurrent operations and transactions
+3. **Integration Tests** ✅
+   - Created test helpers for Firestore setup/teardown
+   - Implemented lightweight integration tests for create and read operations
+   - Tests use Firestore emulator for isolation
+   - Test data factory provides consistent test entities
+   - Run with: `FIRESTORE_EMULATOR_HOST=localhost:8080 pnpm test:integration`
+   - All tests passing with proper cleanup between runs
 
-4. **Additional Features**
-   - Pagination support
-   - Sorting and filtering
-   - Batch operations
-   - Transaction support for complex operations
+### Additional Features (Not Yet Implemented)
+
+4. **Advanced Features** (Optional - not prioritized)
+   - Pagination support (limit, offset, cursor-based)
+   - Complex sorting and filtering
+   - Batch operations (createMany, updateMany, deleteMany)
+   - Transaction support for multi-document operations
    - Event sourcing
    - CQRS pattern
 
