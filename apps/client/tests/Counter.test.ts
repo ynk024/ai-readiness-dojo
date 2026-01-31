@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/svelte';
+import { fireEvent, render, screen } from '@testing-library/svelte';
+import { describe, expect, it } from 'vitest';
+
 import Counter from '../src/lib/Counter.svelte';
 
 describe('Counter', () => {
@@ -20,10 +21,10 @@ describe('Counter', () => {
     render(Counter);
     const incrementBtn = screen.getByText('+');
 
-    await incrementBtn.click();
+    await fireEvent.click(incrementBtn);
     expect(screen.getByText('1')).toBeTruthy();
 
-    await incrementBtn.click();
+    await fireEvent.click(incrementBtn);
     expect(screen.getByText('2')).toBeTruthy();
   });
 
@@ -31,10 +32,10 @@ describe('Counter', () => {
     render(Counter);
     const decrementBtn = screen.getByText('-');
 
-    await decrementBtn.click();
+    await fireEvent.click(decrementBtn);
     expect(screen.getByText('-1')).toBeTruthy();
 
-    await decrementBtn.click();
+    await fireEvent.click(decrementBtn);
     expect(screen.getByText('-2')).toBeTruthy();
   });
 
@@ -44,13 +45,13 @@ describe('Counter', () => {
     const resetBtn = screen.getByText('Reset');
 
     // Increment a few times
-    await incrementBtn.click();
-    await incrementBtn.click();
-    await incrementBtn.click();
+    await fireEvent.click(incrementBtn);
+    await fireEvent.click(incrementBtn);
+    await fireEvent.click(incrementBtn);
     expect(screen.getByText('3')).toBeTruthy();
 
     // Reset
-    await resetBtn.click();
+    await fireEvent.click(resetBtn);
     expect(screen.getByText('0')).toBeTruthy();
   });
 });

@@ -1,11 +1,13 @@
-import Fastify from 'fastify';
 import cors from '@fastify/cors';
+import Fastify, { type FastifyInstance } from 'fastify';
+
 import { healthRoutes } from './routes/health.js';
 
-const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
-const HOST = process.env.HOST || '0.0.0.0';
+const DEFAULT_PORT = 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : DEFAULT_PORT;
+const HOST = process.env.HOST ?? '0.0.0.0';
 
-export async function buildServer() {
+export async function buildServer(): Promise<FastifyInstance> {
   const fastify = Fastify({
     logger: {
       transport:
@@ -32,9 +34,9 @@ export async function buildServer() {
   return fastify;
 }
 
-async function start() {
+async function start(): Promise<void> {
   try {
-    const fastify = await buildServer();
+    const fastify: FastifyInstance = await buildServer();
     await fastify.listen({ port: PORT, host: HOST });
   } catch (err) {
     console.error(err);
@@ -43,6 +45,6 @@ async function start() {
 }
 
 // Only start server if this file is run directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  start();
+if (import.meta.url === `file://${process.argv[1] ?? ''}`) {
+  void start();
 }

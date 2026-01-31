@@ -1,6 +1,14 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+
 import { buildServer } from '../src/index.js';
-import { FastifyInstance } from 'fastify';
+
+import type { FastifyInstance } from 'fastify';
+
+interface HealthResponseBody {
+  status: string;
+  timestamp: string;
+  uptime: number;
+}
 
 describe('Health Endpoint', () => {
   let server: FastifyInstance;
@@ -29,7 +37,7 @@ describe('Health Endpoint', () => {
       url: '/health',
     });
 
-    const body = JSON.parse(response.body);
+    const body = JSON.parse(response.body) as HealthResponseBody;
     expect(body.status).toBe('ok');
   });
 
@@ -39,9 +47,8 @@ describe('Health Endpoint', () => {
       url: '/health',
     });
 
-    const body = JSON.parse(response.body);
+    const body = JSON.parse(response.body) as HealthResponseBody;
     expect(body.timestamp).toBeDefined();
-    expect(() => new Date(body.timestamp)).not.toThrow();
 
     // Check if it's a valid ISO string
     const date = new Date(body.timestamp);
@@ -54,7 +61,7 @@ describe('Health Endpoint', () => {
       url: '/health',
     });
 
-    const body = JSON.parse(response.body);
+    const body = JSON.parse(response.body) as HealthResponseBody;
     expect(typeof body.uptime).toBe('number');
     expect(body.uptime).toBeGreaterThanOrEqual(0);
   });
@@ -65,7 +72,11 @@ describe('Health Endpoint', () => {
       url: '/health',
     });
 
-    expect(response.headers['content-type']).toContain('application/json');
-    expect(() => JSON.parse(response.body)).not.toThrow();
+    const contentType = response.headers['content-type'];
+    expect(contentType).toBeDefined();
+    expect(typeof contentType === 'string' ? contentType : '').toContain('application/json');
+
+    const parsedBody = JSON.parse(response.body) as HealthResponseBody;
+    expect(parsedBody).toBeDefined();
   });
 });

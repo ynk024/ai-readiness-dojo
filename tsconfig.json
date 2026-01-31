@@ -16,6 +16,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "files": [],
+  "files": ["vitest.workspace.ts"],
   "references": [{ "path": "./apps/client" }, { "path": "./apps/server" }]
 }
