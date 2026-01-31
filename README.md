@@ -114,6 +114,7 @@ pnpm test --watch
 ```
 
 Coverage reports are generated in `coverage/` directory with:
+
 - `coverage-summary.json` - Summary in Jest format (for AI-readiness checks)
 - Detailed HTML reports for manual inspection
 

@@ -17,38 +17,38 @@ describe('Counter', () => {
   });
 
   it('should increment count when + button is clicked', async () => {
-    const { component } = render(Counter);
+    render(Counter);
     const incrementBtn = screen.getByText('+');
-    
+
     await incrementBtn.click();
     expect(screen.getByText('1')).toBeTruthy();
-    
+
     await incrementBtn.click();
     expect(screen.getByText('2')).toBeTruthy();
   });
 
   it('should decrement count when - button is clicked', async () => {
-    const { component } = render(Counter);
+    render(Counter);
     const decrementBtn = screen.getByText('-');
-    
+
     await decrementBtn.click();
     expect(screen.getByText('-1')).toBeTruthy();
-    
+
     await decrementBtn.click();
     expect(screen.getByText('-2')).toBeTruthy();
   });
 
   it('should reset count to 0 when Reset button is clicked', async () => {
-    const { component } = render(Counter);
+    render(Counter);
     const incrementBtn = screen.getByText('+');
     const resetBtn = screen.getByText('Reset');
-    
+
     // Increment a few times
     await incrementBtn.click();
     await incrementBtn.click();
     await incrementBtn.click();
     expect(screen.getByText('3')).toBeTruthy();
-    
+
     // Reset
     await resetBtn.click();
     expect(screen.getByText('0')).toBeTruthy();

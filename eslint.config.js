@@ -2,10 +2,13 @@ import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import boundaries from 'eslint-plugin-boundaries';
 import globals from 'globals';
+import sveltePlugin from 'eslint-plugin-svelte';
+import svelteParser from 'svelte-eslint-parser';
 
 export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
+  ...sveltePlugin.configs['flat/recommended'],
   {
     ignores: [
       '**/node_modules/**',
@@ -14,6 +17,7 @@ export default tseslint.config(
       '**/coverage/**',
       '**/*.config.js',
       '**/*.config.ts',
+      'pnpm-lock.yaml',
     ],
   },
   {
@@ -52,7 +56,19 @@ export default tseslint.config(
     },
   },
   {
-    files: ['apps/client/**/*.ts', 'apps/client/**/*.svelte'],
+    files: ['apps/client/**/*.svelte'],
+    languageOptions: {
+      parser: svelteParser,
+      parserOptions: {
+        parser: tseslint.parser,
+      },
+      globals: {
+        ...globals.browser,
+      },
+    },
+  },
+  {
+    files: ['apps/client/**/*.ts'],
     languageOptions: {
       globals: {
         ...globals.browser,

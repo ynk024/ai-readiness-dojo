@@ -42,7 +42,7 @@ describe('Health Endpoint', () => {
     const body = JSON.parse(response.body);
     expect(body.timestamp).toBeDefined();
     expect(() => new Date(body.timestamp)).not.toThrow();
-    
+
     // Check if it's a valid ISO string
     const date = new Date(body.timestamp);
     expect(date.toISOString()).toBe(body.timestamp);
