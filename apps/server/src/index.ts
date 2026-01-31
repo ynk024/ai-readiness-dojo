@@ -6,6 +6,7 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import { loadEnvironmentConfig } from './infrastructure/config/environment.js';
 import { registerDependencies } from './infrastructure/di/container.js';
 import { healthRoutes } from './presentation/routes/health.js';
+import { itemsRoutes } from './presentation/routes/items.routes.js';
 
 export async function buildServer(): Promise<FastifyInstance> {
   // Load and validate environment configuration
@@ -36,6 +37,7 @@ export async function buildServer(): Promise<FastifyInstance> {
 
   // Register routes
   await fastify.register(healthRoutes);
+  await fastify.register(itemsRoutes);
 
   return fastify;
 }
