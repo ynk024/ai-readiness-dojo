@@ -5,8 +5,10 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     coverage: {
+      enabled: true,
       provider: 'v8',
-      reporter: ['text', 'json-summary', 'json'],
+      reporter: ['text', 'json-summary', 'json', 'html'],
+      reportsDirectory: '../../coverage',
       include: ['src/**/*.ts'],
       exclude: ['src/**/*.test.ts', 'src/**/*.spec.ts'],
     },
