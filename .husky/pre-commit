@@ -1,0 +1,30 @@
+echo "🔍 Running pre-commit checks..."
+
+echo "\n📝 Formatting code..."
+pnpm format
+
+echo "\n🔎 Running linter..."
+pnpm lint || {
+  echo "❌ Linting failed. Fix the issues above."
+  exit 1
+}
+
+echo "\n🔧 Running type checks..."
+pnpm type-check || {
+  echo "❌ Type check failed. Fix the type errors above."
+  exit 1
+}
+
+echo "\n🧪 Running tests with coverage..."
+pnpm test:coverage || {
+  echo "❌ Tests failed. Fix the failing tests above."
+  exit 1
+}
+
+echo "\n🏗️  Building project..."
+pnpm build || {
+  echo "❌ Build failed. Fix the build errors above."
+  exit 1
+}
+
+echo "\n✅ All pre-commit checks passed!"

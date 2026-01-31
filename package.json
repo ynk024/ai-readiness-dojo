@@ -7,6 +7,7 @@
   "scripts": {
     "dev:client": "pnpm --filter client dev",
     "dev:server": "pnpm --filter server dev",
+    "build": "pnpm build:client && pnpm build:server",
     "build:client": "pnpm --filter client build",
     "build:server": "pnpm --filter server build",
     "test": "vitest",
@@ -14,7 +15,8 @@
     "type-check": "pnpm -r run type-check",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
@@ -29,6 +31,7 @@
     "eslint-plugin-sonarjs": "^3.0.6",
     "eslint-plugin-svelte": "^3.14.0",
     "globals": "^15.13.0",
+    "husky": "^9.1.7",
     "prettier": "^3.4.2",
     "prettier-plugin-svelte": "^3.3.2",
     "svelte-eslint-parser": "^1.4.1",
