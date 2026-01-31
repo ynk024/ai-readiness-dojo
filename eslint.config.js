@@ -77,7 +77,7 @@ export default tseslint.config(
       // ============================================
       // COMPLEXITY RULES
       // ============================================
-      'complexity': ['error', { max: 10 }],
+      complexity: ['error', { max: 10 }],
       'max-depth': ['error', { max: 4 }],
       'max-lines-per-function': [
         'error',
