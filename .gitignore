@@ -32,3 +32,8 @@ logs/
 *.log
 npm-debug.log*
 pnpm-debug.log*
+
+# Firebase emulator data
+**/emulator-data/
+**/firestore-debug.log
+**/.firebase/
