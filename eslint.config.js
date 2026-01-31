@@ -112,6 +112,7 @@ export default tseslint.config(
             {
               from: 'server-tests',
               allow: [
+                'server-tests',
                 'server-composition-root',
                 'server-domain',
                 'server-application',
