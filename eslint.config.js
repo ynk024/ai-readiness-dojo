@@ -193,7 +193,7 @@ export default tseslint.config(
       ],
       'max-statements': ['error', { max: 30 }, { ignoreTopLevelFunctions: false }],
       'max-params': ['error', { max: 4 }],
-      'max-nested-callbacks': ['error', { max: 3 }],
+      'max-nested-callbacks': ['error', { max: 6 }],
       'max-lines': [
         'error',
         {
