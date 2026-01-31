@@ -1,17 +1,20 @@
+import 'dotenv/config';
+
 import cors from '@fastify/cors';
 import Fastify, { type FastifyInstance } from 'fastify';
 
+import { loadEnvironmentConfig } from './infrastructure/config/environment.js';
+import { registerDependencies } from './infrastructure/di/container.js';
 import { healthRoutes } from './presentation/routes/health.js';
 
-const DEFAULT_PORT = 3000;
-const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : DEFAULT_PORT;
-const HOST = process.env.HOST ?? '0.0.0.0';
-
 export async function buildServer(): Promise<FastifyInstance> {
+  // Load and validate environment configuration
+  const config = loadEnvironmentConfig();
+
   const fastify = Fastify({
     logger: {
       transport:
-        process.env.NODE_ENV !== 'production'
+        config.nodeEnv !== 'production'
           ? {
               target: 'pino-pretty',
               options: {
@@ -28,6 +31,9 @@ export async function buildServer(): Promise<FastifyInstance> {
     origin: true,
   });
 
+  // Register dependencies (DI container - composition root)
+  registerDependencies(fastify, config);
+
   // Register routes
   await fastify.register(healthRoutes);
 
@@ -36,8 +42,9 @@ export async function buildServer(): Promise<FastifyInstance> {
 
 async function start(): Promise<void> {
   try {
+    const config = loadEnvironmentConfig();
     const fastify: FastifyInstance = await buildServer();
-    await fastify.listen({ port: PORT, host: HOST });
+    await fastify.listen({ port: config.port, host: config.host });
   } catch (err) {
     console.error(err);
     process.exit(1);
