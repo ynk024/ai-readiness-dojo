@@ -1,7 +1,7 @@
 import cors from '@fastify/cors';
 import Fastify, { type FastifyInstance } from 'fastify';
 
-import { healthRoutes } from './routes/health.js';
+import { healthRoutes } from './presentation/routes/health.js';
 
 const DEFAULT_PORT = 3000;
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : DEFAULT_PORT;
