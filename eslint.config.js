@@ -47,6 +47,44 @@ export default tseslint.config(
           type: 'server',
           pattern: 'apps/server/**/*',
         },
+        // Test files can import from all layers
+        {
+          type: 'server-tests',
+          pattern: 'apps/server/tests/**/*',
+          mode: 'full',
+        },
+        // Composition root - can import from all layers (order matters: put specific patterns first)
+        {
+          type: 'server-composition-root',
+          pattern: 'apps/server/src/index.ts',
+          mode: 'full',
+        },
+        // Hexagonal architecture layers for server
+        {
+          type: 'server-domain',
+          pattern: 'apps/server/src/domain/**/*',
+          mode: 'full',
+        },
+        {
+          type: 'server-application',
+          pattern: 'apps/server/src/application/**/*',
+          mode: 'full',
+        },
+        {
+          type: 'server-infrastructure',
+          pattern: 'apps/server/src/infrastructure/**/*',
+          mode: 'full',
+        },
+        {
+          type: 'server-presentation',
+          pattern: 'apps/server/src/presentation/**/*',
+          mode: 'full',
+        },
+        {
+          type: 'server-shared',
+          pattern: 'apps/server/src/shared/**/*',
+          mode: 'full',
+        },
       ],
       'import/resolver': {
         typescript: {
@@ -69,6 +107,70 @@ export default tseslint.config(
             {
               from: 'server',
               allow: ['server'],
+            },
+            // Test files can import from all server layers
+            {
+              from: 'server-tests',
+              allow: [
+                'server-composition-root',
+                'server-domain',
+                'server-application',
+                'server-infrastructure',
+                'server-presentation',
+                'server-shared',
+              ],
+              message: 'Test files can import from any layer',
+            },
+            // Composition root can import from all server layers
+            {
+              from: 'server-composition-root',
+              allow: [
+                'server-domain',
+                'server-application',
+                'server-infrastructure',
+                'server-presentation',
+                'server-shared',
+              ],
+              message: 'Composition root (index.ts) can wire all layers together',
+            },
+            // Hexagonal architecture enforcement for server
+            {
+              from: 'server-domain',
+              allow: ['server-domain', 'server-shared'],
+              message:
+                'Domain layer can only import from domain and shared layers (hexagonal architecture)',
+            },
+            {
+              from: 'server-application',
+              allow: ['server-domain', 'server-application', 'server-shared'],
+              message:
+                'Application layer can only import from domain, application, and shared layers',
+            },
+            {
+              from: 'server-infrastructure',
+              allow: [
+                'server-domain',
+                'server-application',
+                'server-infrastructure',
+                'server-shared',
+              ],
+              message: 'Infrastructure layer is outermost and can import from all layers',
+            },
+            {
+              from: 'server-presentation',
+              allow: [
+                'server-domain',
+                'server-application',
+                'server-presentation',
+                'server-shared',
+              ],
+              message:
+                'Presentation layer can import from domain, application, and shared layers (not infrastructure)',
+            },
+            {
+              from: 'server-shared',
+              allow: ['server-shared'],
+              message: 'Shared layer cannot import from any other layers (stays isolated)',
             },
           ],
         },
