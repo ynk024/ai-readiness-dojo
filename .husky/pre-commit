@@ -8,12 +8,18 @@ pnpm deps:graph
 
 echo "\n🔄 Checking for circular dependencies..."
 pnpm circular:check || {
-  echo "❌ Circular dependencies detected. Check docs/dependencies/ reports for details."
+  echo "❌ Circular dependencies detected."
   exit 1
 }
 
+echo "\n🔗 Checking for high coupling..."
+pnpm deps:check-coupling || {
+  echo "⚠️  Warning: High coupling detected (see above)"
+  # Don't exit - this is a warning only
+}
+
 echo "\n➕ Staging dependency graphs..."
-git add docs/dependencies/*.json
+git add docs/dependencies/*-deps.json
 
 echo "\n🔎 Running linter..."
 pnpm lint || {

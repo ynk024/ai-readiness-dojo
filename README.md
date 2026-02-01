@@ -151,27 +151,24 @@ pnpm deps:check-coupling
 pnpm circular:check && pnpm deps:graph && pnpm deps:check-coupling
 ```
 
-**Reports** are generated in `docs/dependencies/` directory (committed with code):
+**Reports** are generated in `docs/dependencies/` directory:
 
-**Circular dependency reports:**
-
-- `client-circular.json` - Client circular dependencies (empty array = no cycles)
-- `server-circular.json` - Server circular dependencies (empty array = no cycles)
-
-**Dependency graphs:**
+**Dependency graphs (committed with code):**
 
 - `client-deps.json` - Complete client dependency graph
 - `server-deps.json` - Complete server dependency graph
 
+**Circular dependency reports (NOT persisted):**
+
+- Generated to `/tmp/` during checks
+- Always empty for successful commits (pre-commit blocks circular deps)
+
 **Pre-commit hook:**
 
 - ✅ Generates dependency graphs (committed with code changes)
-- ✅ Runs circular dependency checks (blocking)
-- ✅ Stages graphs for inclusion in commit
-
-**Pre-push hook:**
-
+- ✅ Runs circular dependency checks (blocking, output to /tmp/)
 - ✅ Analyzes coupling and warns about complexity (non-blocking)
+- ✅ Stages graphs for inclusion in commit
 
 **Coupling warnings:**
 

@@ -37,3 +37,6 @@ pnpm-debug.log*
 **/emulator-data/
 **/firestore-debug.log
 **/.firebase/
+
+# Madge circular dependency reports (transient - not persisted)
+*-circular.json

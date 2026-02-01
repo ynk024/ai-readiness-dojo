@@ -1,34 +1,15 @@
 # Dependency Graphs
 
-This directory contains automatically generated dependency graphs and circular dependency reports for the AI Readiness Dojo monorepo.
+This directory contains automatically generated dependency graphs for the AI Readiness Dojo monorepo.
 
 ## Files
 
-| File                   | Description                               | Updated                            |
-| ---------------------- | ----------------------------------------- | ---------------------------------- |
-| `client-circular.json` | Circular dependency report for client app | Every commit (via pre-commit hook) |
-| `server-circular.json` | Circular dependency report for server app | Every commit (via pre-commit hook) |
-| `client-deps.json`     | Full dependency graph for client app      | Every commit (via pre-commit hook) |
-| `server-deps.json`     | Full dependency graph for server app      | Every commit (via pre-commit hook) |
+| File               | Description                          | Updated                            |
+| ------------------ | ------------------------------------ | ---------------------------------- |
+| `client-deps.json` | Full dependency graph for client app | Every commit (via pre-commit hook) |
+| `server-deps.json` | Full dependency graph for server app | Every commit (via pre-commit hook) |
 
 ## What's in these files?
-
-### Circular Dependency Reports
-
-Empty array `[]` means no circular dependencies found (good!):
-
-```json
-[]
-```
-
-If circular dependencies exist, you'll see chains like:
-
-```json
-[
-  ["src/A.ts", "src/B.ts", "src/A.ts"],
-  ["src/X.ts", "src/Y.ts", "src/Z.ts", "src/X.ts"]
-]
-```
 
 ### Dependency Graphs
 
@@ -47,6 +28,16 @@ JSON object mapping each file to its dependencies:
 }
 ```
 
+## What about circular dependency reports?
+
+Circular dependency checks (`*-circular.json`) are **NOT persisted** because:
+
+- They would always be empty arrays `[]` for successful commits
+- The pre-commit hook blocks any commits with circular dependencies
+- No value in tracking empty arrays in git history
+
+Circular checks are run on every commit but output to `/tmp/` (not committed).
+
 ## How are these generated?
 
 These files are **automatically generated and committed** by the pre-commit git hook using [madge](https://github.com/pahen/madge).
@@ -56,8 +47,10 @@ These files are **automatically generated and committed** by the pre-commit git 
 1. Developer runs `git commit`
 2. Pre-commit hook runs `pnpm deps:graph`
 3. Madge analyzes the codebase and generates JSON reports
-4. Reports are staged and included in the commit
-5. Commit proceeds (or blocked if circular dependencies found)
+4. Dependency graphs are staged and included in the commit
+5. Circular dependency check runs (blocks commit if any found)
+6. Coupling analysis runs (warnings only, non-blocking)
+7. Commit proceeds
 
 ## Why commit these files?
 
@@ -72,10 +65,10 @@ These files are **automatically generated and committed** by the pre-commit git 
 To manually regenerate these files:
 
 ```bash
-# Generate all graphs
+# Generate dependency graphs
 pnpm deps:graph
 
-# Check for circular dependencies
+# Check for circular dependencies (output to /tmp/)
 pnpm circular:check
 
 # Analyze coupling

@@ -244,7 +244,7 @@ This project uses **madge** to analyze module dependencies, enforce architectura
 
 1. **Circular Dependency Detection** (`circular:check`) - Fast, blocking, runs in pre-commit
 2. **Dependency Graph Generation** (`deps:graph`) - Full analysis, runs in pre-commit, committed to repo
-3. **Coupling Analysis** (`deps:check-coupling`) - Warns about complexity, runs in pre-push
+3. **Coupling Analysis** (`deps:check-coupling`) - Warns about complexity, runs in pre-commit
 
 ### Git Hooks Integration
 
@@ -252,11 +252,8 @@ This project uses **madge** to analyze module dependencies, enforce architectura
 
 - ✅ Runs `deps:graph` (generates graphs and stages them)
 - ✅ Runs `circular:check` (blocking - prevents commit if circular deps found)
-- ✅ Graphs are committed alongside code changes
-
-**Pre-push hook:**
-
 - ✅ Runs `deps:check-coupling` (warnings only - non-blocking)
+- ✅ Graphs are committed alongside code changes
 
 ### Circular Dependency Checks
 
@@ -274,10 +271,12 @@ pnpm circular:check:server
 - `0` - No circular dependencies found ✅
 - `1` - Circular dependencies detected ❌ (blocks commit)
 
-**Reports:** `docs/dependencies/client-circular.json` and `docs/dependencies/server-circular.json`
+**Reports:** Output to `/tmp/client-circular.json` and `/tmp/server-circular.json` (NOT persisted in git)
 
 - Empty array `[]` = No circular dependencies
 - Non-empty array = Circular dependency chains found
+
+**Note:** Circular reports are not committed because they're always empty for successful commits (pre-commit hook blocks any circular dependencies).
 
 **Example circular dependency report:**
 
@@ -321,7 +320,7 @@ Each key is a source file, value is array of files it imports.
 ### Coupling Analysis
 
 ```bash
-# Analyze coupling (runs in pre-push hook)
+# Analyze coupling (runs in pre-commit hook)
 pnpm deps:check-coupling
 ```
 
