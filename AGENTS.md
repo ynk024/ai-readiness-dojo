@@ -13,6 +13,19 @@ This is a **pnpm monorepo** with TypeScript, featuring:
 - **Testing**: Vitest with coverage reporting
 - **Node**: >=20.0.0, **pnpm**: >=9.0.0
 
+## Automated Enforcement
+
+This repository enforces code quality through automated tooling. **When in doubt, run `pnpm lint` and `pnpm format`.**
+
+- **Formatting**: `.prettierrc.json` enforced by Prettier + pre-commit hook
+- **Code quality & complexity**: `eslint.config.js` enforced by ESLint
+- **Type safety**: `tsconfig.json` and `apps/*/tsconfig.json` enforced by TypeScript compiler
+- **Architecture boundaries**: `eslint-plugin-boundaries` in `eslint.config.js` enforces hexagonal layers
+- **Circular dependencies**: Pre-commit hook blocks circular imports and critical coupling violations
+- **Pre-commit checks**: All formatting, linting, and dependency checks run automatically before commit
+
+**Philosophy**: Let tooling catch mistakes. Focus on understanding the architecture and patterns below.
+
 ## Build, Lint, and Test Commands
 
 ### Root-level Commands
@@ -83,11 +96,9 @@ pnpm --filter server test:integration    # Run integration tests
 
 ### Imports
 
-- **Order**: builtin → external → internal → parent → sibling → index → object → type
-- **Newlines**: Always use newlines between import groups
-- **Alphabetize**: Sort alphabetically, case-insensitive
-- **No duplicates**: Combine imports from the same module
-- **Extensions**: Use `.js` extension in imports (TypeScript ESM requirement)
+**Pattern**: builtin → external → internal → parent → sibling → index → object → type
+
+Always use `.js` extension in imports (TypeScript ESM requirement). Import ordering and grouping enforced by `import/order` rule in `eslint.config.js`.
 
 Example:
 
@@ -103,60 +114,42 @@ import { TeamRepository } from '../../domain/repositories/team-repository.js';
 import type { FastifyInstance } from 'fastify';
 ```
 
-### Formatting (Prettier)
+### Formatting
 
-- **Semicolons**: Yes
-- **Quotes**: Single quotes
-- **Trailing commas**: All
-- **Print width**: 100 characters
-- **Tab width**: 2 spaces
-- **Arrow parens**: Always
+All code is formatted according to `.prettierrc.json`. Run `pnpm format` before committing. The pre-commit hook enforces this automatically.
 
 ### TypeScript
 
-- **Strict mode**: Enabled with all strict checks
-- **Return types**: Explicit return types required for all functions
-- **Module boundary types**: Must be exported
-- **No `any`**: Forbidden - use proper types
-- **No unsafe operations**: No unsafe assignments, calls, or returns
-- **Index access**: Must check for undefined (`noUncheckedIndexedAccess`)
+Strict mode enabled with full type safety. See `tsconfig.json` and `apps/*/tsconfig.json` for complete configuration.
 
-### Naming Conventions
+**Key principles:**
 
-- **Variables**: camelCase, UPPER_CASE (constants), PascalCase (components/classes)
-- **Functions**: camelCase or PascalCase
-- **Classes/Interfaces/Types**: PascalCase
-- **Enum members**: PascalCase or UPPER_CASE
-- **Leading underscore**: Allowed for unused parameters
-- **Trailing underscore**: Forbidden
+- Explicit return types required for all functions
+- No `any` types allowed
+- No unsafe operations (assignments, calls, returns)
+- Index access must check for undefined (`noUncheckedIndexedAccess`)
 
-### Complexity Limits
+### Complexity & Code Quality
 
-- **Cyclomatic complexity**: Max 10
-- **Cognitive complexity**: Max 15
-- **Max depth**: 4 levels
-- **Max lines per function**: 100 (excluding blanks/comments)
-- **Max statements**: 30 per function
-- **Max parameters**: 4 per function
-- **Max file lines**: 500 (excluding blanks/comments)
+Complexity limits and code quality rules are enforced by ESLint. See `eslint.config.js` for detailed configuration.
 
-### Code Quality Rules
+**Key principles:**
 
-- **No magic numbers**: Extract to named constants (except 0, 1, -1)
-- **No console.log**: Use console.warn or console.error only
-- **Prefer const**: Use const over let when possible
-- **No var**: Always use const or let
-- **Prefer template literals**: Use template strings over concatenation
-- **No nested ternaries**: Keep conditionals simple
-- **Early returns**: Prefer early returns over else blocks
-- **Async/await**: Always await promises, no floating promises
+- Extract complex logic into smaller functions (max complexity: 10)
+- Keep functions focused and testable (max 100 lines)
+- Use named constants instead of magic numbers
+- Prefer `const`, template literals, and early returns
+- Always await promises (no floating promises)
 
 ### Error Handling
 
-- **Custom errors**: Use domain-specific errors from `shared/errors/domain-errors.js`
-- **Types**: ValidationError, BusinessRuleViolationError, NotFoundError
-- **Error messages**: Clear, descriptive messages
-- **No silent failures**: Always handle or propagate errors
+Use domain-specific errors from `shared/errors/domain-errors.js`:
+
+- **ValidationError**: Invalid input or business rule violations
+- **BusinessRuleViolationError**: Domain constraint violations
+- **NotFoundError**: Resource not found
+
+Always provide clear error messages and handle/propagate errors explicitly. No silent failures.
 
 ## Architecture Rules (Server)
 
@@ -196,6 +189,10 @@ shared/              → Shared utilities (errors, types)
 - **Shared**: Cannot import from any other layer (isolated)
 - **Tests**: Can import from all layers
 - **Composition root** (`index.ts`): Can wire all layers together
+
+**Key principle**: Dependencies point inward. The domain layer has no external dependencies and contains pure business logic.
+
+**Enforcement**: Boundary violations will fail ESLint. See `eslint-plugin-boundaries` configuration in `eslint.config.js`.
 
 ### Entity Patterns
 
