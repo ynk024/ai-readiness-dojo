@@ -6,6 +6,7 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import { loadEnvironmentConfig } from './infrastructure/config/environment.js';
 import { registerDependencies } from './infrastructure/di/container.js';
 import { healthRoutes } from './presentation/routes/health.js';
+import { ingestRoutes } from './presentation/routes/ingest.routes.js';
 import { itemsRoutes } from './presentation/routes/items.routes.js';
 
 export async function buildServer(): Promise<FastifyInstance> {
@@ -38,6 +39,7 @@ export async function buildServer(): Promise<FastifyInstance> {
   // Register routes
   await fastify.register(healthRoutes);
   await fastify.register(itemsRoutes);
+  await fastify.register(ingestRoutes, { prefix: '/api' });
 
   return fastify;
 }
