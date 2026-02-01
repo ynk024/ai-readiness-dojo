@@ -10,7 +10,7 @@ import {
 } from '../../../src/domain/value-objects/repo-value-objects.js';
 import { TeamId, TeamSlug } from '../../../src/domain/value-objects/team-value-objects.js';
 
-import type { RepoMetadata } from '../../../src/application/mappers/ai-readiness-report-mapper.js';
+import type { RepoMetadata } from '../../../src/application/dto/repo-metadata.dto.js';
 import type { RepoRepository } from '../../../src/domain/repositories/repo-repository.js';
 import type { TeamRepository } from '../../../src/domain/repositories/team-repository.js';
 

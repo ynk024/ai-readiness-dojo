@@ -11,11 +11,12 @@ import {
 } from '../../../src/domain/value-objects/repo-value-objects.js';
 import { QuestKey } from '../../../src/domain/value-objects/scan-value-objects.js';
 import { TeamId, TeamSlug } from '../../../src/domain/value-objects/team-value-objects.js';
+import { toApplicationDto } from '../../../src/presentation/mappers/ingest-scan-run.mapper.js';
 
-import type { AiReadinessReport } from '../../../src/application/mappers/ai-readiness-report-mapper.js';
 import type { RepoRepository } from '../../../src/domain/repositories/repo-repository.js';
 import type { ScanRunRepository } from '../../../src/domain/repositories/scan-run-repository.js';
 import type { TeamRepository } from '../../../src/domain/repositories/team-repository.js';
+import type { IngestScanRequestDto } from '../../../src/presentation/dto/ingest-scan.dto.js';
 
 describe('IngestScanRunUseCase', () => {
   let teamRepository: TeamRepository;
@@ -23,7 +24,7 @@ describe('IngestScanRunUseCase', () => {
   let scanRunRepository: ScanRunRepository;
   let useCase: IngestScanRunUseCase;
 
-  const sampleReport: AiReadinessReport = {
+  const sampleReport: IngestScanRequestDto = {
     metadata: {
       repository: {
         name: 'ynk024/Workouttrackerdesign',
@@ -123,7 +124,7 @@ describe('IngestScanRunUseCase', () => {
       vi.mocked(scanRunRepository.save).mockImplementation(async (scanRun) => scanRun);
 
       // Act
-      const result = await useCase.execute(sampleReport);
+      const result = await useCase.execute(toApplicationDto(sampleReport));
 
       // Assert
       expect(result.teamId).toBe('team_ynk024');
@@ -144,7 +145,7 @@ describe('IngestScanRunUseCase', () => {
       vi.mocked(scanRunRepository.save).mockImplementation(async (scanRun) => scanRun);
 
       // Act
-      const result = await useCase.execute(sampleReport);
+      const result = await useCase.execute(toApplicationDto(sampleReport));
 
       // Assert
       expect(result.teamId).toBe('team_ynk024');
@@ -186,7 +187,7 @@ describe('IngestScanRunUseCase', () => {
       });
 
       // Act
-      await useCase.execute(sampleReport);
+      await useCase.execute(toApplicationDto(sampleReport));
 
       // Assert
       expect(savedScanRun).not.toBeNull();
@@ -234,7 +235,7 @@ describe('IngestScanRunUseCase', () => {
       });
 
       // Act
-      await useCase.execute(sampleReport);
+      await useCase.execute(toApplicationDto(sampleReport));
 
       // Assert
       expect(savedScanRun).not.toBeNull();
@@ -281,10 +282,10 @@ describe('IngestScanRunUseCase', () => {
       vi.mocked(scanRunRepository.save).mockImplementation(async (scanRun) => scanRun);
 
       // Act
-      const result1 = await useCase.execute(sampleReport);
+      const result1 = await useCase.execute(toApplicationDto(sampleReport));
       // Add tiny delay to ensure different timestamp
       await new Promise((resolve) => setTimeout(resolve, 2));
-      const result2 = await useCase.execute(sampleReport);
+      const result2 = await useCase.execute(toApplicationDto(sampleReport));
 
       // Assert
       expect(result1.scanRunId).not.toBe(result2.scanRunId);
@@ -294,7 +295,7 @@ describe('IngestScanRunUseCase', () => {
 
     it('should handle reports with minimal checks', async () => {
       // Arrange
-      const minimalReport: AiReadinessReport = {
+      const minimalReport: IngestScanRequestDto = {
         metadata: sampleReport.metadata,
         checks: {
           documentation: {
@@ -328,7 +329,7 @@ describe('IngestScanRunUseCase', () => {
       vi.mocked(scanRunRepository.save).mockImplementation(async (scanRun) => scanRun);
 
       // Act
-      const result = await useCase.execute(minimalReport);
+      const result = await useCase.execute(toApplicationDto(minimalReport));
 
       // Assert
       expect(result.summary.totalQuests).toBe(1);
@@ -363,7 +364,7 @@ describe('IngestScanRunUseCase', () => {
       vi.mocked(scanRunRepository.save).mockImplementation(async (scanRun) => scanRun);
 
       // Act
-      const result = await useCase.execute(sampleReport);
+      const result = await useCase.execute(toApplicationDto(sampleReport));
 
       // Assert
       expect(result.summary).toEqual({

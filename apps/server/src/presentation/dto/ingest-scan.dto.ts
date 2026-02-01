@@ -1,5 +1,3 @@
-import type { AiReadinessReport } from '../../application/mappers/ai-readiness-report-mapper.js';
-
 /**
  * Ingest Scan DTOs (Data Transfer Objects)
  *
@@ -9,9 +7,46 @@ import type { AiReadinessReport } from '../../application/mappers/ai-readiness-r
 
 /**
  * Request DTO for ingesting a scan run
- * Matches the external AI-Readiness report format
+ * Matches the external AI-Readiness report format from the ai-readiness-action
  */
-export type IngestScanRequestDto = AiReadinessReport;
+export interface IngestScanRequestDto {
+  metadata: {
+    repository: {
+      name: string; // Format: "owner/repo-name"
+      url: string;
+      commit_sha: string;
+      branch: string;
+      run_id: string;
+      run_url: string;
+    };
+    timestamp: string; // ISO 8601 format
+    workflow_version: string;
+  };
+  checks: {
+    documentation?: {
+      agents_md?: { present: boolean };
+      skill_md?: { count: number };
+    };
+    formatters?: {
+      javascript?: {
+        prettier?: { present: boolean };
+      };
+    };
+    linting?: {
+      javascript?: {
+        eslint?: { present: boolean };
+      };
+    };
+    sast?: {
+      codeql?: { present: boolean };
+      semgrep?: { present: boolean };
+    };
+    test_coverage?: {
+      available: boolean;
+      meets_threshold: boolean;
+    };
+  };
+}
 
 /**
  * Response DTO for scan ingestion

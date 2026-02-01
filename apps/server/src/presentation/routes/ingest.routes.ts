@@ -1,3 +1,5 @@
+import { toApplicationDto } from '../mappers/ingest-scan-run.mapper.js';
+
 import type { IngestScanRequestDto, IngestScanResponseDto } from '../dto/ingest-scan.dto.js';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
@@ -52,8 +54,11 @@ async function ingestScan(
     // Create use case instance using decorated factory
     const useCase = fastify.useCases.ingestScanRun();
 
+    // Map HTTP DTO to application DTO
+    const applicationDto = toApplicationDto(request.body);
+
     // Execute use case
-    const result = await useCase.execute(request.body);
+    const result = await useCase.execute(applicationDto);
 
     // Return response
     return await reply.code(HTTP_OK).send({

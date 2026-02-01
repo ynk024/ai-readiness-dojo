@@ -1,14 +1,11 @@
 import { ScanRun } from '../../domain/entities/scan-run.js';
 import { ScanRunId, CommitSha } from '../../domain/value-objects/scan-value-objects.js';
-import {
-  AiReadinessReportMapper,
-  type AiReadinessReport,
-} from '../mappers/ai-readiness-report-mapper.js';
 import { TeamRepoResolver } from '../services/team-repo-resolver.js';
 
 import type { RepoRepository } from '../../domain/repositories/repo-repository.js';
 import type { ScanRunRepository } from '../../domain/repositories/scan-run-repository.js';
 import type { TeamRepository } from '../../domain/repositories/team-repository.js';
+import type { IngestScanRunDto } from '../dto/ingest-scan-run.dto.js';
 
 /**
  * Result of ingesting a scan run
@@ -28,11 +25,10 @@ export interface IngestScanRunResult {
  * Use case for ingesting AI-Readiness scan runs.
  *
  * Orchestrates the full ingestion flow:
- * 1. Extract metadata and quest results from AI-Readiness report
- * 2. Resolve or create team and repo
- * 3. Create ScanRun entity with quest results
- * 4. Persist ScanRun to repository
- * 5. Return summary with IDs and quest counts
+ * 1. Resolve or create team and repo
+ * 2. Create ScanRun entity with quest results
+ * 3. Persist ScanRun to repository
+ * 4. Return summary with IDs and quest counts
  */
 export class IngestScanRunUseCase {
   private readonly teamRepoResolver: TeamRepoResolver;
@@ -48,38 +44,34 @@ export class IngestScanRunUseCase {
   /**
    * Execute the scan run ingestion use case
    *
-   * @param report - AI-Readiness report from GitHub Action
+   * @param dto - Scan run data transfer object
    * @returns Ingestion result with IDs and summary
    */
-  async execute(report: AiReadinessReport): Promise<IngestScanRunResult> {
-    // Step 1: Extract metadata and quest results from report
-    const metadata = AiReadinessReportMapper.extractRepoMetadata(report);
-    const questResults = AiReadinessReportMapper.extractQuestResults(report);
+  async execute(dto: IngestScanRunDto): Promise<IngestScanRunResult> {
+    // Step 1: Resolve or create team and repo
+    const { team, repo } = await this.teamRepoResolver.resolveFromMetadata(dto.metadata);
 
-    // Step 2: Resolve or create team and repo
-    const { team, repo } = await this.teamRepoResolver.resolveFromMetadata(metadata);
+    // Step 2: Generate unique scan run ID
+    const scanRunId = this.generateScanRunId(dto.metadata.providerRunId);
 
-    // Step 3: Generate unique scan run ID
-    const scanRunId = this.generateScanRunId(metadata.providerRunId);
-
-    // Step 4: Create ScanRun entity
+    // Step 3: Create ScanRun entity
     const scanRun = ScanRun.create({
       id: scanRunId,
       teamId: team.id,
       repoId: repo.id,
-      commitSha: CommitSha.create(metadata.commitSha),
-      refName: metadata.refName,
-      providerRunId: metadata.providerRunId,
-      runUrl: metadata.runUrl,
-      workflowVersion: metadata.workflowVersion,
-      scannedAt: metadata.scannedAt,
-      questResults,
+      commitSha: CommitSha.create(dto.metadata.commitSha),
+      refName: dto.metadata.refName,
+      providerRunId: dto.metadata.providerRunId,
+      runUrl: dto.metadata.runUrl,
+      workflowVersion: dto.metadata.workflowVersion,
+      scannedAt: dto.metadata.scannedAt,
+      questResults: dto.questResults,
     });
 
-    // Step 5: Persist scan run
+    // Step 4: Persist scan run
     await this.scanRunRepository.save(scanRun);
 
-    // Step 6: Return result with summary
+    // Step 5: Return result with summary
     return {
       scanRunId: scanRun.id.value,
       teamId: team.id.value,

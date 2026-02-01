@@ -5,7 +5,7 @@ import { TeamId, TeamSlug } from '../../domain/value-objects/team-value-objects.
 
 import type { RepoRepository } from '../../domain/repositories/repo-repository.js';
 import type { TeamRepository } from '../../domain/repositories/team-repository.js';
-import type { RepoMetadata } from '../mappers/ai-readiness-report-mapper.js';
+import type { RepoMetadata } from '../dto/repo-metadata.dto.js';
 
 /**
  * Result of resolving team and repo from metadata

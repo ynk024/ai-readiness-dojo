@@ -1,74 +1,19 @@
 import { QuestStatus } from '../../domain/value-objects/scan-value-objects.js';
 
-/**
- * Type definition for AI-Readiness Report JSON structure
- * This represents the external format from the ai-readiness-action
- */
-export interface AiReadinessReport {
-  metadata: {
-    repository: {
-      name: string; // Format: "owner/repo-name"
-      url: string;
-      commit_sha: string;
-      branch: string;
-      run_id: string;
-      run_url: string;
-    };
-    timestamp: string; // ISO 8601 format
-    workflow_version: string;
-  };
-  checks: {
-    documentation?: {
-      agents_md?: { present: boolean };
-      skill_md?: { count: number };
-    };
-    formatters?: {
-      javascript?: {
-        prettier?: { present: boolean };
-      };
-    };
-    linting?: {
-      javascript?: {
-        eslint?: { present: boolean };
-      };
-    };
-    sast?: {
-      codeql?: { present: boolean };
-      semgrep?: { present: boolean };
-    };
-    test_coverage?: {
-      available: boolean;
-      meets_threshold: boolean;
-    };
-  };
-}
-
-/**
- * Repository metadata extracted from AI-Readiness Report
- */
-export interface RepoMetadata {
-  owner: string;
-  name: string;
-  fullName: string;
-  url: string;
-  commitSha: string;
-  refName: string;
-  providerRunId: string;
-  runUrl: string;
-  workflowVersion: string;
-  scannedAt: Date;
-}
+import type { IngestScanRunDto } from '../../application/dto/ingest-scan-run.dto.js';
+import type { RepoMetadata } from '../../application/dto/repo-metadata.dto.js';
+import type { IngestScanRequestDto } from '../dto/ingest-scan.dto.js';
 
 const EXPECTED_NAME_PARTS = 2;
 
 /**
- * Extract repository metadata from AI-Readiness Report
- * @param report - The AI-Readiness report
+ * Extract repository metadata from ingest scan request
+ * @param request - The ingest scan request DTO
  * @returns Repository metadata
  * @throws Error if repository name format is invalid or timestamp is invalid
  */
-function extractRepoMetadata(report: AiReadinessReport): RepoMetadata {
-  const { repository, timestamp, workflow_version: workflowVersion } = report.metadata;
+function extractRepoMetadata(request: IngestScanRequestDto): RepoMetadata {
+  const { repository, timestamp, workflow_version: workflowVersion } = request.metadata;
 
   // Parse repository name (format: "owner/repo-name")
   const nameParts = repository.name.split('/');
@@ -104,7 +49,7 @@ function extractRepoMetadata(report: AiReadinessReport): RepoMetadata {
  */
 function addDocumentationResults(
   results: Map<string, QuestStatus>,
-  documentation: AiReadinessReport['checks']['documentation'],
+  documentation: IngestScanRequestDto['checks']['documentation'],
 ): void {
   if (documentation?.agents_md !== undefined) {
     const status = documentation.agents_md.present ? QuestStatus.pass() : QuestStatus.fail();
@@ -124,7 +69,7 @@ function addDocumentationResults(
  */
 function addFormatterResults(
   results: Map<string, QuestStatus>,
-  formatters: AiReadinessReport['checks']['formatters'],
+  formatters: IngestScanRequestDto['checks']['formatters'],
 ): void {
   if (formatters?.javascript?.prettier !== undefined) {
     const status = formatters.javascript.prettier.present ? QuestStatus.pass() : QuestStatus.fail();
@@ -137,7 +82,7 @@ function addFormatterResults(
  */
 function addLintingResults(
   results: Map<string, QuestStatus>,
-  linting: AiReadinessReport['checks']['linting'],
+  linting: IngestScanRequestDto['checks']['linting'],
 ): void {
   if (linting?.javascript?.eslint !== undefined) {
     const status = linting.javascript.eslint.present ? QuestStatus.pass() : QuestStatus.fail();
@@ -150,7 +95,7 @@ function addLintingResults(
  */
 function addSastResults(
   results: Map<string, QuestStatus>,
-  sast: AiReadinessReport['checks']['sast'],
+  sast: IngestScanRequestDto['checks']['sast'],
 ): void {
   if (sast?.codeql !== undefined) {
     const status = sast.codeql.present ? QuestStatus.pass() : QuestStatus.fail();
@@ -168,7 +113,7 @@ function addSastResults(
  */
 function addCoverageResults(
   results: Map<string, QuestStatus>,
-  coverage: AiReadinessReport['checks']['test_coverage'],
+  coverage: IngestScanRequestDto['checks']['test_coverage'],
 ): void {
   if (coverage?.available !== undefined) {
     const status = coverage.available ? QuestStatus.pass() : QuestStatus.fail();
@@ -182,7 +127,7 @@ function addCoverageResults(
 }
 
 /**
- * Extract quest results from AI-Readiness Report checks
+ * Extract quest results from ingest scan request checks
  * Maps the nested checks structure to flat quest keys with pass/fail/unknown status
  *
  * Quest key mapping:
@@ -195,12 +140,12 @@ function addCoverageResults(
  * - test_coverage.available → "quality.coverage_available"
  * - test_coverage.meets_threshold → "quality.coverage_threshold_met"
  *
- * @param report - The AI-Readiness report
+ * @param request - The ingest scan request DTO
  * @returns Map of quest keys to quest status
  */
-function extractQuestResults(report: AiReadinessReport): Map<string, QuestStatus> {
+function extractQuestResults(request: IngestScanRequestDto): Map<string, QuestStatus> {
   const results = new Map<string, QuestStatus>();
-  const { checks } = report;
+  const { checks } = request;
 
   addDocumentationResults(results, checks.documentation);
   addFormatterResults(results, checks.formatters);
@@ -212,10 +157,20 @@ function extractQuestResults(report: AiReadinessReport): Map<string, QuestStatus
 }
 
 /**
- * Mapper for transforming AI-Readiness Reports from external JSON format
- * to domain types (value objects, entities)
+ * Map IngestScanRequestDto (HTTP format) to IngestScanRunDto (application format)
+ *
+ * Transforms HTTP request DTOs into application-layer DTOs.
+ * This sits at the boundary between presentation and application layers.
+ *
+ * @param request - Ingest scan request from HTTP
+ * @returns Application-layer DTO ready for use case execution
  */
-export const AiReadinessReportMapper = {
-  extractRepoMetadata,
-  extractQuestResults,
-};
+export function toApplicationDto(request: IngestScanRequestDto): IngestScanRunDto {
+  const metadata = extractRepoMetadata(request);
+  const questResults = extractQuestResults(request);
+
+  return {
+    metadata,
+    questResults,
+  };
+}
