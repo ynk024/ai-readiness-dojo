@@ -124,7 +124,8 @@
     "infrastructure/persistence/firestore/firestore-client.ts",
     "presentation/routes/health.ts",
     "presentation/routes/ingest.routes.ts",
-    "presentation/routes/items.routes.ts"
+    "presentation/routes/items.routes.ts",
+    "presentation/routes/quests.routes.ts"
   ],
   "infrastructure/config/environment.ts": [],
   "infrastructure/config/firebase.config.ts": [
@@ -236,6 +237,9 @@
     "domain/item/item.ts",
     "presentation/dto/item.dto.ts",
     "shared/errors/domain-errors.ts"
+  ],
+  "presentation/routes/quests.routes.ts": [
+    "presentation/dto/quest.dto.ts"
   ],
   "shared/base-repository.ts": [],
   "shared/errors/domain-errors.ts": []
