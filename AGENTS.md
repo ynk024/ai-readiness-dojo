@@ -238,193 +238,32 @@ export class Team {
 
 ## Dependency Analysis with Madge
 
-This project uses **madge** to analyze module dependencies, enforce architectural quality, and detect coupling issues.
+This project uses **madge** to detect circular dependencies, generate dependency graphs, and analyze coupling. See `docs/dependencies/README.md` for detailed documentation.
 
-### Three modes of operation
-
-1. **Circular Dependency Detection** (`circular:check`) - Fast, blocking, runs in pre-commit
-2. **Dependency Graph Generation** (`deps:graph`) - Full analysis, runs in pre-commit, committed to repo
-3. **Coupling Analysis** (`deps:check-coupling`) - Warns about complexity, runs in pre-commit
-
-### Git Hooks Integration
-
-**Pre-commit hook:**
-
-- ✅ Runs `deps:graph` (generates graphs and stages them)
-- ✅ Runs `circular:check` (blocking - prevents commit if circular deps found)
-- ✅ Runs `deps:check-coupling` (warnings only - non-blocking)
-- ✅ Graphs are committed alongside code changes
-
-### Circular Dependency Checks
+### Commands
 
 ```bash
-# Check both apps (runs in pre-commit hook)
-pnpm circular:check
+# Check for circular dependencies (blocks commits)
+pnpm circular:check              # Check both client and server
+pnpm circular:check:client       # Client only
+pnpm circular:check:server       # Server only
 
-# Check specific app
-pnpm circular:check:client
-pnpm circular:check:server
+# Generate dependency graphs (committed to git)
+pnpm deps:graph                  # Generate both graphs
+pnpm deps:graph:client           # Client only
+pnpm deps:graph:server           # Server only
+
+# Analyze coupling (warnings only)
+pnpm deps:check-coupling         # Analyze both apps
 ```
 
-**Exit codes:**
+### Key Points
 
-- `0` - No circular dependencies found ✅
-- `1` - Circular dependencies detected ❌ (blocks commit)
-
-**Reports:** Output to `/tmp/client-circular.json` and `/tmp/server-circular.json` (NOT persisted in git)
-
-- Empty array `[]` = No circular dependencies
-- Non-empty array = Circular dependency chains found
-
-**Note:** Circular reports are not committed because they're always empty for successful commits (pre-commit hook blocks any circular dependencies).
-
-**Example circular dependency report:**
-
-```json
-[
-  ["src/components/A.svelte", "src/components/B.svelte", "src/components/A.svelte"],
-  ["src/services/foo.ts", "src/services/bar.ts", "src/services/foo.ts"]
-]
-```
-
-### Dependency Graph Generation
-
-```bash
-# Generate graphs for both apps (runs in pre-commit hook)
-pnpm deps:graph
-
-# Generate for specific app
-pnpm deps:graph:client
-pnpm deps:graph:server
-```
-
-**Reports:** `docs/dependencies/client-deps.json` and `docs/dependencies/server-deps.json`
-
-**JSON structure:**
-
-```json
-{
-  "apps/server/src/index.ts": [
-    "apps/server/src/infrastructure/config/environment.js",
-    "apps/server/src/infrastructure/di/container.js"
-  ],
-  "apps/server/src/domain/entities/team.ts": [
-    "apps/server/src/domain/value-objects/team-value-objects.js",
-    "apps/server/src/shared/errors/domain-errors.js"
-  ]
-}
-```
-
-Each key is a source file, value is array of files it imports.
-
-### Coupling Analysis
-
-```bash
-# Analyze coupling (runs in pre-commit hook)
-pnpm deps:check-coupling
-```
-
-**What it checks:**
-
-- ⚠️ **High coupling**: Files importing >10 modules
-- 🔴 **Critical coupling**: Files importing >20 modules
-- ℹ️ **Core modules**: Files imported by >15 other files (high centrality)
-- 🔴 **Critical centrality**: Files imported by >30 other files
-- ℹ️ **Orphaned files**: Files with no imports/exports (potential dead code)
-
-**Output is non-blocking** - provides warnings and suggestions for improvement.
-
-**Example output:**
-
-```
-⚠️  Files with high coupling (imports >10 modules):
-  ⚠️  infrastructure/di/container.ts: 15 imports
-  🔴 presentation/routes/scan-runs.ts: 22 imports
-
-  💡 Consider: Extract shared logic, use dependency injection, or split into smaller modules
-
-⚠️  Core modules (imported by >15 files):
-  ℹ️  shared/errors/domain-errors.ts: imported by 18 files
-  🔴 domain/value-objects/team-value-objects.ts: imported by 32 files
-
-  💡 These are core modules - changes here have wide impact. Consider careful testing.
-
-📈 Server Summary:
-  • Total modules: 45
-  • High coupling: 2 files
-  • Core modules: 2 files
-  • Isolated files: 3 files
-```
-
-### Use Cases for Dependency Graphs
-
-**For AI agents:**
-
-- Understand module relationships before making changes
-- Identify impact radius of refactoring (core modules)
-- Find highly coupled modules that need decoupling
-- Verify layer boundaries are respected (hexagonal architecture)
-- Discover orphaned or isolated modules (dead code candidates)
-
-**For CI/CD:**
-
-- Graphs are committed with code changes (in git history)
-- Track coupling metrics over time via git log
-- Analyze dependency evolution between commits
-- Detect architectural drift in pull requests
-
-### Analyzing Dependency Graphs with jq
-
-**Note:** These examples require `jq` (JSON query tool) to be installed separately.
-
-```bash
-# Find files with most dependencies (coupling hotspots)
-cat docs/dependencies/server-deps.json | jq 'to_entries | map({file: .key, deps: (.value | length)}) | sort_by(.deps) | reverse | .[0:10]'
-
-# Find files imported by many others (core modules)
-cat docs/dependencies/server-deps.json | jq '[.[] | .[] ] | group_by(.) | map({file: .[0], importedBy: length}) | sort_by(.importedBy) | reverse'
-
-# Check specific file's dependencies
-cat docs/dependencies/server-deps.json | jq '.["apps/server/src/domain/entities/team.ts"]'
-
-# Count total modules
-cat docs/dependencies/server-deps.json | jq 'keys | length'
-
-# Find orphaned files (no dependencies)
-cat docs/dependencies/server-deps.json | jq 'to_entries | map(select(.value | length == 0)) | map(.key)'
-```
-
-### Common Circular Dependency Patterns to Avoid
-
-1. **Entity ↔ Repository cycles**: Entities should NOT import repositories
-2. **Service ↔ Service cycles**: Break with interfaces or events
-3. **Component ↔ Component cycles**: Extract shared logic to utilities
-4. **Layer boundary violations**: Respect hexagonal architecture layers (see above)
-
-### When to Generate Dependency Graphs
-
-- Automatically on every commit (pre-commit hook)
-- Before major refactoring to understand impact
-- When reviewing architecture for AI-readiness
-- During code reviews to assess coupling
-- When onboarding to understand system structure
-- After adding new features to verify layer boundaries
-
-### Coupling Thresholds
-
-These are configured in `scripts/check-coupling.js`:
-
-**Dependency count (outbound coupling):**
-
-- `COUPLING_THRESHOLDS.high: 10` - Warning threshold
-- `COUPLING_THRESHOLDS.critical: 20` - Critical threshold
-
-**Centrality (inbound coupling):**
-
-- `CENTRALITY_THRESHOLDS.high: 15` - Warning threshold
-- `CENTRALITY_THRESHOLDS.critical: 30` - Critical threshold
-
-Adjust these based on your project's complexity and architectural goals.
+- **Pre-commit hook** runs all checks automatically
+- **Circular dependencies** block commits (output to `/tmp/`)
+- **Dependency graphs** committed to `docs/dependencies/` for historical tracking
+- **Coupling analysis** provides non-blocking warnings about complexity
+- See `docs/dependencies/README.md` for JSON structure, use cases, and jq query examples
 
 ## Common Patterns
 
