@@ -36,15 +36,15 @@ export function initializeTestFirestore(): FirestoreClient {
 }
 
 /**
- * Clears all documents from the items collection
+ * Clears all documents from a collection
  * Should be called in afterEach() to ensure test isolation
  */
-export async function clearItemsCollection(): Promise<void> {
+export async function clearCollection(collectionName: string): Promise<void> {
   if (!firestoreClient) {
     throw new Error('Firestore client not initialized. Call initializeTestFirestore() first.');
   }
 
-  const collection = firestoreClient.collection(ITEMS_COLLECTION);
+  const collection = firestoreClient.collection(collectionName);
   const snapshot = await collection.get();
 
   // Use batch delete for efficiency
@@ -54,6 +54,14 @@ export async function clearItemsCollection(): Promise<void> {
   });
 
   await batch.commit();
+}
+
+/**
+ * Clears all documents from the items collection
+ * Should be called in afterEach() to ensure test isolation
+ */
+export async function clearItemsCollection(): Promise<void> {
+  return clearCollection(ITEMS_COLLECTION);
 }
 
 /**

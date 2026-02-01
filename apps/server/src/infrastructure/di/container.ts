@@ -1,8 +1,14 @@
 import { FirebaseConfig } from '../config/firebase.config.js';
 import { FirestoreClient } from '../persistence/firestore/firestore-client.js';
 import { FirestoreItemRepository } from '../persistence/firestore/repositories/firestore-item-repository.js';
+import { FirestoreRepoRepository } from '../persistence/firestore/repositories/firestore-repo-repository.js';
+import { FirestoreScanRunRepository } from '../persistence/firestore/repositories/firestore-scan-run-repository.js';
+import { FirestoreTeamRepository } from '../persistence/firestore/repositories/firestore-team-repository.js';
 
 import type { ItemRepository } from '../../domain/repositories/item-repository.js';
+import type { RepoRepository } from '../../domain/repositories/repo-repository.js';
+import type { ScanRunRepository } from '../../domain/repositories/scan-run-repository.js';
+import type { TeamRepository } from '../../domain/repositories/team-repository.js';
 import type { EnvironmentConfig } from '../config/environment.js';
 import type { FastifyInstance } from 'fastify';
 
@@ -17,6 +23,9 @@ import type { FastifyInstance } from 'fastify';
 declare module 'fastify' {
   interface FastifyInstance {
     itemRepository: ItemRepository;
+    teamRepository: TeamRepository;
+    repoRepository: RepoRepository;
+    scanRunRepository: ScanRunRepository;
     firebaseConfig: FirebaseConfig;
     firestoreClient: FirestoreClient;
   }
@@ -39,6 +48,15 @@ export function registerDependencies(fastify: FastifyInstance, config: Environme
   // Register repositories (driven adapters)
   const itemRepository = new FirestoreItemRepository(firestoreClient);
   fastify.decorate('itemRepository', itemRepository);
+
+  const teamRepository = new FirestoreTeamRepository(firestoreClient);
+  fastify.decorate('teamRepository', teamRepository);
+
+  const repoRepository = new FirestoreRepoRepository(firestoreClient);
+  fastify.decorate('repoRepository', repoRepository);
+
+  const scanRunRepository = new FirestoreScanRunRepository(firestoreClient);
+  fastify.decorate('scanRunRepository', scanRunRepository);
 
   // Register cleanup hook
   fastify.addHook('onClose', async () => {
