@@ -48,6 +48,9 @@ pnpm circular:check:server   # Check server only (includes .ts files)
 pnpm deps:graph              # Generate full dependency graphs for both apps
 pnpm deps:graph:client       # Generate client dependency graph
 pnpm deps:graph:server       # Generate server dependency graph
+pnpm deps:metrics            # Generate code quality metrics for both apps
+pnpm deps:metrics:client     # Generate client metrics only
+pnpm deps:metrics:server     # Generate server metrics only
 pnpm deps:check-coupling     # Analyze coupling and warn about complexity
 ```
 
@@ -253,15 +256,79 @@ pnpm deps:graph                  # Generate both graphs
 pnpm deps:graph:client           # Client only
 pnpm deps:graph:server           # Server only
 
+# Generate code quality metrics (committed to git)
+pnpm deps:metrics                # Generate both metrics reports
+pnpm deps:metrics:client         # Client only
+pnpm deps:metrics:server         # Server only
+
 # Analyze coupling (warnings only)
 pnpm deps:check-coupling         # Analyze both apps
 ```
+
+### Code Quality Metrics
+
+Automatically generated metrics reports analyze code quality based on dependency graphs:
+
+**Metrics included:**
+
+- **Circular dependencies**: Count, cycle length, affected modules
+- **Coupling (fan-in/fan-out)**: Import/export relationships, God modules
+- **Dependency depth**: Longest chains, average depth
+- **Cohesion**: Per-directory internal vs external imports
+- **Graph complexity**: Node/edge counts, density, degree
+- **Health scores**: Overall and per-category (coupling, depth, cohesion, modularity)
+
+**Files generated:**
+
+- `docs/dependencies/client-metrics.json`
+- `docs/dependencies/server-metrics.json`
+
+**Quality gates:**
+
+- ❌ **BLOCKS commits**:
+  - Fan-out >20 (critical coupling)
+  - Dependency chain depth >8 (excessive depth)
+  - Graph density >30% (everything depends on everything)
+  - God modules (both fan-in and fan-out >15)
+- ⚠️ **Warns**:
+  - Fan-out 10-20 (high coupling)
+  - Fan-in >15 (high centrality)
+  - Dependency chain depth 6-8 (moderate depth)
+  - Graph density 20-30% (high density)
+- ℹ️ **Tracks**: All other metrics for visibility
+
+**Exemptions:**
+
+- DI containers (`**/di/container.ts`)
+- Entry points (`index.ts`, `main.ts`)
+
+These files are composition roots and naturally have high coupling.
+
+**Example queries:**
+
+```bash
+# Check overall health score
+jq '.summary.healthScore' docs/dependencies/server-metrics.json
+
+# Find refactoring candidates (high coupling)
+jq '[.coupling.highCoupling[], .coupling.criticalCoupling[]] | map(.file)' docs/dependencies/server-metrics.json
+
+# Check directory cohesion scores
+jq '.cohesion.byDirectory | to_entries | map({dir: .key, score: .value.cohesionScore}) | sort_by(.score)' docs/dependencies/server-metrics.json
+
+# Find deepest dependency chains
+jq '.topModules.deepest[0:5]' docs/dependencies/server-metrics.json
+```
+
+See `docs/dependencies/README.md` for complete metric explanations and more jq query examples.
 
 ### Key Points
 
 - **Pre-commit hook** runs all checks automatically
 - **Circular dependencies** block commits (output to `/tmp/`)
 - **Dependency graphs** committed to `docs/dependencies/` for historical tracking
+- **Metrics reports** committed to `docs/dependencies/` for trend analysis
+- **Critical violations** block commits (fan-out >20, depth >8, density >30%, God modules)
 - **Coupling analysis** provides non-blocking warnings about complexity
 - See `docs/dependencies/README.md` for JSON structure, use cases, and jq query examples
 

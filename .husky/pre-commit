@@ -12,14 +12,20 @@ pnpm circular:check || {
   exit 1
 }
 
+echo "\n📈 Generating code quality metrics..."
+pnpm deps:metrics || {
+  echo "❌ Critical code quality violations detected."
+  exit 1
+}
+
 echo "\n🔗 Checking for high coupling..."
 pnpm deps:check-coupling || {
   echo "⚠️  Warning: High coupling detected (see above)"
   # Don't exit - this is a warning only
 }
 
-echo "\n➕ Staging dependency graphs..."
-git add docs/dependencies/*-deps.json
+echo "\n➕ Staging dependency graphs and metrics..."
+git add docs/dependencies/*-deps.json docs/dependencies/*-metrics.json
 
 echo "\n🔎 Running linter..."
 pnpm lint || {

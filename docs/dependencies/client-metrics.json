@@ -1,0 +1,129 @@
+{
+  "metadata": {
+    "timestamp": "2026-02-01T12:52:39.612Z",
+    "app": "client",
+    "generator": "generate-metrics.js v1.0.0"
+  },
+  "summary": {
+    "totalModules": 5,
+    "totalDependencies": 2,
+    "graphDensity": 0.1,
+    "avgFanOut": 0.4,
+    "avgFanIn": 0.4,
+    "healthScore": 88,
+    "status": "PASS"
+  },
+  "circular": {
+    "cycleCount": 0,
+    "avgCycleLength": 0,
+    "modulesInCycles": 0,
+    "percentageInCycles": 0,
+    "cycles": []
+  },
+  "coupling": {
+    "avgFanOut": 0.4,
+    "maxFanOut": 2,
+    "maxFanOutFile": "main.ts",
+    "avgFanIn": 0.4,
+    "maxFanIn": 1,
+    "maxFanInFile": "App.svelte",
+    "criticalCoupling": [],
+    "highCoupling": [],
+    "godModules": []
+  },
+  "depth": {
+    "longestChain": 1,
+    "avgDepth": 0.2,
+    "criticalDepth": [],
+    "deepModules": []
+  },
+  "cohesion": {
+    "orphanedModules": [
+      "lib/Counter.svelte",
+      "vite-env.d.ts"
+    ],
+    "isolatedCount": 2,
+    "byDirectory": {
+      "./": {
+        "totalModules": 4,
+        "internalImports": 2,
+        "externalImports": 0,
+        "cohesionScore": 100
+      },
+      "lib/": {
+        "totalModules": 1,
+        "internalImports": 0,
+        "externalImports": 0,
+        "cohesionScore": 0
+      }
+    }
+  },
+  "graph": {
+    "nodeCount": 5,
+    "edgeCount": 2,
+    "density": 0.1,
+    "avgDegree": 0.8,
+    "maxPossibleEdges": 20
+  },
+  "topModules": {
+    "mostCoupled": [
+      {
+        "file": "main.ts",
+        "fanOut": 2,
+        "rank": 1
+      },
+      {
+        "file": "App.svelte",
+        "fanOut": 0,
+        "rank": 2
+      },
+      {
+        "file": "app.css",
+        "fanOut": 0,
+        "rank": 3
+      },
+      {
+        "file": "lib/Counter.svelte",
+        "fanOut": 0,
+        "rank": 4
+      },
+      {
+        "file": "vite-env.d.ts",
+        "fanOut": 0,
+        "rank": 5
+      }
+    ],
+    "mostDepended": [
+      {
+        "file": "App.svelte",
+        "fanIn": 1,
+        "rank": 1
+      },
+      {
+        "file": "app.css",
+        "fanIn": 1,
+        "rank": 2
+      }
+    ],
+    "deepest": [
+      {
+        "file": "main.ts",
+        "maxDepth": 1,
+        "rank": 1
+      }
+    ]
+  },
+  "violations": {
+    "critical": [],
+    "warnings": []
+  },
+  "healthScore": {
+    "overall": 88,
+    "breakdown": {
+      "coupling": 100,
+      "depth": 100,
+      "cohesion": 50,
+      "modularity": 100
+    }
+  }
+}

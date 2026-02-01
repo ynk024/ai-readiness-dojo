@@ -22,6 +22,9 @@
     "deps:graph": "pnpm deps:graph:client && pnpm deps:graph:server",
     "deps:graph:client": "madge --extensions ts,svelte --json apps/client/src > docs/dependencies/client-deps.json",
     "deps:graph:server": "madge --extensions ts --json apps/server/src > docs/dependencies/server-deps.json",
+    "deps:metrics": "node scripts/generate-metrics.js",
+    "deps:metrics:client": "node scripts/generate-metrics.js --app=client",
+    "deps:metrics:server": "node scripts/generate-metrics.js --app=server",
     "deps:check-coupling": "node scripts/check-coupling.js",
     "prepare": "husky"
   },
