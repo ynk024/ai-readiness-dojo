@@ -1,7 +1,11 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { buildServer } from '../../src/index.js';
-import { clearCollection, initializeTestFirestore } from '../helpers/firestore-test-helper.js';
+import {
+  createTestFirestoreClient,
+  teardownTestFirestore,
+  type IsolatedFirestoreClient,
+} from '../helpers/firestore-test-helper.js';
 
 import type { FastifyInstance } from 'fastify';
 
@@ -18,6 +22,7 @@ interface IngestScanResponseDto {
 
 describe('POST /api/ingest-scan - Integration Test', () => {
   let server: FastifyInstance;
+  let testFirestore: IsolatedFirestoreClient;
 
   // Sample AI-Readiness Report payload
   const sampleReport = {
@@ -56,23 +61,18 @@ describe('POST /api/ingest-scan - Integration Test', () => {
   };
 
   beforeAll(async () => {
-    // Initialize Firestore test client
-    initializeTestFirestore();
+    // Initialize isolated Firestore test client
+    testFirestore = createTestFirestoreClient('ingest_scan_test');
 
-    // Build server
-    server = await buildServer();
+    // Build server with test Firestore client
+    server = await buildServer(testFirestore);
     await server.ready();
-  });
-
-  afterEach(async () => {
-    // Clean up test data after each test
-    await clearCollection('teams');
-    await clearCollection('repos');
-    await clearCollection('scanRuns');
   });
 
   afterAll(async () => {
     await server.close();
+    // Clean up all test data
+    await teardownTestFirestore(testFirestore);
   });
 
   it('should return 200 and ingest scan run successfully', async () => {

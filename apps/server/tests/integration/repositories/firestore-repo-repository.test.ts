@@ -1,4 +1,4 @@
-import { afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import { Repo } from '../../../src/domain/entities/repo.js';
 import {
@@ -10,20 +10,27 @@ import { TeamId } from '../../../src/domain/value-objects/team-value-objects.js'
 import { FirestoreRepoRepository } from '../../../src/infrastructure/persistence/firestore/repositories/firestore-repo-repository.js';
 import {
   clearCollection,
+  createTestFirestoreClient,
   documentExists,
-  initializeTestFirestore,
+  teardownTestFirestore,
+  type IsolatedFirestoreClient,
 } from '../../helpers/firestore-test-helper.js';
 
 describe('FirestoreRepoRepository - Integration Tests', () => {
   let repository: FirestoreRepoRepository;
+  let testFirestore: IsolatedFirestoreClient;
 
   beforeAll(() => {
-    const firestoreClient = initializeTestFirestore();
-    repository = new FirestoreRepoRepository(firestoreClient);
+    testFirestore = createTestFirestoreClient('repo_repo_test');
+    repository = new FirestoreRepoRepository(testFirestore);
   });
 
   afterEach(async () => {
-    await clearCollection('repos');
+    await clearCollection('repos', testFirestore);
+  });
+
+  afterAll(async () => {
+    await teardownTestFirestore(testFirestore);
   });
 
   describe('save() and findById()', () => {
@@ -121,7 +128,7 @@ describe('FirestoreRepoRepository - Integration Tests', () => {
       await repository.save(repo);
       await repository.delete(RepoId.create('repo_testorg_myproject'));
 
-      const exists = await documentExists('repos', 'repo_testorg_myproject');
+      const exists = await documentExists('repos', 'repo_testorg_myproject', testFirestore);
       expect(exists).toBe(false);
     });
   });

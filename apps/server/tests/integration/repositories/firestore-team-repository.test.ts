@@ -1,4 +1,4 @@
-import { afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import { Team } from '../../../src/domain/entities/team.js';
 import { RepoId } from '../../../src/domain/value-objects/repo-value-objects.js';
@@ -6,9 +6,11 @@ import { TeamId, TeamSlug } from '../../../src/domain/value-objects/team-value-o
 import { FirestoreTeamRepository } from '../../../src/infrastructure/persistence/firestore/repositories/firestore-team-repository.js';
 import {
   clearCollection,
+  createTestFirestoreClient,
   documentExists,
   getCollectionCount,
-  initializeTestFirestore,
+  teardownTestFirestore,
+  type IsolatedFirestoreClient,
 } from '../../helpers/firestore-test-helper.js';
 
 /**
@@ -22,14 +24,20 @@ import {
 
 describe('FirestoreTeamRepository - Integration Tests', () => {
   let repository: FirestoreTeamRepository;
+  let testFirestore: IsolatedFirestoreClient;
 
   beforeAll(() => {
-    const firestoreClient = initializeTestFirestore();
-    repository = new FirestoreTeamRepository(firestoreClient);
+    testFirestore = createTestFirestoreClient('team_repo_test');
+    repository = new FirestoreTeamRepository(testFirestore);
   });
 
   afterEach(async () => {
-    await clearCollection('teams');
+    // Clear test data between tests in the same file
+    await clearCollection('teams', testFirestore);
+  });
+
+  afterAll(async () => {
+    await teardownTestFirestore(testFirestore);
   });
 
   describe('save() - Create Team', () => {
@@ -48,7 +56,7 @@ describe('FirestoreTeamRepository - Integration Tests', () => {
       expect(savedTeam.slug.value).toBe('test-organization');
       expect(savedTeam.repoIds).toHaveLength(0);
 
-      const exists = await documentExists('teams', 'team_testorg');
+      const exists = await documentExists('teams', 'team_testorg', testFirestore);
       expect(exists).toBe(true);
     });
 
@@ -84,7 +92,7 @@ describe('FirestoreTeamRepository - Integration Tests', () => {
       expect(updatedTeam.repoIds).toHaveLength(1);
 
       // Should still be only one document
-      const count = await getCollectionCount('teams');
+      const count = await getCollectionCount('teams', testFirestore);
       expect(count).toBe(1);
     });
   });
@@ -225,7 +233,7 @@ describe('FirestoreTeamRepository - Integration Tests', () => {
 
       await repository.delete(TeamId.create('team_testorg'));
 
-      const exists = await documentExists('teams', 'team_testorg');
+      const exists = await documentExists('teams', 'team_testorg', testFirestore);
       expect(exists).toBe(false);
 
       const foundTeam = await repository.findById(TeamId.create('team_testorg'));

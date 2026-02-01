@@ -1,4 +1,4 @@
-import { afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import { ScanRun } from '../../../src/domain/entities/scan-run.js';
 import { RepoId } from '../../../src/domain/value-objects/repo-value-objects.js';
@@ -11,20 +11,27 @@ import { TeamId } from '../../../src/domain/value-objects/team-value-objects.js'
 import { FirestoreScanRunRepository } from '../../../src/infrastructure/persistence/firestore/repositories/firestore-scan-run-repository.js';
 import {
   clearCollection,
+  createTestFirestoreClient,
   documentExists,
-  initializeTestFirestore,
+  teardownTestFirestore,
+  type IsolatedFirestoreClient,
 } from '../../helpers/firestore-test-helper.js';
 
 describe('FirestoreScanRunRepository - Integration Tests', () => {
   let repository: FirestoreScanRunRepository;
+  let testFirestore: IsolatedFirestoreClient;
 
   beforeAll(() => {
-    const firestoreClient = initializeTestFirestore();
-    repository = new FirestoreScanRunRepository(firestoreClient);
+    testFirestore = createTestFirestoreClient('scan_run_repo_test');
+    repository = new FirestoreScanRunRepository(testFirestore);
   });
 
   afterEach(async () => {
-    await clearCollection('scanRuns');
+    await clearCollection('scanRuns', testFirestore);
+  });
+
+  afterAll(async () => {
+    await teardownTestFirestore(testFirestore);
   });
 
   describe('save() and findById()', () => {
@@ -222,7 +229,7 @@ describe('FirestoreScanRunRepository - Integration Tests', () => {
       await repository.save(scanRun);
       await repository.delete(ScanRunId.create('scan_run_123'));
 
-      const exists = await documentExists('scanRuns', 'scan_run_123');
+      const exists = await documentExists('scanRuns', 'scan_run_123', testFirestore);
       expect(exists).toBe(false);
     });
   });

@@ -1,12 +1,14 @@
-import { afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import { ItemId } from '../../../src/domain/value-objects/item-value-objects.js';
 import { FirestoreItemRepository } from '../../../src/infrastructure/persistence/firestore/repositories/firestore-item-repository.js';
 import {
-  clearItemsCollection,
+  clearCollection,
+  createTestFirestoreClient,
   documentExists,
   getCollectionCount,
-  initializeTestFirestore,
+  teardownTestFirestore,
+  type IsolatedFirestoreClient,
 } from '../../helpers/firestore-test-helper.js';
 import { createTestItem, TEST_ITEMS } from '../../helpers/test-data-factory.js';
 
@@ -24,16 +26,22 @@ import { createTestItem, TEST_ITEMS } from '../../helpers/test-data-factory.js';
 
 describe('FirestoreItemRepository - Integration Tests', () => {
   let repository: FirestoreItemRepository;
+  let testFirestore: IsolatedFirestoreClient;
 
   beforeAll(() => {
-    // Initialize Firestore client for testing
-    const firestoreClient = initializeTestFirestore();
-    repository = new FirestoreItemRepository(firestoreClient);
+    // Initialize isolated Firestore client for this test file
+    testFirestore = createTestFirestoreClient('item_repo_test');
+    repository = new FirestoreItemRepository(testFirestore);
   });
 
   afterEach(async () => {
-    // Clear all test data after each test to ensure isolation
-    await clearItemsCollection();
+    // Clear test data between tests
+    await clearCollection('items', testFirestore);
+  });
+
+  afterAll(async () => {
+    // Clean up all test data created by this test file
+    await teardownTestFirestore(testFirestore);
   });
 
   describe('save() - Create Item', () => {
@@ -56,7 +64,7 @@ describe('FirestoreItemRepository - Integration Tests', () => {
       expect(savedItem.quantity).toBe(50);
 
       // Verify item was actually persisted to Firestore
-      const exists = await documentExists('items', 'integration-test-001');
+      const exists = await documentExists('items', 'integration-test-001', testFirestore);
       expect(exists).toBe(true);
     });
 
@@ -70,7 +78,7 @@ describe('FirestoreItemRepository - Integration Tests', () => {
       await repository.save(item2);
 
       // Assert
-      const count = await getCollectionCount('items');
+      const count = await getCollectionCount('items', testFirestore);
       expect(count).toBe(2);
     });
 

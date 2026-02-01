@@ -37,16 +37,39 @@ declare module 'fastify' {
 
 /**
  * Registers all dependencies with the Fastify instance
+ *
+ * @param fastify - Fastify instance
+ * @param config - Environment configuration
+ * @param testFirestoreClient - Optional Firestore client for testing (overrides default)
  */
-export function registerDependencies(fastify: FastifyInstance, config: EnvironmentConfig): void {
-  // Initialize Firebase
-  const firebaseConfig = new FirebaseConfig(config);
-  firebaseConfig.initialize();
-  fastify.decorate('firebaseConfig', firebaseConfig);
+export function registerDependencies(
+  fastify: FastifyInstance,
+  config: EnvironmentConfig,
+  testFirestoreClient?: FirestoreClient,
+): void {
+  let firestoreClient: FirestoreClient;
 
-  // Create Firestore client
-  const firestore = firebaseConfig.getFirestore();
-  const firestoreClient = new FirestoreClient(firestore);
+  if (testFirestoreClient) {
+    // Use provided test client (for integration tests)
+    firestoreClient = testFirestoreClient;
+    // Note: We don't initialize Firebase or add cleanup hooks when using test client
+  } else {
+    // Initialize Firebase (production/normal flow)
+    const firebaseConfig = new FirebaseConfig(config);
+    firebaseConfig.initialize();
+    fastify.decorate('firebaseConfig', firebaseConfig);
+
+    // Create Firestore client
+    const firestore = firebaseConfig.getFirestore();
+    firestoreClient = new FirestoreClient(firestore);
+
+    // Register cleanup hook
+    fastify.addHook('onClose', async () => {
+      await firebaseConfig.close();
+    });
+  }
+
+  // Decorate Firestore client
   fastify.decorate('firestoreClient', firestoreClient);
 
   // Register repositories (driven adapters)
@@ -66,10 +89,5 @@ export function registerDependencies(fastify: FastifyInstance, config: Environme
   fastify.decorate('useCases', {
     ingestScanRun: () =>
       new IngestScanRunUseCase(teamRepository, repoRepository, scanRunRepository),
-  });
-
-  // Register cleanup hook
-  fastify.addHook('onClose', async () => {
-    await firebaseConfig.close();
   });
 }

@@ -5,11 +5,12 @@ import Fastify, { type FastifyInstance } from 'fastify';
 
 import { loadEnvironmentConfig } from './infrastructure/config/environment.js';
 import { registerDependencies } from './infrastructure/di/container.js';
+import { FirestoreClient } from './infrastructure/persistence/firestore/firestore-client.js';
 import { healthRoutes } from './presentation/routes/health.js';
 import { ingestRoutes } from './presentation/routes/ingest.routes.js';
 import { itemsRoutes } from './presentation/routes/items.routes.js';
 
-export async function buildServer(): Promise<FastifyInstance> {
+export async function buildServer(testFirestoreClient?: FirestoreClient): Promise<FastifyInstance> {
   // Load and validate environment configuration
   const config = loadEnvironmentConfig();
 
@@ -34,7 +35,7 @@ export async function buildServer(): Promise<FastifyInstance> {
   });
 
   // Register dependencies (DI container - composition root)
-  registerDependencies(fastify, config);
+  registerDependencies(fastify, config, testFirestoreClient);
 
   // Register routes
   await fastify.register(healthRoutes);
