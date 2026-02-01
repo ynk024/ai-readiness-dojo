@@ -329,6 +329,7 @@ export default tseslint.config(
       'object-shorthand': 'error',
       'no-useless-concat': 'error',
       'no-useless-return': 'error',
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       'require-await': 'off', // Turned off in favor of TypeScript rule
       '@typescript-eslint/require-await': 'error',
       '@typescript-eslint/no-floating-promises': 'error',
@@ -340,6 +341,10 @@ export default tseslint.config(
             arguments: false,
           },
         },
+      ],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
     },
   },

@@ -77,7 +77,7 @@ export class FirestoreRepoRepository implements RepoRepository {
     return entity;
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await, @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/require-await
   async update(_id: RepoId, _partial: Partial<Repo>): Promise<Repo> {
     throw new Error(
       'Repo.update() is not supported. Use domain methods (archive/unarchive/updateDefaultBranch) and then save() instead.',

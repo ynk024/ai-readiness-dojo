@@ -89,15 +89,6 @@ export function createTestFirestoreClient(testPrefix: string): IsolatedFirestore
 }
 
 /**
- * DEPRECATED: Use createTestFirestoreClient() instead
- * Kept for backward compatibility during migration
- */
-export function initializeTestFirestore(): FirestoreClient {
-  const firestore = initializeBaseFirestore();
-  return new FirestoreClient(firestore);
-}
-
-/**
  * Clears all documents from a collection
  * Should be called in afterEach() to ensure test isolation
  */
@@ -105,7 +96,7 @@ export async function clearCollection(
   collectionName: string,
   client?: FirestoreClient,
 ): Promise<void> {
-  const firestoreClient = client ?? initializeTestFirestore();
+  const firestoreClient = client ?? createTestFirestoreClient('default');
 
   const collection = firestoreClient.collection(collectionName);
   const snapshot = await collection.get();
@@ -128,14 +119,6 @@ export async function clearItemsCollection(client?: FirestoreClient): Promise<vo
 }
 
 /**
- * DEPRECATED: Use the client instance passed to tests instead
- * Kept for backward compatibility during migration
- */
-export function getTestFirestoreClient(): FirestoreClient {
-  return initializeTestFirestore();
-}
-
-/**
  * Verifies that a document exists in Firestore
  * Useful for assertions in tests
  */
@@ -144,7 +127,7 @@ export async function documentExists(
   documentId: string,
   client?: FirestoreClient,
 ): Promise<boolean> {
-  const firestoreClient = client ?? initializeTestFirestore();
+  const firestoreClient = client ?? createTestFirestoreClient('default');
 
   const docRef = firestoreClient.document(collectionName, documentId);
   const snapshot = await docRef.get();
@@ -160,7 +143,7 @@ export async function getCollectionCount(
   collectionName: string,
   client?: FirestoreClient,
 ): Promise<number> {
-  const firestoreClient = client ?? initializeTestFirestore();
+  const firestoreClient = client ?? createTestFirestoreClient('default');
 
   const collection = firestoreClient.collection(collectionName);
   const snapshot = await collection.get();

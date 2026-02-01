@@ -72,7 +72,7 @@ export class FirestoreScanRunRepository implements ScanRunRepository {
     return entity;
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await, @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/require-await
   async update(_id: ScanRunId, _partial: Partial<ScanRun>): Promise<ScanRun> {
     throw new Error('ScanRun.update() is not supported. ScanRun entities are immutable.');
   }

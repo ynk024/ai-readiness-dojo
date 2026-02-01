@@ -83,7 +83,7 @@ export class FirestoreTeamRepository implements TeamRepository {
    * Updates a team (for Team, we just save the whole entity since updates are done via domain methods)
    * @throws Error - This method is not supported for Team entities
    */
-  // eslint-disable-next-line @typescript-eslint/require-await, @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/require-await
   async update(_id: TeamId, _partial: Partial<Team>): Promise<Team> {
     // For Team, partial updates don't make sense as the entity manages its own state
     // This method exists to satisfy the interface but shouldn't typically be used
