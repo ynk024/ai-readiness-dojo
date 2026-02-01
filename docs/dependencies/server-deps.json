@@ -219,6 +219,7 @@
   ],
   "presentation/dto/ingest-scan.dto.ts": [],
   "presentation/dto/item.dto.ts": [],
+  "presentation/dto/quest.dto.ts": [],
   "presentation/mappers/ingest-scan-run.mapper.ts": [
     "application/dto/ingest-scan-run.dto.ts",
     "application/dto/repo-metadata.dto.ts",

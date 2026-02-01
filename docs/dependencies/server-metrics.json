@@ -4,11 +4,11 @@
     "generator": "generate-metrics.js v1.0.0"
   },
   "summary": {
-    "totalModules": 41,
+    "totalModules": 42,
     "totalDependencies": 97,
-    "graphDensity": 0.059,
-    "avgFanOut": 2.37,
-    "avgFanIn": 2.37,
+    "graphDensity": 0.056,
+    "avgFanOut": 2.31,
+    "avgFanIn": 2.31,
     "healthScore": 80,
     "status": "PASS"
   },
@@ -20,10 +20,10 @@
     "cycles": []
   },
   "coupling": {
-    "avgFanOut": 2.37,
+    "avgFanOut": 2.31,
     "maxFanOut": 7,
     "maxFanOutFile": "application/services/team-repo-resolver.ts",
-    "avgFanIn": 2.37,
+    "avgFanIn": 2.31,
     "maxFanIn": 15,
     "maxFanInFile": "shared/errors/domain-errors.ts",
     "criticalCoupling": [],
@@ -32,15 +32,16 @@
   },
   "depth": {
     "longestChain": 5,
-    "avgDepth": 2,
+    "avgDepth": 1.95,
     "criticalDepth": [],
     "deepModules": []
   },
   "cohesion": {
     "orphanedModules": [
+      "presentation/dto/quest.dto.ts",
       "presentation/routes/health.ts"
     ],
-    "isolatedCount": 1,
+    "isolatedCount": 2,
     "byDirectory": {
       "application/dto/": {
         "totalModules": 2,
@@ -127,7 +128,7 @@
         "cohesionScore": 0
       },
       "presentation/dto/": {
-        "totalModules": 2,
+        "totalModules": 3,
         "internalImports": 0,
         "externalImports": 0,
         "cohesionScore": 0
@@ -159,11 +160,11 @@
     }
   },
   "graph": {
-    "nodeCount": 41,
+    "nodeCount": 42,
     "edgeCount": 97,
-    "density": 0.059,
-    "avgDegree": 4.73,
-    "maxPossibleEdges": 1640
+    "density": 0.056,
+    "avgDegree": 4.62,
+    "maxPossibleEdges": 1722
   },
   "topModules": {
     "mostCoupled": [
