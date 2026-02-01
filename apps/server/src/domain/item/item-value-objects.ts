@@ -1,16 +1,9 @@
 import { ValidationError } from '../../shared/errors/domain-errors.js';
 
-// Validation constants
 const MAX_ITEM_ID_LENGTH = 100;
 const MIN_ITEM_NAME_LENGTH = 2;
 const MAX_ITEM_NAME_LENGTH = 200;
 
-/**
- * ItemId Value Object
- *
- * Represents a unique identifier for an Item entity.
- * Value objects are immutable and enforce validation rules.
- */
 export class ItemId {
   private readonly _value: string;
 
@@ -18,11 +11,6 @@ export class ItemId {
     this._value = value;
   }
 
-  /**
-   * Creates an ItemId from a string value
-   * @param value The identifier value
-   * @throws {ValidationError} If the value is invalid
-   */
   static create(value: string): ItemId {
     if (!value || value.trim().length === 0) {
       throw new ValidationError('ItemId cannot be empty');
@@ -48,11 +36,6 @@ export class ItemId {
   }
 }
 
-/**
- * ItemName Value Object
- *
- * Represents the name of an Item with business rules.
- */
 export class ItemName {
   private readonly _value: string;
 
@@ -60,11 +43,6 @@ export class ItemName {
     this._value = value;
   }
 
-  /**
-   * Creates an ItemName from a string value
-   * @param value The name value
-   * @throws {ValidationError} If the value is invalid
-   */
   static create(value: string): ItemName {
     if (!value || value.trim().length === 0) {
       throw new ValidationError('ItemName cannot be empty');

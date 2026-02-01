@@ -1,6 +1,6 @@
-import { Team } from '../../../../domain/entities/team.js';
-import { TeamRepository } from '../../../../domain/repositories/team-repository.js';
-import { TeamId, TeamSlug } from '../../../../domain/value-objects/team-value-objects.js';
+import { TeamId, TeamSlug } from '../../../../domain/shared/team-types.js';
+import { TeamRepository } from '../../../../domain/team/team-repository.js';
+import { Team } from '../../../../domain/team/team.js';
 import { EntityNotFoundError } from '../../../../shared/errors/domain-errors.js';
 import { FirestoreClient } from '../firestore-client.js';
 import {

@@ -1,12 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
-import { Repo } from '../../../src/domain/entities/repo.js';
-import {
-  RepoId,
-  RepoFullName,
-  RepoUrl,
-} from '../../../src/domain/value-objects/repo-value-objects.js';
-import { TeamId } from '../../../src/domain/value-objects/team-value-objects.js';
+import { Repo } from '../../../src/domain/repo/repo.js';
+import { RepoId, RepoFullName, RepoUrl, TeamId } from '../../../src/domain/shared/index.js';
 import { ValidationError } from '../../../src/shared/errors/domain-errors.js';
 
 describe('Repo Entity', () => {

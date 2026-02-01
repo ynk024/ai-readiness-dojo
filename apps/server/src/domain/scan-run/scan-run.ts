@@ -1,12 +1,7 @@
 import { ValidationError } from '../../shared/errors/domain-errors.js';
-import { RepoId } from '../value-objects/repo-value-objects.js';
-import {
-  ScanRunId,
-  CommitSha,
-  QuestKey,
-  QuestStatus,
-} from '../value-objects/scan-value-objects.js';
-import { TeamId } from '../value-objects/team-value-objects.js';
+import { RepoId, TeamId } from '../shared/index.js';
+
+import { ScanRunId, CommitSha, QuestKey, QuestStatus } from './scan-value-objects.js';
 
 export interface ScanRunProps {
   id: ScanRunId;

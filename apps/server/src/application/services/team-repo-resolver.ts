@@ -1,10 +1,10 @@
-import { Repo } from '../../domain/entities/repo.js';
-import { Team } from '../../domain/entities/team.js';
-import { RepoId, RepoFullName, RepoUrl } from '../../domain/value-objects/repo-value-objects.js';
-import { TeamId, TeamSlug } from '../../domain/value-objects/team-value-objects.js';
+import { Repo } from '../../domain/repo/repo.js';
+import { RepoId, RepoFullName, RepoUrl } from '../../domain/shared/repo-types.js';
+import { TeamId, TeamSlug } from '../../domain/shared/team-types.js';
+import { Team } from '../../domain/team/team.js';
 
-import type { RepoRepository } from '../../domain/repositories/repo-repository.js';
-import type { TeamRepository } from '../../domain/repositories/team-repository.js';
+import type { RepoRepository } from '../../domain/repo/repo-repository.js';
+import type { TeamRepository } from '../../domain/team/team-repository.js';
 import type { RepoMetadata } from '../dto/repo-metadata.dto.js';
 
 /**

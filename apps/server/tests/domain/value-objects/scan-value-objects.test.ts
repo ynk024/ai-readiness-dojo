@@ -5,7 +5,7 @@ import {
   CommitSha,
   QuestKey,
   QuestStatus,
-} from '../../../src/domain/value-objects/scan-value-objects.js';
+} from '../../../src/domain/scan-run/scan-value-objects.js';
 import { ValidationError } from '../../../src/shared/errors/domain-errors.js';
 
 describe('ScanRunId', () => {

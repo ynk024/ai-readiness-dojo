@@ -1,14 +1,13 @@
 import { Timestamp } from 'firebase-admin/firestore';
 import { describe, expect, it } from 'vitest';
 
-import { ScanRun } from '../../../../../src/domain/entities/scan-run.js';
-import { RepoId } from '../../../../../src/domain/value-objects/repo-value-objects.js';
+import { ScanRun } from '../../../../../src/domain/scan-run/scan-run.js';
 import {
   CommitSha,
   QuestStatus,
   ScanRunId,
-} from '../../../../../src/domain/value-objects/scan-value-objects.js';
-import { TeamId } from '../../../../../src/domain/value-objects/team-value-objects.js';
+} from '../../../../../src/domain/scan-run/scan-value-objects.js';
+import { RepoId, TeamId } from '../../../../../src/domain/shared/index.js';
 import {
   scanRunToDocumentId,
   scanRunToDomain,

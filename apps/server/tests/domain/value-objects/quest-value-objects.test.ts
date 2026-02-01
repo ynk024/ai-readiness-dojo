@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { QuestId } from '../../../src/domain/value-objects/quest-value-objects.js';
+import { QuestId } from '../../../src/domain/quest/quest-value-objects.js';
 
 describe('QuestId', () => {
   describe('create', () => {

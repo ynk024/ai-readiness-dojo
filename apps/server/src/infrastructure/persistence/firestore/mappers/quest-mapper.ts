@@ -1,5 +1,5 @@
-import { Quest } from '../../../../domain/entities/quest.js';
-import { QuestId } from '../../../../domain/value-objects/quest-value-objects.js';
+import { QuestId } from '../../../../domain/quest/quest-value-objects.js';
+import { Quest } from '../../../../domain/quest/quest.js';
 
 /**
  * Firestore Document Data for Quest

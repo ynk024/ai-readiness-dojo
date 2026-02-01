@@ -1,6 +1,5 @@
 import { ValidationError, BusinessRuleViolationError } from '../../shared/errors/domain-errors.js';
-import { RepoId } from '../value-objects/repo-value-objects.js';
-import { TeamId, TeamSlug } from '../value-objects/team-value-objects.js';
+import { RepoId, TeamId, TeamSlug } from '../shared/index.js';
 
 export interface TeamProps {
   id: TeamId;

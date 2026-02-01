@@ -1,6 +1,6 @@
-import { Item } from '../../../../domain/entities/item.js';
-import { ItemRepository } from '../../../../domain/repositories/item-repository.js';
-import { ItemId } from '../../../../domain/value-objects/item-value-objects.js';
+import { ItemRepository } from '../../../../domain/item/item-repository.js';
+import { ItemId } from '../../../../domain/item/item-value-objects.js';
+import { Item } from '../../../../domain/item/item.js';
 import { EntityNotFoundError } from '../../../../shared/errors/domain-errors.js';
 import { FirestoreClient } from '../firestore-client.js';
 import {

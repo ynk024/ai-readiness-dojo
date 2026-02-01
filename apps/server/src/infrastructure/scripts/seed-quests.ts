@@ -17,8 +17,8 @@
  *   - Production Firestore configured (for production seeding)
  */
 
-import { Quest } from '../../domain/entities/quest.js';
-import { QuestId } from '../../domain/value-objects/quest-value-objects.js';
+import { QuestId } from '../../domain/quest/quest-value-objects.js';
+import { Quest } from '../../domain/quest/quest.js';
 import { loadEnvironmentConfig } from '../config/environment.js';
 import { FirebaseConfig } from '../config/firebase.config.js';
 import { FirestoreClient } from '../persistence/firestore/firestore-client.js';

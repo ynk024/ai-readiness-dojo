@@ -99,7 +99,6 @@ export class RepoUrl {
       throw new ValidationError('RepoUrl cannot be empty');
     }
 
-    // Validate URL format
     let url: URL;
     try {
       url = new URL(trimmed);
@@ -107,7 +106,6 @@ export class RepoUrl {
       throw new ValidationError('RepoUrl must be a valid URL');
     }
 
-    // Ensure http or https protocol
     if (url.protocol !== 'http:' && url.protocol !== 'https:') {
       throw new ValidationError('RepoUrl must use http or https protocol');
     }

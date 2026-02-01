@@ -54,7 +54,6 @@ export class CommitSha {
       throw new ValidationError('CommitSha must not exceed 40 characters');
     }
 
-    // Validate hexadecimal characters only
     const hexPattern = /^[0-9a-fA-F]+$/;
     if (!hexPattern.test(trimmed)) {
       throw new ValidationError('CommitSha must contain only hexadecimal characters');

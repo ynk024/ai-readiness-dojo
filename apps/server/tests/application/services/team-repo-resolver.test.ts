@@ -1,18 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { TeamRepoResolver } from '../../../src/application/services/team-repo-resolver.js';
-import { Repo } from '../../../src/domain/entities/repo.js';
-import { Team } from '../../../src/domain/entities/team.js';
+import { Repo } from '../../../src/domain/repo/repo.js';
 import {
   RepoId,
   RepoFullName,
   RepoUrl,
-} from '../../../src/domain/value-objects/repo-value-objects.js';
-import { TeamId, TeamSlug } from '../../../src/domain/value-objects/team-value-objects.js';
+  TeamId,
+  TeamSlug,
+} from '../../../src/domain/shared/index.js';
+import { Team } from '../../../src/domain/team/team.js';
 
 import type { RepoMetadata } from '../../../src/application/dto/repo-metadata.dto.js';
-import type { RepoRepository } from '../../../src/domain/repositories/repo-repository.js';
-import type { TeamRepository } from '../../../src/domain/repositories/team-repository.js';
+import type { RepoRepository } from '../../../src/domain/repo/repo-repository.js';
+import type { TeamRepository } from '../../../src/domain/team/team-repository.js';
 
 describe('TeamRepoResolver', () => {
   let teamRepository: TeamRepository;

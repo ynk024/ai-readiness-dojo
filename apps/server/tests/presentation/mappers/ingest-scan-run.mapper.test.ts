@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { QuestStatus } from '../../../src/domain/value-objects/scan-value-objects.js';
+import { QuestStatus } from '../../../src/domain/scan-run/scan-value-objects.js';
 import { toApplicationDto } from '../../../src/presentation/mappers/ingest-scan-run.mapper.js';
 
 import type { IngestScanRequestDto } from '../../../src/presentation/dto/ingest-scan.dto.js';

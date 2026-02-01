@@ -1,6 +1,5 @@
-import { Team } from '../../../../domain/entities/team.js';
-import { RepoId } from '../../../../domain/value-objects/repo-value-objects.js';
-import { TeamId, TeamSlug } from '../../../../domain/value-objects/team-value-objects.js';
+import { RepoId, TeamId, TeamSlug } from '../../../../domain/shared/index.js';
+import { Team } from '../../../../domain/team/team.js';
 
 /**
  * Firestore Document Data for Team

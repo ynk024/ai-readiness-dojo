@@ -1,4 +1,4 @@
-import { QuestStatus } from '../../domain/value-objects/scan-value-objects.js';
+import { QuestStatus } from '../../domain/scan-run/scan-value-objects.js';
 
 import type { IngestScanRunDto } from '../../application/dto/ingest-scan-run.dto.js';
 import type { RepoMetadata } from '../../application/dto/repo-metadata.dto.js';

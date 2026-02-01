@@ -1,21 +1,22 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { IngestScanRunUseCase } from '../../../src/application/use-cases/ingest-scan-run.use-case.js';
-import { Repo } from '../../../src/domain/entities/repo.js';
-import { ScanRun } from '../../../src/domain/entities/scan-run.js';
-import { Team } from '../../../src/domain/entities/team.js';
+import { Repo } from '../../../src/domain/repo/repo.js';
+import { ScanRun } from '../../../src/domain/scan-run/scan-run.js';
+import { QuestKey } from '../../../src/domain/scan-run/scan-value-objects.js';
 import {
   RepoId,
   RepoFullName,
   RepoUrl,
-} from '../../../src/domain/value-objects/repo-value-objects.js';
-import { QuestKey } from '../../../src/domain/value-objects/scan-value-objects.js';
-import { TeamId, TeamSlug } from '../../../src/domain/value-objects/team-value-objects.js';
+  TeamId,
+  TeamSlug,
+} from '../../../src/domain/shared/index.js';
+import { Team } from '../../../src/domain/team/team.js';
 import { toApplicationDto } from '../../../src/presentation/mappers/ingest-scan-run.mapper.js';
 
-import type { RepoRepository } from '../../../src/domain/repositories/repo-repository.js';
-import type { ScanRunRepository } from '../../../src/domain/repositories/scan-run-repository.js';
-import type { TeamRepository } from '../../../src/domain/repositories/team-repository.js';
+import type { RepoRepository } from '../../../src/domain/repo/repo-repository.js';
+import type { ScanRunRepository } from '../../../src/domain/scan-run/scan-run-repository.js';
+import type { TeamRepository } from '../../../src/domain/team/team-repository.js';
 import type { IngestScanRequestDto } from '../../../src/presentation/dto/ingest-scan.dto.js';
 
 describe('IngestScanRunUseCase', () => {

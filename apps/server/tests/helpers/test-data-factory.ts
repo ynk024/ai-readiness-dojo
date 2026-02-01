@@ -1,5 +1,5 @@
-import { Item } from '../../src/domain/entities/item.js';
-import { ItemId, ItemName } from '../../src/domain/value-objects/item-value-objects.js';
+import { ItemId, ItemName } from '../../src/domain/item/item-value-objects.js';
+import { Item } from '../../src/domain/item/item.js';
 
 /**
  * Test Data Factory

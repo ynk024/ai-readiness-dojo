@@ -1,7 +1,6 @@
-import { Repo } from '../../../../domain/entities/repo.js';
-import { RepoRepository } from '../../../../domain/repositories/repo-repository.js';
-import { RepoFullName, RepoId } from '../../../../domain/value-objects/repo-value-objects.js';
-import { TeamId } from '../../../../domain/value-objects/team-value-objects.js';
+import { RepoRepository } from '../../../../domain/repo/repo-repository.js';
+import { Repo } from '../../../../domain/repo/repo.js';
+import { RepoFullName, RepoId, TeamId } from '../../../../domain/shared/index.js';
 import { EntityNotFoundError } from '../../../../shared/errors/domain-errors.js';
 import { FirestoreClient } from '../firestore-client.js';
 import {

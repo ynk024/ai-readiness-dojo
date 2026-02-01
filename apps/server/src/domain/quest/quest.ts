@@ -1,5 +1,6 @@
 import { ValidationError } from '../../shared/errors/domain-errors.js';
-import { QuestId } from '../value-objects/quest-value-objects.js';
+
+import { QuestId } from './quest-value-objects.js';
 
 const MAX_TITLE_LENGTH = 100;
 const MAX_DESCRIPTION_LENGTH = 500;

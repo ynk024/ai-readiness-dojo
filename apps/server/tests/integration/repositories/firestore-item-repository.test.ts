@@ -1,6 +1,6 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
-import { ItemId } from '../../../src/domain/value-objects/item-value-objects.js';
+import { ItemId } from '../../../src/domain/item/item-value-objects.js';
 import { FirestoreItemRepository } from '../../../src/infrastructure/persistence/firestore/repositories/firestore-item-repository.js';
 import {
   clearCollection,

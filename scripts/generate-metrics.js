@@ -545,7 +545,6 @@ function generateMetrics(graph, appName) {
 
   return {
     metadata: {
-      timestamp: new Date().toISOString(),
       app: appName,
       generator: 'generate-metrics.js v1.0.0',
     },
@@ -670,6 +669,16 @@ function printMetrics(metrics, appName) {
   console.log(`\n${statusEmoji} Metrics generated: docs/dependencies/${appName}-metrics.json`);
 }
 
+function filterExemptFromGraph(graph) {
+  const filteredGraph = {};
+  Object.entries(graph).forEach(([file, deps]) => {
+    if (!isExempt(file)) {
+      filteredGraph[file] = deps.filter((dep) => isExempt(dep) === false);
+    }
+  });
+  return filteredGraph;
+}
+
 // ============================================================================
 // MAIN EXECUTION
 // ============================================================================
@@ -698,7 +707,8 @@ function main() {
     .forEach((app) => {
       try {
         const graph = JSON.parse(readFileSync(app.graphPath, 'utf-8'));
-        const metrics = generateMetrics(graph, app.name);
+        const filteredGraph = filterExemptFromGraph(graph);
+        const metrics = generateMetrics(filteredGraph, app.name);
 
         // Print console output
         printMetrics(metrics, app.name);

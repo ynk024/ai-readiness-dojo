@@ -1,10 +1,10 @@
-import { ScanRun } from '../../domain/entities/scan-run.js';
-import { ScanRunId, CommitSha } from '../../domain/value-objects/scan-value-objects.js';
+import { ScanRun } from '../../domain/scan-run/scan-run.js';
+import { ScanRunId, CommitSha } from '../../domain/scan-run/scan-value-objects.js';
 import { TeamRepoResolver } from '../services/team-repo-resolver.js';
 
-import type { RepoRepository } from '../../domain/repositories/repo-repository.js';
-import type { ScanRunRepository } from '../../domain/repositories/scan-run-repository.js';
-import type { TeamRepository } from '../../domain/repositories/team-repository.js';
+import type { RepoRepository } from '../../domain/repo/repo-repository.js';
+import type { ScanRunRepository } from '../../domain/scan-run/scan-run-repository.js';
+import type { TeamRepository } from '../../domain/team/team-repository.js';
 import type { IngestScanRunDto } from '../dto/ingest-scan-run.dto.js';
 
 /**

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { TeamId, TeamSlug } from '../../../src/domain/value-objects/team-value-objects.js';
+import { TeamId, TeamSlug } from '../../../src/domain/shared/team-types.js';
 import { ValidationError } from '../../../src/shared/errors/domain-errors.js';
 
 describe('TeamId', () => {

@@ -49,7 +49,6 @@ export class TeamSlug {
       throw new ValidationError('TeamSlug must be between 1 and 100 characters');
     }
 
-    // Only lowercase letters, numbers, and hyphens
     const slugPattern = /^[a-z0-9-]+$/;
     if (!slugPattern.test(trimmed)) {
       throw new ValidationError(

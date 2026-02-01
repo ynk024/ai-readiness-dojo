@@ -1,11 +1,10 @@
-import { ScanRun } from '../../../../domain/entities/scan-run.js';
-import { RepoId } from '../../../../domain/value-objects/repo-value-objects.js';
+import { ScanRun } from '../../../../domain/scan-run/scan-run.js';
 import {
   CommitSha,
   QuestStatus,
   ScanRunId,
-} from '../../../../domain/value-objects/scan-value-objects.js';
-import { TeamId } from '../../../../domain/value-objects/team-value-objects.js';
+} from '../../../../domain/scan-run/scan-value-objects.js';
+import { RepoId, TeamId } from '../../../../domain/shared/index.js';
 
 /**
  * Firestore Document Data for ScanRun

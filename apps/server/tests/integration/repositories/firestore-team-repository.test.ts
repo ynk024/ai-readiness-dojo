@@ -1,8 +1,7 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
-import { Team } from '../../../src/domain/entities/team.js';
-import { RepoId } from '../../../src/domain/value-objects/repo-value-objects.js';
-import { TeamId, TeamSlug } from '../../../src/domain/value-objects/team-value-objects.js';
+import { RepoId, TeamId, TeamSlug } from '../../../src/domain/shared/index.js';
+import { Team } from '../../../src/domain/team/team.js';
 import { FirestoreTeamRepository } from '../../../src/infrastructure/persistence/firestore/repositories/firestore-team-repository.js';
 import {
   clearCollection,

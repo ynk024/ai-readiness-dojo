@@ -1,10 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import {
-  RepoId,
-  RepoFullName,
-  RepoUrl,
-} from '../../../src/domain/value-objects/repo-value-objects.js';
+import { RepoId, RepoFullName, RepoUrl } from '../../../src/domain/shared/repo-types.js';
 import { ValidationError } from '../../../src/shared/errors/domain-errors.js';
 
 describe('RepoId', () => {

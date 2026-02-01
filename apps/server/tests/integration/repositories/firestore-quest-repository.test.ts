@@ -1,7 +1,7 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
-import { Quest } from '../../../src/domain/entities/quest.js';
-import { QuestId } from '../../../src/domain/value-objects/quest-value-objects.js';
+import { QuestId } from '../../../src/domain/quest/quest-value-objects.js';
+import { Quest } from '../../../src/domain/quest/quest.js';
 import { FirestoreQuestRepository } from '../../../src/infrastructure/persistence/firestore/repositories/firestore-quest-repository.js';
 import {
   clearCollection,

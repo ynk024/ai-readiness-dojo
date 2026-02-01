@@ -1,10 +1,5 @@
-import { Repo } from '../../../../domain/entities/repo.js';
-import {
-  RepoFullName,
-  RepoId,
-  RepoUrl,
-} from '../../../../domain/value-objects/repo-value-objects.js';
-import { TeamId } from '../../../../domain/value-objects/team-value-objects.js';
+import { Repo } from '../../../../domain/repo/repo.js';
+import { RepoFullName, RepoId, RepoUrl, TeamId } from '../../../../domain/shared/index.js';
 
 /**
  * Firestore Document Data for Repo

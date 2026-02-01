@@ -1,6 +1,6 @@
-import { Quest } from '../../../../domain/entities/quest.js';
-import { QuestRepository } from '../../../../domain/repositories/quest-repository.js';
-import { QuestId } from '../../../../domain/value-objects/quest-value-objects.js';
+import { QuestRepository } from '../../../../domain/quest/quest-repository.js';
+import { QuestId } from '../../../../domain/quest/quest-value-objects.js';
+import { Quest } from '../../../../domain/quest/quest.js';
 import { EntityNotFoundError } from '../../../../shared/errors/domain-errors.js';
 import { FirestoreClient } from '../firestore-client.js';
 import {

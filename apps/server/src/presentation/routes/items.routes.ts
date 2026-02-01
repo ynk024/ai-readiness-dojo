@@ -1,5 +1,5 @@
-import { Item } from '../../domain/entities/item.js';
-import { ItemId, ItemName } from '../../domain/value-objects/item-value-objects.js';
+import { ItemId, ItemName } from '../../domain/item/item-value-objects.js';
+import { Item } from '../../domain/item/item.js';
 import { EntityNotFoundError, ValidationError } from '../../shared/errors/domain-errors.js';
 
 import type { CreateItemDto, ItemResponseDto, UpdateItemDto } from '../dto/item.dto.js';

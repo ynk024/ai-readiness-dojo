@@ -1,6 +1,5 @@
 import { ValidationError } from '../../shared/errors/domain-errors.js';
-import { RepoId, RepoFullName, RepoUrl } from '../value-objects/repo-value-objects.js';
-import { TeamId } from '../value-objects/team-value-objects.js';
+import { RepoId, RepoFullName, RepoUrl, TeamId } from '../shared/index.js';
 
 export interface RepoProps {
   id: RepoId;

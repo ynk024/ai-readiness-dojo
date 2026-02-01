@@ -1,12 +1,7 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
-import { Repo } from '../../../src/domain/entities/repo.js';
-import {
-  RepoFullName,
-  RepoId,
-  RepoUrl,
-} from '../../../src/domain/value-objects/repo-value-objects.js';
-import { TeamId } from '../../../src/domain/value-objects/team-value-objects.js';
+import { Repo } from '../../../src/domain/repo/repo.js';
+import { RepoFullName, RepoId, RepoUrl, TeamId } from '../../../src/domain/shared/index.js';
 import { FirestoreRepoRepository } from '../../../src/infrastructure/persistence/firestore/repositories/firestore-repo-repository.js';
 import {
   clearCollection,
