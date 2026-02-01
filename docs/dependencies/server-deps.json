@@ -1,0 +1,180 @@
+{
+  "application/dto/ingest-scan-run.dto.ts": [
+    "application/dto/repo-metadata.dto.ts",
+    "domain/value-objects/scan-value-objects.ts"
+  ],
+  "application/dto/repo-metadata.dto.ts": [],
+  "application/services/team-repo-resolver.ts": [
+    "application/dto/repo-metadata.dto.ts",
+    "domain/entities/repo.ts",
+    "domain/entities/team.ts",
+    "domain/repositories/repo-repository.ts",
+    "domain/repositories/team-repository.ts",
+    "domain/value-objects/repo-value-objects.ts",
+    "domain/value-objects/team-value-objects.ts"
+  ],
+  "application/use-cases/ingest-scan-run.use-case.ts": [
+    "application/dto/ingest-scan-run.dto.ts",
+    "application/services/team-repo-resolver.ts",
+    "domain/entities/scan-run.ts",
+    "domain/repositories/repo-repository.ts",
+    "domain/repositories/scan-run-repository.ts",
+    "domain/repositories/team-repository.ts",
+    "domain/value-objects/scan-value-objects.ts"
+  ],
+  "domain/entities/item.ts": [
+    "domain/value-objects/item-value-objects.ts"
+  ],
+  "domain/entities/repo.ts": [
+    "domain/value-objects/repo-value-objects.ts",
+    "domain/value-objects/team-value-objects.ts",
+    "shared/errors/domain-errors.ts"
+  ],
+  "domain/entities/scan-run.ts": [
+    "domain/value-objects/repo-value-objects.ts",
+    "domain/value-objects/scan-value-objects.ts",
+    "domain/value-objects/team-value-objects.ts",
+    "shared/errors/domain-errors.ts"
+  ],
+  "domain/entities/team.ts": [
+    "domain/value-objects/repo-value-objects.ts",
+    "domain/value-objects/team-value-objects.ts",
+    "shared/errors/domain-errors.ts"
+  ],
+  "domain/repositories/base-repository.ts": [],
+  "domain/repositories/item-repository.ts": [
+    "domain/entities/item.ts",
+    "domain/repositories/base-repository.ts",
+    "domain/value-objects/item-value-objects.ts"
+  ],
+  "domain/repositories/repo-repository.ts": [
+    "domain/entities/repo.ts",
+    "domain/repositories/base-repository.ts",
+    "domain/value-objects/repo-value-objects.ts",
+    "domain/value-objects/team-value-objects.ts"
+  ],
+  "domain/repositories/scan-run-repository.ts": [
+    "domain/entities/scan-run.ts",
+    "domain/repositories/base-repository.ts",
+    "domain/value-objects/repo-value-objects.ts",
+    "domain/value-objects/scan-value-objects.ts"
+  ],
+  "domain/repositories/team-repository.ts": [
+    "domain/entities/team.ts",
+    "domain/repositories/base-repository.ts",
+    "domain/value-objects/team-value-objects.ts"
+  ],
+  "domain/value-objects/item-value-objects.ts": [
+    "shared/errors/domain-errors.ts"
+  ],
+  "domain/value-objects/repo-value-objects.ts": [
+    "shared/errors/domain-errors.ts"
+  ],
+  "domain/value-objects/scan-value-objects.ts": [
+    "shared/errors/domain-errors.ts"
+  ],
+  "domain/value-objects/team-value-objects.ts": [
+    "shared/errors/domain-errors.ts"
+  ],
+  "index.ts": [
+    "infrastructure/config/environment.ts",
+    "infrastructure/di/container.ts",
+    "infrastructure/persistence/firestore/firestore-client.ts",
+    "presentation/routes/health.ts",
+    "presentation/routes/ingest.routes.ts",
+    "presentation/routes/items.routes.ts"
+  ],
+  "infrastructure/config/environment.ts": [],
+  "infrastructure/config/firebase.config.ts": [
+    "infrastructure/config/environment.ts"
+  ],
+  "infrastructure/di/container.ts": [
+    "application/use-cases/ingest-scan-run.use-case.ts",
+    "domain/repositories/item-repository.ts",
+    "domain/repositories/repo-repository.ts",
+    "domain/repositories/scan-run-repository.ts",
+    "domain/repositories/team-repository.ts",
+    "infrastructure/config/environment.ts",
+    "infrastructure/config/firebase.config.ts",
+    "infrastructure/persistence/firestore/firestore-client.ts",
+    "infrastructure/persistence/firestore/repositories/firestore-item-repository.ts",
+    "infrastructure/persistence/firestore/repositories/firestore-repo-repository.ts",
+    "infrastructure/persistence/firestore/repositories/firestore-scan-run-repository.ts",
+    "infrastructure/persistence/firestore/repositories/firestore-team-repository.ts"
+  ],
+  "infrastructure/persistence/firestore/firestore-client.ts": [],
+  "infrastructure/persistence/firestore/mappers/item-mapper.ts": [
+    "domain/entities/item.ts",
+    "domain/value-objects/item-value-objects.ts"
+  ],
+  "infrastructure/persistence/firestore/mappers/repo-mapper.ts": [
+    "domain/entities/repo.ts",
+    "domain/value-objects/repo-value-objects.ts",
+    "domain/value-objects/team-value-objects.ts"
+  ],
+  "infrastructure/persistence/firestore/mappers/scan-run-mapper.ts": [
+    "domain/entities/scan-run.ts",
+    "domain/value-objects/repo-value-objects.ts",
+    "domain/value-objects/scan-value-objects.ts",
+    "domain/value-objects/team-value-objects.ts"
+  ],
+  "infrastructure/persistence/firestore/mappers/team-mapper.ts": [
+    "domain/entities/team.ts",
+    "domain/value-objects/repo-value-objects.ts",
+    "domain/value-objects/team-value-objects.ts"
+  ],
+  "infrastructure/persistence/firestore/repositories/firestore-item-repository.ts": [
+    "domain/entities/item.ts",
+    "domain/repositories/item-repository.ts",
+    "domain/value-objects/item-value-objects.ts",
+    "infrastructure/persistence/firestore/firestore-client.ts",
+    "infrastructure/persistence/firestore/mappers/item-mapper.ts",
+    "shared/errors/domain-errors.ts"
+  ],
+  "infrastructure/persistence/firestore/repositories/firestore-repo-repository.ts": [
+    "domain/entities/repo.ts",
+    "domain/repositories/repo-repository.ts",
+    "domain/value-objects/repo-value-objects.ts",
+    "domain/value-objects/team-value-objects.ts",
+    "infrastructure/persistence/firestore/firestore-client.ts",
+    "infrastructure/persistence/firestore/mappers/repo-mapper.ts",
+    "shared/errors/domain-errors.ts"
+  ],
+  "infrastructure/persistence/firestore/repositories/firestore-scan-run-repository.ts": [
+    "domain/entities/scan-run.ts",
+    "domain/repositories/scan-run-repository.ts",
+    "domain/value-objects/repo-value-objects.ts",
+    "domain/value-objects/scan-value-objects.ts",
+    "infrastructure/persistence/firestore/firestore-client.ts",
+    "infrastructure/persistence/firestore/mappers/scan-run-mapper.ts",
+    "shared/errors/domain-errors.ts"
+  ],
+  "infrastructure/persistence/firestore/repositories/firestore-team-repository.ts": [
+    "domain/entities/team.ts",
+    "domain/repositories/team-repository.ts",
+    "domain/value-objects/team-value-objects.ts",
+    "infrastructure/persistence/firestore/firestore-client.ts",
+    "infrastructure/persistence/firestore/mappers/team-mapper.ts",
+    "shared/errors/domain-errors.ts"
+  ],
+  "presentation/dto/ingest-scan.dto.ts": [],
+  "presentation/dto/item.dto.ts": [],
+  "presentation/mappers/ingest-scan-run.mapper.ts": [
+    "application/dto/ingest-scan-run.dto.ts",
+    "application/dto/repo-metadata.dto.ts",
+    "domain/value-objects/scan-value-objects.ts",
+    "presentation/dto/ingest-scan.dto.ts"
+  ],
+  "presentation/routes/health.ts": [],
+  "presentation/routes/ingest.routes.ts": [
+    "presentation/dto/ingest-scan.dto.ts",
+    "presentation/mappers/ingest-scan-run.mapper.ts"
+  ],
+  "presentation/routes/items.routes.ts": [
+    "domain/entities/item.ts",
+    "domain/value-objects/item-value-objects.ts",
+    "presentation/dto/item.dto.ts",
+    "shared/errors/domain-errors.ts"
+  ],
+  "shared/errors/domain-errors.ts": []
+}

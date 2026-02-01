@@ -45,6 +45,7 @@ This repository achieves maximum AI-readiness for JavaScript/TypeScript projects
 - **Prettier** - Code formatting with Svelte support
 - **ESLint** - Linting with TypeScript support
 - **eslint-plugin-boundaries** - Architecture enforcement
+- **madge** - Circular dependency detection, dependency graph analysis, and coupling warnings
 - **TypeScript** - Type checking with strict mode
 - **Vitest** - Testing with coverage reporting
 
@@ -134,6 +135,61 @@ pnpm format
 pnpm format:check
 ```
 
+### Dependency Analysis
+
+```bash
+# Check for circular dependencies (runs in pre-commit)
+pnpm circular:check
+
+# Generate full dependency graphs (runs in pre-push)
+pnpm deps:graph
+
+# Check for high coupling (runs in pre-push)
+pnpm deps:check-coupling
+
+# Run all dependency checks
+pnpm circular:check && pnpm deps:graph && pnpm deps:check-coupling
+```
+
+**Reports** are generated in `docs/dependencies/` directory (committed with code):
+
+**Circular dependency reports:**
+
+- `client-circular.json` - Client circular dependencies (empty array = no cycles)
+- `server-circular.json` - Server circular dependencies (empty array = no cycles)
+
+**Dependency graphs:**
+
+- `client-deps.json` - Complete client dependency graph
+- `server-deps.json` - Complete server dependency graph
+
+**Pre-commit hook:**
+
+- ✅ Generates dependency graphs (committed with code changes)
+- ✅ Runs circular dependency checks (blocking)
+- ✅ Stages graphs for inclusion in commit
+
+**Pre-push hook:**
+
+- ✅ Analyzes coupling and warns about complexity (non-blocking)
+
+**Coupling warnings:**
+
+- Files importing >10 modules (high coupling)
+- Files importing >20 modules (critical coupling)
+- Core modules imported by many files (fragility risk)
+- Orphaned files (no imports/exports)
+
+**Use cases:**
+
+- Understanding module relationships before refactoring
+- Identifying highly coupled modules that need decoupling
+- Finding files with high impact radius (core modules)
+- Discovering orphaned or dead code
+- Historical tracking of dependency evolution in git history
+- Code review - see dependency changes in pull requests
+- AI context - agents can read committed graphs to understand architecture
+
 ## Package Scripts
 
 ### Root Scripts
@@ -148,6 +204,13 @@ pnpm format:check
 - `pnpm lint` - Lint all packages
 - `pnpm format` - Format all files
 - `pnpm format:check` - Check formatting
+- `pnpm circular:check` - Check for circular dependencies
+- `pnpm circular:check:client` - Check client circular dependencies
+- `pnpm circular:check:server` - Check server circular dependencies
+- `pnpm deps:graph` - Generate full dependency graphs
+- `pnpm deps:graph:client` - Generate client dependency graph
+- `pnpm deps:graph:server` - Generate server dependency graph
+- `pnpm deps:check-coupling` - Analyze coupling and warn about high complexity
 
 ### Client Scripts
 

@@ -1,0 +1,10 @@
+{
+  "App.svelte": [],
+  "app.css": [],
+  "lib/Counter.svelte": [],
+  "main.ts": [
+    "App.svelte",
+    "app.css"
+  ],
+  "vite-env.d.ts": []
+}

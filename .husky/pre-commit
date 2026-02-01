@@ -3,6 +3,18 @@ echo "🔍 Running pre-commit checks..."
 echo "\n📝 Formatting code..."
 pnpm format
 
+echo "\n📊 Generating dependency graphs..."
+pnpm deps:graph
+
+echo "\n🔄 Checking for circular dependencies..."
+pnpm circular:check || {
+  echo "❌ Circular dependencies detected. Check docs/dependencies/ reports for details."
+  exit 1
+}
+
+echo "\n➕ Staging dependency graphs..."
+git add docs/dependencies/*.json
+
 echo "\n🔎 Running linter..."
 pnpm lint || {
   echo "❌ Linting failed. Fix the issues above."

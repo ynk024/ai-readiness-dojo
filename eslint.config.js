@@ -22,6 +22,7 @@ export default tseslint.config(
       '**/*.config.js',
       '**/*.config.ts',
       'pnpm-lock.yaml',
+      'scripts/**',
     ],
   },
   {

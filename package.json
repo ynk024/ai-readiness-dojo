@@ -16,6 +16,13 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "circular:check": "pnpm circular:check:client && pnpm circular:check:server",
+    "circular:check:client": "madge --circular --extensions ts,svelte --json apps/client/src > docs/dependencies/client-circular.json",
+    "circular:check:server": "madge --circular --extensions ts --json apps/server/src > docs/dependencies/server-circular.json",
+    "deps:graph": "pnpm deps:graph:client && pnpm deps:graph:server",
+    "deps:graph:client": "madge --extensions ts,svelte --json apps/client/src > docs/dependencies/client-deps.json",
+    "deps:graph:server": "madge --extensions ts --json apps/server/src > docs/dependencies/server-deps.json",
+    "deps:check-coupling": "node scripts/check-coupling.js",
     "prepare": "husky"
   },
   "devDependencies": {
@@ -32,6 +39,7 @@
     "eslint-plugin-svelte": "^3.14.0",
     "globals": "^15.13.0",
     "husky": "^9.1.7",
+    "madge": "^8.0.0",
     "prettier": "^3.4.2",
     "prettier-plugin-svelte": "^3.3.2",
     "svelte-eslint-parser": "^1.4.1",
