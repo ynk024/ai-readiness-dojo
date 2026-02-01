@@ -1,3 +1,4 @@
+import { IngestScanRunUseCase } from '../../application/use-cases/ingest-scan-run.use-case.js';
 import { FirebaseConfig } from '../config/firebase.config.js';
 import { FirestoreClient } from '../persistence/firestore/firestore-client.js';
 import { FirestoreItemRepository } from '../persistence/firestore/repositories/firestore-item-repository.js';
@@ -28,6 +29,9 @@ declare module 'fastify' {
     scanRunRepository: ScanRunRepository;
     firebaseConfig: FirebaseConfig;
     firestoreClient: FirestoreClient;
+    useCases: {
+      ingestScanRun: () => IngestScanRunUseCase;
+    };
   }
 }
 
@@ -57,6 +61,12 @@ export function registerDependencies(fastify: FastifyInstance, config: Environme
 
   const scanRunRepository = new FirestoreScanRunRepository(firestoreClient);
   fastify.decorate('scanRunRepository', scanRunRepository);
+
+  // Register use cases with factory pattern
+  fastify.decorate('useCases', {
+    ingestScanRun: () =>
+      new IngestScanRunUseCase(teamRepository, repoRepository, scanRunRepository),
+  });
 
   // Register cleanup hook
   fastify.addHook('onClose', async () => {

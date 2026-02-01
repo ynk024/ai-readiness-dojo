@@ -1,5 +1,3 @@
-import { IngestScanRunUseCase } from '../../application/use-cases/ingest-scan-run.use-case.js';
-
 import type { IngestScanRequestDto, IngestScanResponseDto } from '../dto/ingest-scan.dto.js';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
@@ -51,12 +49,8 @@ async function ingestScan(
       });
     }
 
-    // Create use case instance with repository dependencies
-    const useCase = new IngestScanRunUseCase(
-      fastify.teamRepository,
-      fastify.repoRepository,
-      fastify.scanRunRepository,
-    );
+    // Create use case instance using decorated factory
+    const useCase = fastify.useCases.ingestScanRun();
 
     // Execute use case
     const result = await useCase.execute(request.body);
@@ -73,7 +67,7 @@ async function ingestScan(
     fastify.log.error(error, 'Error ingesting scan run');
 
     // Return generic error response
-    return await reply.code(HTTP_INTERNAL_SERVER_ERROR).send({
+    return reply.code(HTTP_INTERNAL_SERVER_ERROR).send({
       error: ERROR_INTERNAL_SERVER,
       message: error instanceof Error ? error.message : 'An unexpected error occurred',
     });
