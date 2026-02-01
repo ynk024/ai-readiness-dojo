@@ -2,11 +2,13 @@ import { IngestScanRunUseCase } from '../../application/use-cases/ingest-scan-ru
 import { FirebaseConfig } from '../config/firebase.config.js';
 import { FirestoreClient } from '../persistence/firestore/firestore-client.js';
 import { FirestoreItemRepository } from '../persistence/firestore/repositories/firestore-item-repository.js';
+import { FirestoreQuestRepository } from '../persistence/firestore/repositories/firestore-quest-repository.js';
 import { FirestoreRepoRepository } from '../persistence/firestore/repositories/firestore-repo-repository.js';
 import { FirestoreScanRunRepository } from '../persistence/firestore/repositories/firestore-scan-run-repository.js';
 import { FirestoreTeamRepository } from '../persistence/firestore/repositories/firestore-team-repository.js';
 
 import type { ItemRepository } from '../../domain/repositories/item-repository.js';
+import type { QuestRepository } from '../../domain/repositories/quest-repository.js';
 import type { RepoRepository } from '../../domain/repositories/repo-repository.js';
 import type { ScanRunRepository } from '../../domain/repositories/scan-run-repository.js';
 import type { TeamRepository } from '../../domain/repositories/team-repository.js';
@@ -27,6 +29,7 @@ declare module 'fastify' {
     teamRepository: TeamRepository;
     repoRepository: RepoRepository;
     scanRunRepository: ScanRunRepository;
+    questRepository: QuestRepository;
     firebaseConfig: FirebaseConfig;
     firestoreClient: FirestoreClient;
     useCases: {
@@ -84,6 +87,9 @@ export function registerDependencies(
 
   const scanRunRepository = new FirestoreScanRunRepository(firestoreClient);
   fastify.decorate('scanRunRepository', scanRunRepository);
+
+  const questRepository = new FirestoreQuestRepository(firestoreClient);
+  fastify.decorate('questRepository', questRepository);
 
   // Register use cases with factory pattern
   fastify.decorate('useCases', {
