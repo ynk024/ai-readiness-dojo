@@ -390,6 +390,9 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/unbound-method': 'off', // Allow vi.fn() for mocking
+      '@typescript-eslint/require-await': 'off', // Allow mock async functions without await
+      '@typescript-eslint/no-non-null-assertion': 'off', // Allow non-null assertions in tests
     },
   },
 );
