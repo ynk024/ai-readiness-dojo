@@ -1,4 +1,4 @@
-import { ScanRunRepository } from '../../../../domain/scan-run/scan-run-repository.js';
+import { ScanRunRepository } from '../../../../application/ports/scan-run-repository.js';
 import { ScanRun } from '../../../../domain/scan-run/scan-run.js';
 import { ScanRunId } from '../../../../domain/scan-run/scan-value-objects.js';
 import { RepoId } from '../../../../domain/shared/repo-types.js';

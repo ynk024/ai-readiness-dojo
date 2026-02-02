@@ -6,10 +6,10 @@ import { FirestoreRepoRepository } from '../persistence/firestore/repositories/f
 import { FirestoreScanRunRepository } from '../persistence/firestore/repositories/firestore-scan-run-repository.js';
 import { FirestoreTeamRepository } from '../persistence/firestore/repositories/firestore-team-repository.js';
 
-import type { QuestRepository } from '../../domain/quest/quest-repository.js';
-import type { RepoRepository } from '../../domain/repo/repo-repository.js';
-import type { ScanRunRepository } from '../../domain/scan-run/scan-run-repository.js';
-import type { TeamRepository } from '../../domain/team/team-repository.js';
+import type { QuestRepository } from '../../application/ports/quest-repository.js';
+import type { RepoRepository } from '../../application/ports/repo-repository.js';
+import type { ScanRunRepository } from '../../application/ports/scan-run-repository.js';
+import type { TeamRepository } from '../../application/ports/team-repository.js';
 import type { EnvironmentConfig } from '../config/environment.js';
 import type { FastifyInstance } from 'fastify';
 

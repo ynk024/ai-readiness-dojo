@@ -14,9 +14,9 @@ import {
 import { Team } from '../../../src/domain/team/team.js';
 import { toApplicationDto } from '../../../src/presentation/mappers/ingest-scan-run.mapper.js';
 
-import type { RepoRepository } from '../../../src/domain/repo/repo-repository.js';
-import type { ScanRunRepository } from '../../../src/domain/scan-run/scan-run-repository.js';
-import type { TeamRepository } from '../../../src/domain/team/team-repository.js';
+import type { RepoRepository } from '../../../src/application/ports/repo-repository.js';
+import type { ScanRunRepository } from '../../../src/application/ports/scan-run-repository.js';
+import type { TeamRepository } from '../../../src/application/ports/team-repository.js';
 import type { IngestScanRequestDto } from '../../../src/presentation/dto/ingest-scan.dto.js';
 
 describe('IngestScanRunUseCase', () => {

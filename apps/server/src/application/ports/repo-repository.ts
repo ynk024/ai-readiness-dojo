@@ -1,7 +1,7 @@
-import { BaseRepository } from '../../shared/base-repository.js';
-import { RepoFullName, RepoId, TeamId } from '../shared/index.js';
+import { Repo } from '../../domain/repo/repo.js';
+import { RepoFullName, RepoId, TeamId } from '../../domain/shared/index.js';
 
-import { Repo } from './repo.js';
+import { BaseRepository } from './base-repository.js';
 
 export interface RepoRepository extends BaseRepository<Repo, RepoId> {
   findByFullName(fullName: RepoFullName): Promise<Repo | null>;

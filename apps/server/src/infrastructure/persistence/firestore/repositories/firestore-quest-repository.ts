@@ -1,4 +1,4 @@
-import { QuestRepository } from '../../../../domain/quest/quest-repository.js';
+import { QuestRepository } from '../../../../application/ports/quest-repository.js';
 import { QuestId } from '../../../../domain/quest/quest-value-objects.js';
 import { Quest } from '../../../../domain/quest/quest.js';
 import { EntityNotFoundError } from '../../../../shared/errors/domain-errors.js';
@@ -13,7 +13,7 @@ import {
 /**
  * Firestore Quest Repository - Driven Adapter
  *
- * Implements the QuestRepository interface (outbound port) defined in the domain layer.
+ * Implements the QuestRepository interface (outbound port) defined in the application layer.
  * This adapter translates domain operations to Firestore-specific operations.
  */
 export class FirestoreQuestRepository implements QuestRepository {

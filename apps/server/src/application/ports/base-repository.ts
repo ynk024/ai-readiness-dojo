@@ -5,9 +5,9 @@
  * It follows the Repository pattern from Domain-Driven Design and serves
  * as an outbound port in hexagonal architecture.
  *
- * The domain layer defines this interface, and the infrastructure layer
- * provides concrete implementations (adapters) for specific persistence
- * technologies (e.g., Firestore, MongoDB, PostgreSQL).
+ * The application layer defines this interface as an outbound port, and the
+ * infrastructure layer provides concrete implementations (adapters) for specific
+ * persistence technologies (e.g., Firestore, MongoDB, PostgreSQL).
  *
  * @template T The domain entity type
  * @template ID The identifier type (e.g., string, number)

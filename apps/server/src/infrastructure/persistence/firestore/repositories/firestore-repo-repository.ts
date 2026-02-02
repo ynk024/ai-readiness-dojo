@@ -1,4 +1,4 @@
-import { RepoRepository } from '../../../../domain/repo/repo-repository.js';
+import { RepoRepository } from '../../../../application/ports/repo-repository.js';
 import { Repo } from '../../../../domain/repo/repo.js';
 import { RepoFullName, RepoId, TeamId } from '../../../../domain/shared/index.js';
 import { EntityNotFoundError } from '../../../../shared/errors/domain-errors.js';
@@ -13,7 +13,7 @@ import {
 /**
  * Firestore Repo Repository - Driven Adapter
  *
- * Implements the RepoRepository interface (outbound port) defined in the domain layer.
+ * Implements the RepoRepository interface (outbound port) defined in the application layer.
  */
 export class FirestoreRepoRepository implements RepoRepository {
   private readonly collectionName = 'repos';

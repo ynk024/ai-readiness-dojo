@@ -4,23 +4,45 @@
     "domain/scan-run/scan-value-objects.ts"
   ],
   "application/dto/repo-metadata.dto.ts": [],
+  "application/ports/base-repository.ts": [],
+  "application/ports/quest-repository.ts": [
+    "application/ports/base-repository.ts",
+    "domain/quest/quest-value-objects.ts",
+    "domain/quest/quest.ts"
+  ],
+  "application/ports/repo-repository.ts": [
+    "application/ports/base-repository.ts",
+    "domain/repo/repo.ts",
+    "domain/shared/index.ts"
+  ],
+  "application/ports/scan-run-repository.ts": [
+    "application/ports/base-repository.ts",
+    "domain/scan-run/scan-run.ts",
+    "domain/scan-run/scan-value-objects.ts",
+    "domain/shared/index.ts"
+  ],
+  "application/ports/team-repository.ts": [
+    "application/ports/base-repository.ts",
+    "domain/shared/team-types.ts",
+    "domain/team/team.ts"
+  ],
   "application/services/team-repo-resolver.ts": [
     "application/dto/repo-metadata.dto.ts",
-    "domain/repo/repo-repository.ts",
+    "application/ports/repo-repository.ts",
+    "application/ports/team-repository.ts",
     "domain/repo/repo.ts",
     "domain/shared/repo-types.ts",
     "domain/shared/team-types.ts",
-    "domain/team/team-repository.ts",
     "domain/team/team.ts"
   ],
   "application/use-cases/ingest-scan-run.use-case.ts": [
     "application/dto/ingest-scan-run.dto.ts",
+    "application/ports/repo-repository.ts",
+    "application/ports/scan-run-repository.ts",
+    "application/ports/team-repository.ts",
     "application/services/team-repo-resolver.ts",
-    "domain/repo/repo-repository.ts",
-    "domain/scan-run/scan-run-repository.ts",
     "domain/scan-run/scan-run.ts",
-    "domain/scan-run/scan-value-objects.ts",
-    "domain/team/team-repository.ts"
+    "domain/scan-run/scan-value-objects.ts"
   ],
   "domain/index.ts": [
     "domain/quest/index.ts",
@@ -30,14 +52,8 @@
     "domain/team/index.ts"
   ],
   "domain/quest/index.ts": [
-    "domain/quest/quest-repository.ts",
     "domain/quest/quest-value-objects.ts",
     "domain/quest/quest.ts"
-  ],
-  "domain/quest/quest-repository.ts": [
-    "domain/quest/quest-value-objects.ts",
-    "domain/quest/quest.ts",
-    "shared/base-repository.ts"
   ],
   "domain/quest/quest-value-objects.ts": [
     "shared/errors/domain-errors.ts"
@@ -47,28 +63,15 @@
     "shared/errors/domain-errors.ts"
   ],
   "domain/repo/index.ts": [
-    "domain/repo/repo-repository.ts",
     "domain/repo/repo.ts"
-  ],
-  "domain/repo/repo-repository.ts": [
-    "domain/repo/repo.ts",
-    "domain/shared/index.ts",
-    "shared/base-repository.ts"
   ],
   "domain/repo/repo.ts": [
     "domain/shared/index.ts",
     "shared/errors/domain-errors.ts"
   ],
   "domain/scan-run/index.ts": [
-    "domain/scan-run/scan-run-repository.ts",
     "domain/scan-run/scan-run.ts",
     "domain/scan-run/scan-value-objects.ts"
-  ],
-  "domain/scan-run/scan-run-repository.ts": [
-    "domain/scan-run/scan-run.ts",
-    "domain/scan-run/scan-value-objects.ts",
-    "domain/shared/index.ts",
-    "shared/base-repository.ts"
   ],
   "domain/scan-run/scan-run.ts": [
     "domain/scan-run/scan-value-objects.ts",
@@ -89,13 +92,7 @@
     "shared/errors/domain-errors.ts"
   ],
   "domain/team/index.ts": [
-    "domain/team/team-repository.ts",
     "domain/team/team.ts"
-  ],
-  "domain/team/team-repository.ts": [
-    "domain/shared/team-types.ts",
-    "domain/team/team.ts",
-    "shared/base-repository.ts"
   ],
   "domain/team/team.ts": [
     "domain/shared/index.ts",
@@ -114,11 +111,11 @@
     "infrastructure/config/environment.ts"
   ],
   "infrastructure/di/container.ts": [
+    "application/ports/quest-repository.ts",
+    "application/ports/repo-repository.ts",
+    "application/ports/scan-run-repository.ts",
+    "application/ports/team-repository.ts",
     "application/use-cases/ingest-scan-run.use-case.ts",
-    "domain/quest/quest-repository.ts",
-    "domain/repo/repo-repository.ts",
-    "domain/scan-run/scan-run-repository.ts",
-    "domain/team/team-repository.ts",
     "infrastructure/config/environment.ts",
     "infrastructure/config/firebase.config.ts",
     "infrastructure/persistence/firestore/firestore-client.ts",
@@ -146,7 +143,7 @@
     "domain/team/team.ts"
   ],
   "infrastructure/persistence/firestore/repositories/firestore-quest-repository.ts": [
-    "domain/quest/quest-repository.ts",
+    "application/ports/quest-repository.ts",
     "domain/quest/quest-value-objects.ts",
     "domain/quest/quest.ts",
     "infrastructure/persistence/firestore/firestore-client.ts",
@@ -154,7 +151,7 @@
     "shared/errors/domain-errors.ts"
   ],
   "infrastructure/persistence/firestore/repositories/firestore-repo-repository.ts": [
-    "domain/repo/repo-repository.ts",
+    "application/ports/repo-repository.ts",
     "domain/repo/repo.ts",
     "domain/shared/index.ts",
     "infrastructure/persistence/firestore/firestore-client.ts",
@@ -162,7 +159,7 @@
     "shared/errors/domain-errors.ts"
   ],
   "infrastructure/persistence/firestore/repositories/firestore-scan-run-repository.ts": [
-    "domain/scan-run/scan-run-repository.ts",
+    "application/ports/scan-run-repository.ts",
     "domain/scan-run/scan-run.ts",
     "domain/scan-run/scan-value-objects.ts",
     "domain/shared/repo-types.ts",
@@ -171,8 +168,8 @@
     "shared/errors/domain-errors.ts"
   ],
   "infrastructure/persistence/firestore/repositories/firestore-team-repository.ts": [
+    "application/ports/team-repository.ts",
     "domain/shared/team-types.ts",
-    "domain/team/team-repository.ts",
     "domain/team/team.ts",
     "infrastructure/persistence/firestore/firestore-client.ts",
     "infrastructure/persistence/firestore/mappers/team-mapper.ts",
@@ -202,6 +199,5 @@
   "presentation/routes/quests.routes.ts": [
     "presentation/dto/quest.dto.ts"
   ],
-  "shared/base-repository.ts": [],
   "shared/errors/domain-errors.ts": []
 }

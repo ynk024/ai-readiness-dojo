@@ -48,6 +48,12 @@
         "externalImports": 1,
         "cohesionScore": 50
       },
+      "application/ports/": {
+        "totalModules": 5,
+        "internalImports": 4,
+        "externalImports": 7,
+        "cohesionScore": 36.4
+      },
       "application/services/": {
         "totalModules": 1,
         "internalImports": 0,
@@ -61,22 +67,22 @@
         "cohesionScore": 0
       },
       "domain/quest/": {
-        "totalModules": 3,
-        "internalImports": 3,
-        "externalImports": 3,
-        "cohesionScore": 50
-      },
-      "domain/repo/": {
         "totalModules": 2,
         "internalImports": 1,
         "externalImports": 2,
         "cohesionScore": 33.3
       },
+      "domain/repo/": {
+        "totalModules": 1,
+        "internalImports": 0,
+        "externalImports": 1,
+        "cohesionScore": 0
+      },
       "domain/scan-run/": {
-        "totalModules": 3,
-        "internalImports": 3,
-        "externalImports": 3,
-        "cohesionScore": 50
+        "totalModules": 2,
+        "internalImports": 1,
+        "externalImports": 2,
+        "cohesionScore": 33.3
       },
       "domain/shared/": {
         "totalModules": 2,
@@ -85,10 +91,10 @@
         "cohesionScore": 0
       },
       "domain/team/": {
-        "totalModules": 2,
-        "internalImports": 1,
-        "externalImports": 3,
-        "cohesionScore": 25
+        "totalModules": 1,
+        "internalImports": 0,
+        "externalImports": 1,
+        "cohesionScore": 0
       },
       "infrastructure/config/": {
         "totalModules": 2,
@@ -136,12 +142,6 @@
         "totalModules": 3,
         "internalImports": 0,
         "externalImports": 3,
-        "cohesionScore": 0
-      },
-      "shared/": {
-        "totalModules": 1,
-        "internalImports": 0,
-        "externalImports": 0,
         "cohesionScore": 0
       },
       "shared/errors/": {
@@ -202,12 +202,12 @@
         "rank": 8
       },
       {
-        "file": "domain/quest/quest-repository.ts",
+        "file": "application/ports/quest-repository.ts",
         "fanOut": 3,
         "rank": 9
       },
       {
-        "file": "domain/scan-run/scan-run-repository.ts",
+        "file": "application/ports/scan-run-repository.ts",
         "fanOut": 3,
         "rank": 10
       }
@@ -234,27 +234,27 @@
         "rank": 4
       },
       {
-        "file": "domain/quest/quest.ts",
+        "file": "application/ports/base-repository.ts",
         "fanIn": 4,
         "rank": 5
       },
       {
-        "file": "domain/repo/repo.ts",
+        "file": "domain/quest/quest.ts",
         "fanIn": 4,
         "rank": 6
       },
       {
-        "file": "domain/scan-run/scan-run.ts",
+        "file": "domain/repo/repo.ts",
         "fanIn": 4,
         "rank": 7
       },
       {
-        "file": "domain/team/team.ts",
+        "file": "domain/scan-run/scan-run.ts",
         "fanIn": 4,
         "rank": 8
       },
       {
-        "file": "shared/base-repository.ts",
+        "file": "domain/team/team.ts",
         "fanIn": 4,
         "rank": 9
       },
@@ -291,17 +291,17 @@
         "rank": 5
       },
       {
-        "file": "application/services/team-repo-resolver.ts",
+        "file": "application/ports/quest-repository.ts",
         "maxDepth": 3,
         "rank": 6
       },
       {
-        "file": "domain/scan-run/scan-run-repository.ts",
+        "file": "application/ports/scan-run-repository.ts",
         "maxDepth": 3,
         "rank": 7
       },
       {
-        "file": "domain/quest/quest-repository.ts",
+        "file": "application/services/team-repo-resolver.ts",
         "maxDepth": 3,
         "rank": 8
       },
@@ -326,7 +326,7 @@
     "breakdown": {
       "coupling": 100,
       "depth": 100,
-      "cohesion": 17,
+      "cohesion": 14,
       "modularity": 100
     }
   }

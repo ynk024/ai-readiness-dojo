@@ -1,7 +1,7 @@
 import fastify from 'fastify';
 import { describe, expect, it, vi } from 'vitest';
 
-import { QuestRepository } from '../../../src/domain/quest/quest-repository.js';
+import { QuestRepository } from '../../../src/application/ports/quest-repository.js';
 import { QuestId } from '../../../src/domain/quest/quest-value-objects.js';
 import { Quest } from '../../../src/domain/quest/quest.js';
 import { QuestResponseDto } from '../../../src/presentation/dto/quest.dto.js';

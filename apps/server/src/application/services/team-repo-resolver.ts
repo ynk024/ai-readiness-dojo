@@ -3,9 +3,9 @@ import { RepoId, RepoFullName, RepoUrl } from '../../domain/shared/repo-types.js
 import { TeamId, TeamSlug } from '../../domain/shared/team-types.js';
 import { Team } from '../../domain/team/team.js';
 
-import type { RepoRepository } from '../../domain/repo/repo-repository.js';
-import type { TeamRepository } from '../../domain/team/team-repository.js';
 import type { RepoMetadata } from '../dto/repo-metadata.dto.js';
+import type { RepoRepository } from '../ports/repo-repository.js';
+import type { TeamRepository } from '../ports/team-repository.js';
 
 /**
  * Result of resolving team and repo from metadata

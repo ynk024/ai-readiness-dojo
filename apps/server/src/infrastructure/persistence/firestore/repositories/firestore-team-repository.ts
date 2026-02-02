@@ -1,5 +1,5 @@
+import { TeamRepository } from '../../../../application/ports/team-repository.js';
 import { TeamId, TeamSlug } from '../../../../domain/shared/team-types.js';
-import { TeamRepository } from '../../../../domain/team/team-repository.js';
 import { Team } from '../../../../domain/team/team.js';
 import { EntityNotFoundError } from '../../../../shared/errors/domain-errors.js';
 import { FirestoreClient } from '../firestore-client.js';
@@ -13,7 +13,7 @@ import {
 /**
  * Firestore Team Repository - Driven Adapter
  *
- * Implements the TeamRepository interface (outbound port) defined in the domain layer.
+ * Implements the TeamRepository interface (outbound port) defined in the application layer.
  * This adapter translates domain operations to Firestore-specific operations.
  */
 export class FirestoreTeamRepository implements TeamRepository {

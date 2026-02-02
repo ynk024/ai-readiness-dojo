@@ -12,8 +12,8 @@ import {
 import { Team } from '../../../src/domain/team/team.js';
 
 import type { RepoMetadata } from '../../../src/application/dto/repo-metadata.dto.js';
-import type { RepoRepository } from '../../../src/domain/repo/repo-repository.js';
-import type { TeamRepository } from '../../../src/domain/team/team-repository.js';
+import type { RepoRepository } from '../../../src/application/ports/repo-repository.js';
+import type { TeamRepository } from '../../../src/application/ports/team-repository.js';
 
 describe('TeamRepoResolver', () => {
   let teamRepository: TeamRepository;
