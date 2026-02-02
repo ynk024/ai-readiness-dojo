@@ -23,6 +23,7 @@ export default tseslint.config(
       '**/*.config.ts',
       'pnpm-lock.yaml',
       'scripts/**',
+      '.worktrees/**',
     ],
   },
   {
