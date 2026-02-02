@@ -26,6 +26,35 @@ This repository enforces code quality through automated tooling. **When in doubt
 
 **Philosophy**: Let tooling catch mistakes. Focus on understanding the architecture and patterns below.
 
+## Design Philosophy & Best Practices
+
+**Highest Priority**: Follow and respect **Hexagonal Architecture** and **Domain-Driven Design (DDD)** principles.
+
+### 1. Loose Coupling is a First-Class Citizen
+
+- **Decoupling over Convenience**: Do not blindly couple aggregates, entities, or bounded contexts just to save a few lines of code.
+- **Embrace Boilerplate**: Accept the need for **DTOs (Data Transfer Objects)** and **Snapshots** to maintain strict separation between contexts and layers.
+- **Reference by ID**: Aggregates should reference each other by ID, not by object reference.
+
+### 2. Bounded Context Dependencies
+
+- **Current State**: The server currently manages a **single Bounded Context**. However, we design as if there could be multiple to ensure future scalability.
+- **Think Context First**: Before defining an entity or aggregate, deeply consider which **Bounded Context** it belongs to.
+- **Context Boundaries**: Communication between bounded contexts must happen via explicit interfaces (Ports) and DTOs. Never leak internal domain models across context boundaries.
+
+### 3. Aggregate Root Responsibilities
+
+- **Consistency Boundaries**: The Aggregate Root is responsible for maintaining the consistency of all entities within its boundary.
+- **Transactional Integrity**: Changes to an aggregate should be transactional.
+- **Event-Driven**: Use Domain Events to trigger side effects in other aggregates or contexts.
+
+### 4. Workflow: Inside-Out
+
+- **Layer by Layer**: Always work layer by layer, starting from the **Hexagon (Domain)** and moving outwards to Application and Infrastructure.
+  1.  **Domain**: Define Entities, Value Objects, and Repository Interfaces (Ports).
+  2.  **Application**: Implement Use Cases and Services.
+  3.  **Infrastructure/Presentation**: Implement Adapters (Repositories, Controllers).
+
 ## Build, Lint, and Test Commands
 
 ### Root-level Commands
