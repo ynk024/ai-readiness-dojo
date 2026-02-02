@@ -235,6 +235,7 @@ export class Team {
 - **Integration tests**: Located in `tests/integration/`, use real Firestore emulator
 - **Test helpers**: Use factories from `tests/helpers/test-data-factory.ts`
 - **Mocking**: Use Vitest's `vi.fn()` for mocking
+- **Firebase emulator**: Start with `pnpm --filter server emulator:start` before running tests (including integration tests), and stop it after tests complete
 
 ## Dependency Analysis with Madge
 
