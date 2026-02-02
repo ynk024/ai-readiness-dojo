@@ -159,7 +159,7 @@ The server follows strict hexagonal architecture with enforced boundaries:
 
 ```
 domain/              → Core business logic (entities, value objects, repository interfaces)
-├── entities/        → Business entities (Team, Repo, ScanRun, Item)
+├── entities/        → Business entities (Team, Repo, ScanRun, Quest)
 ├── repositories/    → Repository interfaces (ports)
 └── value-objects/   → Value objects (TeamId, RepoId, etc.)
 

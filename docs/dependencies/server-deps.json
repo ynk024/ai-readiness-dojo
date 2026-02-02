@@ -23,28 +23,11 @@
     "domain/team/team-repository.ts"
   ],
   "domain/index.ts": [
-    "domain/item/index.ts",
     "domain/quest/index.ts",
     "domain/repo/index.ts",
     "domain/scan-run/index.ts",
     "domain/shared/index.ts",
     "domain/team/index.ts"
-  ],
-  "domain/item/index.ts": [
-    "domain/item/item-repository.ts",
-    "domain/item/item-value-objects.ts",
-    "domain/item/item.ts"
-  ],
-  "domain/item/item-repository.ts": [
-    "domain/item/item-value-objects.ts",
-    "domain/item/item.ts",
-    "shared/base-repository.ts"
-  ],
-  "domain/item/item-value-objects.ts": [
-    "shared/errors/domain-errors.ts"
-  ],
-  "domain/item/item.ts": [
-    "domain/item/item-value-objects.ts"
   ],
   "domain/quest/index.ts": [
     "domain/quest/quest-repository.ts",
@@ -124,7 +107,6 @@
     "infrastructure/persistence/firestore/firestore-client.ts",
     "presentation/routes/health.ts",
     "presentation/routes/ingest.routes.ts",
-    "presentation/routes/items.routes.ts",
     "presentation/routes/quests.routes.ts"
   ],
   "infrastructure/config/environment.ts": [],
@@ -133,7 +115,6 @@
   ],
   "infrastructure/di/container.ts": [
     "application/use-cases/ingest-scan-run.use-case.ts",
-    "domain/item/item-repository.ts",
     "domain/quest/quest-repository.ts",
     "domain/repo/repo-repository.ts",
     "domain/scan-run/scan-run-repository.ts",
@@ -141,17 +122,12 @@
     "infrastructure/config/environment.ts",
     "infrastructure/config/firebase.config.ts",
     "infrastructure/persistence/firestore/firestore-client.ts",
-    "infrastructure/persistence/firestore/repositories/firestore-item-repository.ts",
     "infrastructure/persistence/firestore/repositories/firestore-quest-repository.ts",
     "infrastructure/persistence/firestore/repositories/firestore-repo-repository.ts",
     "infrastructure/persistence/firestore/repositories/firestore-scan-run-repository.ts",
     "infrastructure/persistence/firestore/repositories/firestore-team-repository.ts"
   ],
   "infrastructure/persistence/firestore/firestore-client.ts": [],
-  "infrastructure/persistence/firestore/mappers/item-mapper.ts": [
-    "domain/item/item-value-objects.ts",
-    "domain/item/item.ts"
-  ],
   "infrastructure/persistence/firestore/mappers/quest-mapper.ts": [
     "domain/quest/quest-value-objects.ts",
     "domain/quest/quest.ts"
@@ -168,14 +144,6 @@
   "infrastructure/persistence/firestore/mappers/team-mapper.ts": [
     "domain/shared/index.ts",
     "domain/team/team.ts"
-  ],
-  "infrastructure/persistence/firestore/repositories/firestore-item-repository.ts": [
-    "domain/item/item-repository.ts",
-    "domain/item/item-value-objects.ts",
-    "domain/item/item.ts",
-    "infrastructure/persistence/firestore/firestore-client.ts",
-    "infrastructure/persistence/firestore/mappers/item-mapper.ts",
-    "shared/errors/domain-errors.ts"
   ],
   "infrastructure/persistence/firestore/repositories/firestore-quest-repository.ts": [
     "domain/quest/quest-repository.ts",
@@ -219,7 +187,6 @@
     "infrastructure/persistence/firestore/repositories/firestore-quest-repository.ts"
   ],
   "presentation/dto/ingest-scan.dto.ts": [],
-  "presentation/dto/item.dto.ts": [],
   "presentation/dto/quest.dto.ts": [],
   "presentation/mappers/ingest-scan-run.mapper.ts": [
     "application/dto/ingest-scan-run.dto.ts",
@@ -231,12 +198,6 @@
   "presentation/routes/ingest.routes.ts": [
     "presentation/dto/ingest-scan.dto.ts",
     "presentation/mappers/ingest-scan-run.mapper.ts"
-  ],
-  "presentation/routes/items.routes.ts": [
-    "domain/item/item-value-objects.ts",
-    "domain/item/item.ts",
-    "presentation/dto/item.dto.ts",
-    "shared/errors/domain-errors.ts"
   ],
   "presentation/routes/quests.routes.ts": [
     "presentation/dto/quest.dto.ts"

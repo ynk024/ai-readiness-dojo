@@ -1,13 +1,11 @@
 import { IngestScanRunUseCase } from '../../application/use-cases/ingest-scan-run.use-case.js';
 import { FirebaseConfig } from '../config/firebase.config.js';
 import { FirestoreClient } from '../persistence/firestore/firestore-client.js';
-import { FirestoreItemRepository } from '../persistence/firestore/repositories/firestore-item-repository.js';
 import { FirestoreQuestRepository } from '../persistence/firestore/repositories/firestore-quest-repository.js';
 import { FirestoreRepoRepository } from '../persistence/firestore/repositories/firestore-repo-repository.js';
 import { FirestoreScanRunRepository } from '../persistence/firestore/repositories/firestore-scan-run-repository.js';
 import { FirestoreTeamRepository } from '../persistence/firestore/repositories/firestore-team-repository.js';
 
-import type { ItemRepository } from '../../domain/item/item-repository.js';
 import type { QuestRepository } from '../../domain/quest/quest-repository.js';
 import type { RepoRepository } from '../../domain/repo/repo-repository.js';
 import type { ScanRunRepository } from '../../domain/scan-run/scan-run-repository.js';
@@ -25,7 +23,6 @@ import type { FastifyInstance } from 'fastify';
 // Extend Fastify types to include our decorators
 declare module 'fastify' {
   interface FastifyInstance {
-    itemRepository: ItemRepository;
     teamRepository: TeamRepository;
     repoRepository: RepoRepository;
     scanRunRepository: ScanRunRepository;
@@ -76,9 +73,6 @@ export function registerDependencies(
   fastify.decorate('firestoreClient', firestoreClient);
 
   // Register repositories (driven adapters)
-  const itemRepository = new FirestoreItemRepository(firestoreClient);
-  fastify.decorate('itemRepository', itemRepository);
-
   const teamRepository = new FirestoreTeamRepository(firestoreClient);
   fastify.decorate('teamRepository', teamRepository);
 

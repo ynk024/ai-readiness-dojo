@@ -8,7 +8,6 @@ import { registerDependencies } from './infrastructure/di/container.js';
 import { FirestoreClient } from './infrastructure/persistence/firestore/firestore-client.js';
 import { healthRoutes } from './presentation/routes/health.js';
 import { ingestRoutes } from './presentation/routes/ingest.routes.js';
-import { itemsRoutes } from './presentation/routes/items.routes.js';
 import { questsRoutes } from './presentation/routes/quests.routes.js';
 
 export async function buildServer(testFirestoreClient?: FirestoreClient): Promise<FastifyInstance> {
@@ -40,7 +39,6 @@ export async function buildServer(testFirestoreClient?: FirestoreClient): Promis
 
   // Register routes
   await fastify.register(healthRoutes);
-  await fastify.register(itemsRoutes);
   await fastify.register(questsRoutes, { prefix: '/api' });
   await fastify.register(ingestRoutes, { prefix: '/api' });
 
