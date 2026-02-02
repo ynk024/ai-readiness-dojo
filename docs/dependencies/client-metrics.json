@@ -57,6 +57,19 @@
         "externalImports": 0,
         "cohesionScore": 0
       }
+    },
+    "byBoundedContext": {},
+    "byLayer": {},
+    "dependencyViolations": [],
+    "moduleIsolation": {
+      "orphaned": [
+        "App.svelte",
+        "app.css",
+        "lib/Counter.svelte",
+        "vite-env.d.ts"
+      ],
+      "leafModules": [],
+      "rootModules": []
     }
   },
   "graph": {

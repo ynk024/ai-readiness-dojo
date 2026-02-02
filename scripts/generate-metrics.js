@@ -310,6 +310,208 @@ function calculateCohesion(graph) {
   };
 }
 
+function identifyBoundedContexts(graph) {
+  const files = Object.keys(graph);
+  const contexts = new Map();
+
+  // Find all domain contexts (subdirectories under domain/, excluding shared)
+  const domainContexts = new Set();
+  files.forEach((file) => {
+    const match = file.match(/^domain\/([^/]+)\//);
+    if (match && match[1] !== 'shared' && match[1] !== 'index.ts') {
+      domainContexts.add(match[1]);
+    }
+  });
+
+  // For each domain context, find related files across layers
+  domainContexts.forEach((contextName) => {
+    const contextFiles = files.filter((file) => {
+      // Domain files
+      if (file.startsWith(`domain/${contextName}/`)) return true;
+
+      // Application ports (repository interfaces)
+      if (file.includes(`/ports/${contextName}-repository.ts`)) return true;
+
+      // Infrastructure repositories and mappers
+      if (file.includes(`/repositories/firestore-${contextName}-repository.ts`)) return true;
+      if (file.includes(`/mappers/${contextName}-mapper.ts`)) return true;
+
+      // Presentation DTOs
+      if (file.includes(`/dto/${contextName}.dto.ts`)) return true;
+
+      return false;
+    });
+
+    if (contextFiles.length > 0) {
+      contexts.set(contextName, contextFiles);
+    }
+  });
+
+  return contexts;
+}
+
+function calculateBoundedContextCohesion(graph, contexts) {
+  const byBoundedContext = {};
+
+  contexts.forEach((contextFiles, contextName) => {
+    const contextFileSet = new Set(contextFiles);
+    let internalImports = 0;
+    let externalImports = 0;
+
+    // Count imports within vs outside the context
+    contextFiles.forEach((file) => {
+      const deps = graph[file] || [];
+      deps.forEach((dep) => {
+        if (contextFileSet.has(dep)) {
+          internalImports++;
+        } else {
+          externalImports++;
+        }
+      });
+    });
+
+    const total = internalImports + externalImports;
+    const cohesionScore = total > 0 ? (internalImports / total) * 100 : 0;
+
+    byBoundedContext[contextName] = {
+      modules: contextFiles,
+      totalModules: contextFiles.length,
+      internalImports,
+      externalImports,
+      cohesionScore: Math.round(cohesionScore * 10) / 10,
+    };
+  });
+
+  return byBoundedContext;
+}
+
+function calculateLayerCohesion(graph) {
+  const files = Object.keys(graph);
+  const layers = {
+    domain: [],
+    application: [],
+    infrastructure: [],
+    presentation: [],
+    shared: [],
+  };
+
+  // Categorize files by layer
+  files.forEach((file) => {
+    if (file.startsWith('domain/')) {
+      layers.domain.push(file);
+    } else if (file.startsWith('application/')) {
+      layers.application.push(file);
+    } else if (file.startsWith('infrastructure/') && !file.includes('/di/container.ts')) {
+      layers.infrastructure.push(file);
+    } else if (file.startsWith('presentation/')) {
+      layers.presentation.push(file);
+    } else if (file.startsWith('shared/')) {
+      layers.shared.push(file);
+    }
+  });
+
+  const byLayer = {};
+
+  Object.entries(layers).forEach(([layerName, layerFiles]) => {
+    if (layerFiles.length === 0) return;
+
+    const layerFileSet = new Set(layerFiles);
+    let internalImports = 0;
+    let externalImports = 0;
+
+    layerFiles.forEach((file) => {
+      const deps = graph[file] || [];
+      deps.forEach((dep) => {
+        if (layerFileSet.has(dep)) {
+          internalImports++;
+        } else {
+          externalImports++;
+        }
+      });
+    });
+
+    const total = internalImports + externalImports;
+    const cohesionScore = total > 0 ? (internalImports / total) * 100 : 0;
+
+    byLayer[layerName] = {
+      totalModules: layerFiles.length,
+      internalImports,
+      externalImports,
+      cohesionScore: Math.round(cohesionScore * 10) / 10,
+    };
+  });
+
+  return byLayer;
+}
+
+function validateDependencyRules(graph) {
+  const files = Object.keys(graph);
+  const violations = [];
+
+  const getLayer = (file) => {
+    if (file.startsWith('domain/')) return 'domain';
+    if (file.startsWith('application/')) return 'application';
+    if (file.startsWith('infrastructure/')) return 'infrastructure';
+    if (file.startsWith('presentation/')) return 'presentation';
+    if (file.startsWith('shared/')) return 'shared';
+    return 'other';
+  };
+
+  const allowedDependencies = {
+    domain: ['shared'], // Domain should only depend on shared utilities
+    application: ['domain', 'shared'],
+    infrastructure: ['domain', 'application', 'shared'],
+    presentation: ['domain', 'application', 'shared'],
+    shared: [],
+  };
+
+  files.forEach((file) => {
+    const fileLayer = getLayer(file);
+    const deps = graph[file] || [];
+
+    deps.forEach((dep) => {
+      const depLayer = getLayer(dep);
+      const allowed = allowedDependencies[fileLayer] || [];
+
+      if (fileLayer !== depLayer && !allowed.includes(depLayer)) {
+        violations.push({
+          file,
+          dependency: dep,
+          violation: `${fileLayer} → ${depLayer}`,
+          message: `${fileLayer} layer should not depend on ${depLayer} layer`,
+        });
+      }
+    });
+  });
+
+  return violations;
+}
+
+function categorizeModuleIsolation(graph) {
+  const files = Object.keys(graph);
+  const categories = {
+    orphaned: [],
+    leafModules: [],
+    rootModules: [],
+  };
+
+  files.forEach((file) => {
+    const hasNoDeps = graph[file].length === 0;
+    const notImported = !files.some((f) => graph[f].includes(file));
+    const isImported = !notImported;
+
+    if (hasNoDeps && notImported) {
+      categories.orphaned.push(file);
+    } else if (hasNoDeps && isImported) {
+      categories.leafModules.push(file);
+    } else if (!hasNoDeps && notImported) {
+      categories.rootModules.push(file);
+    }
+  });
+
+  return categories;
+}
+
 function calculateGraph(graph) {
   const files = Object.keys(graph);
   const nodeCount = files.length;
@@ -355,12 +557,23 @@ function calculateHealthScore(metrics) {
     scores.depth = 75;
   }
 
-  // Cohesion score (based on directory cohesion)
-  const cohesionScores = Object.values(metrics.cohesion.byDirectory).map((d) => d.cohesionScore);
-  const avgCohesion =
-    cohesionScores.length > 0
-      ? cohesionScores.reduce((sum, v) => sum + v, 0) / cohesionScores.length
-      : 100;
+  // Cohesion score (based on bounded context cohesion if available, otherwise directory cohesion)
+  let avgCohesion = 100;
+  if (
+    metrics.cohesion.byBoundedContext &&
+    Object.keys(metrics.cohesion.byBoundedContext).length > 0
+  ) {
+    const boundedContextScores = Object.values(metrics.cohesion.byBoundedContext).map(
+      (c) => c.cohesionScore,
+    );
+    avgCohesion = boundedContextScores.reduce((sum, v) => sum + v, 0) / boundedContextScores.length;
+  } else {
+    const cohesionScores = Object.values(metrics.cohesion.byDirectory).map((d) => d.cohesionScore);
+    avgCohesion =
+      cohesionScores.length > 0
+        ? cohesionScores.reduce((sum, v) => sum + v, 0) / cohesionScores.length
+        : 100;
+  }
   scores.cohesion = Math.round(avgCohesion);
 
   // Modularity score (based on graph density)
@@ -513,6 +726,13 @@ function generateMetrics(graph, appName) {
   const cohesion = calculateCohesion(graph);
   const graphMetrics = calculateGraph(graph);
 
+  // New cohesion metrics
+  const boundedContexts = identifyBoundedContexts(graph);
+  const boundedContextCohesion = calculateBoundedContextCohesion(graph, boundedContexts);
+  const layerCohesion = calculateLayerCohesion(graph);
+  const dependencyViolations = validateDependencyRules(graph);
+  const moduleIsolation = categorizeModuleIsolation(graph);
+
   const metrics = {
     circular,
     coupling: {
@@ -532,7 +752,13 @@ function generateMetrics(graph, appName) {
       criticalDepth: depth.criticalDepth,
       deepModules: depth.deepModules,
     },
-    cohesion,
+    cohesion: {
+      ...cohesion,
+      byBoundedContext: boundedContextCohesion,
+      byLayer: layerCohesion,
+      dependencyViolations,
+      moduleIsolation,
+    },
     graph: graphMetrics,
   };
 
@@ -638,6 +864,54 @@ function printMetrics(metrics, appName) {
       `  ${emoji} ${dir}: ${data.cohesionScore}% (${data.internalImports} internal / ${data.externalImports} external)`,
     );
   });
+
+  // Bounded Context Cohesion
+  if (
+    metrics.cohesion.byBoundedContext &&
+    Object.keys(metrics.cohesion.byBoundedContext).length > 0
+  ) {
+    console.log('\n🎯 Cohesion by Bounded Context:');
+    const contexts = Object.entries(metrics.cohesion.byBoundedContext).sort(
+      ([, a], [, b]) => b.cohesionScore - a.cohesionScore,
+    );
+    contexts.forEach(([contextName, data]) => {
+      const emoji = data.cohesionScore >= 80 ? '🟢' : data.cohesionScore >= 60 ? '🟡' : '🔴';
+      console.log(
+        `  ${emoji} ${contextName}: ${data.cohesionScore}% (${data.totalModules} modules, ${data.internalImports} internal / ${data.externalImports} external)`,
+      );
+    });
+  }
+
+  // Layer Cohesion
+  if (metrics.cohesion.byLayer && Object.keys(metrics.cohesion.byLayer).length > 0) {
+    console.log('\n🏗️  Cohesion by Layer:');
+    const layers = Object.entries(metrics.cohesion.byLayer).sort(
+      ([, a], [, b]) => b.cohesionScore - a.cohesionScore,
+    );
+    layers.forEach(([layerName, data]) => {
+      const emoji = data.cohesionScore >= 80 ? '🟢' : data.cohesionScore >= 60 ? '🟡' : '🔴';
+      console.log(
+        `  ${emoji} ${layerName}: ${data.cohesionScore}% (${data.totalModules} modules, ${data.internalImports} internal / ${data.externalImports} external)`,
+      );
+    });
+  }
+
+  // Dependency Rule Violations
+  if (metrics.cohesion.dependencyViolations && metrics.cohesion.dependencyViolations.length > 0) {
+    console.log('\n⚠️  Dependency Rule Violations:');
+    metrics.cohesion.dependencyViolations.slice(0, 5).forEach((v) => {
+      console.log(`  ❌ ${v.file}`);
+      console.log(`     → ${v.dependency}`);
+      console.log(`     ${v.message}`);
+    });
+    if (metrics.cohesion.dependencyViolations.length > 5) {
+      console.log(
+        `  ... and ${metrics.cohesion.dependencyViolations.length - 5} more violation(s)`,
+      );
+    }
+  } else if (metrics.cohesion.dependencyViolations) {
+    console.log('\n✅ No dependency rule violations detected');
+  }
 
   // Violations
   if (metrics.violations.critical.length > 0) {
