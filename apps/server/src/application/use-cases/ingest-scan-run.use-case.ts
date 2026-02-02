@@ -2,6 +2,7 @@ import { ScanRun } from '../../domain/scan-run/scan-run.js';
 import { ScanRunId, CommitSha } from '../../domain/scan-run/scan-value-objects.js';
 import { TeamRepoResolver } from '../services/team-repo-resolver.js';
 
+import type { ComputeRepoReadinessUseCase } from './compute-repo-readiness.use-case.js';
 import type { IngestScanRunDto } from '../dto/ingest-scan-run.dto.js';
 import type { RepoRepository } from '../ports/repo-repository.js';
 import type { ScanRunRepository } from '../ports/scan-run-repository.js';
@@ -28,7 +29,8 @@ export interface IngestScanRunResult {
  * 1. Resolve or create team and repo
  * 2. Create ScanRun entity with quest results
  * 3. Persist ScanRun to repository
- * 4. Return summary with IDs and quest counts
+ * 4. Compute and persist repo readiness
+ * 5. Return summary with IDs and quest counts
  */
 export class IngestScanRunUseCase {
   private readonly teamRepoResolver: TeamRepoResolver;
@@ -37,6 +39,7 @@ export class IngestScanRunUseCase {
     teamRepository: TeamRepository,
     repoRepository: RepoRepository,
     private readonly scanRunRepository: ScanRunRepository,
+    private readonly computeRepoReadinessUseCase: ComputeRepoReadinessUseCase,
   ) {
     this.teamRepoResolver = new TeamRepoResolver(teamRepository, repoRepository);
   }
@@ -71,7 +74,10 @@ export class IngestScanRunUseCase {
     // Step 4: Persist scan run
     await this.scanRunRepository.save(scanRun);
 
-    // Step 5: Return result with summary
+    // Step 5: Compute and persist repo readiness
+    await this.computeRepoReadinessUseCase.execute(scanRun);
+
+    // Step 6: Return result with summary
     return {
       scanRunId: scanRun.id.value,
       teamId: team.id.value,

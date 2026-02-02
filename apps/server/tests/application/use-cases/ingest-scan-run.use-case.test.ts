@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+import { ComputeRepoReadinessUseCase } from '../../../src/application/use-cases/compute-repo-readiness.use-case.js';
 import { IngestScanRunUseCase } from '../../../src/application/use-cases/ingest-scan-run.use-case.js';
 import { Repo } from '../../../src/domain/repo/repo.js';
 import { ScanRun } from '../../../src/domain/scan-run/scan-run.js';
@@ -23,6 +24,7 @@ describe('IngestScanRunUseCase', () => {
   let teamRepository: TeamRepository;
   let repoRepository: RepoRepository;
   let scanRunRepository: ScanRunRepository;
+  let computeRepoReadinessUseCase: ComputeRepoReadinessUseCase;
   let useCase: IngestScanRunUseCase;
 
   const sampleReport: IngestScanRequestDto = {
@@ -94,7 +96,16 @@ describe('IngestScanRunUseCase', () => {
       findLatestByRepoId: vi.fn(),
     };
 
-    useCase = new IngestScanRunUseCase(teamRepository, repoRepository, scanRunRepository);
+    computeRepoReadinessUseCase = {
+      execute: vi.fn(),
+    } as unknown as ComputeRepoReadinessUseCase;
+
+    useCase = new IngestScanRunUseCase(
+      teamRepository,
+      repoRepository,
+      scanRunRepository,
+      computeRepoReadinessUseCase,
+    );
   });
 
   describe('execute', () => {
