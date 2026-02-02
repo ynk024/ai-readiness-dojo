@@ -28,11 +28,25 @@ export class ComputeRepoReadinessUseCase {
     // Step 1: Fetch quest catalog to enrich readiness with levels
     const quests = await this.questRepository.findActive();
 
-    // Create a map for quick lookup
-    const questCatalog = new Map(quests.map((q) => [q.key, q]));
+    const questCatalog = new Map(
+      quests.map((q) => [
+        q.key,
+        {
+          key: q.key,
+        },
+      ]),
+    );
+
+    const scanRunSummary = {
+      id: scanRun.id,
+      repoId: scanRun.repoId,
+      teamId: scanRun.teamId,
+      scannedAt: scanRun.scannedAt,
+      questResults: scanRun.questResults,
+    };
 
     // Step 2: Compute readiness from scan run
-    const readiness = RepoReadiness.computeFromScanRun(scanRun, questCatalog);
+    const readiness = RepoReadiness.computeFromScanRun(scanRunSummary, questCatalog);
 
     // Step 3: Persist readiness snapshot
     await this.repoReadinessRepository.save(readiness);

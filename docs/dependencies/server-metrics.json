@@ -4,11 +4,11 @@
     "generator": "generate-metrics.js v1.0.0"
   },
   "summary": {
-    "totalModules": 44,
-    "totalDependencies": 106,
-    "graphDensity": 0.056,
-    "avgFanOut": 2.41,
-    "avgFanIn": 2.41,
+    "totalModules": 45,
+    "totalDependencies": 108,
+    "graphDensity": 0.055,
+    "avgFanOut": 2.4,
+    "avgFanIn": 2.4,
     "healthScore": 88,
     "status": "WARN"
   },
@@ -20,10 +20,10 @@
     "cycles": []
   },
   "coupling": {
-    "avgFanOut": 2.41,
+    "avgFanOut": 2.4,
     "maxFanOut": 8,
     "maxFanOutFile": "application/use-cases/ingest-scan-run.use-case.ts",
-    "avgFanIn": 2.41,
+    "avgFanIn": 2.4,
     "maxFanIn": 13,
     "maxFanInFile": "shared/errors/domain-errors.ts",
     "criticalCoupling": [],
@@ -81,8 +81,8 @@
       "domain/repo-readiness/": {
         "totalModules": 2,
         "internalImports": 1,
-        "externalImports": 4,
-        "cohesionScore": 20
+        "externalImports": 3,
+        "cohesionScore": 25
       },
       "domain/repo/": {
         "totalModules": 1,
@@ -97,10 +97,10 @@
         "cohesionScore": 33.3
       },
       "domain/shared/": {
-        "totalModules": 2,
-        "internalImports": 0,
-        "externalImports": 2,
-        "cohesionScore": 0
+        "totalModules": 3,
+        "internalImports": 2,
+        "externalImports": 3,
+        "cohesionScore": 40
       },
       "domain/team/": {
         "totalModules": 1,
@@ -189,8 +189,8 @@
         ],
         "totalModules": 6,
         "internalImports": 7,
-        "externalImports": 11,
-        "cohesionScore": 38.9
+        "externalImports": 10,
+        "cohesionScore": 41.2
       },
       "repo": {
         "modules": [
@@ -232,10 +232,10 @@
     },
     "byLayer": {
       "domain": {
-        "totalModules": 10,
-        "internalImports": 6,
+        "totalModules": 11,
+        "internalImports": 8,
         "externalImports": 9,
-        "cohesionScore": 40
+        "cohesionScore": 47.1
       },
       "application": {
         "totalModules": 11,
@@ -291,11 +291,11 @@
     }
   },
   "graph": {
-    "nodeCount": 44,
-    "edgeCount": 106,
-    "density": 0.056,
-    "avgDegree": 4.82,
-    "maxPossibleEdges": 1892
+    "nodeCount": 45,
+    "edgeCount": 108,
+    "density": 0.055,
+    "avgDegree": 4.8,
+    "maxPossibleEdges": 1980
   },
   "topModules": {
     "mostCoupled": [
@@ -358,42 +358,42 @@
       },
       {
         "file": "domain/scan-run/scan-value-objects.ts",
-        "fanIn": 9,
+        "fanIn": 10,
         "rank": 2
       },
       {
-        "file": "domain/scan-run/scan-run.ts",
+        "file": "domain/shared/repo-types.ts",
         "fanIn": 6,
         "rank": 3
       },
       {
-        "file": "infrastructure/persistence/firestore/firestore-client.ts",
+        "file": "domain/shared/team-types.ts",
         "fanIn": 6,
         "rank": 4
       },
       {
-        "file": "application/ports/base-repository.ts",
-        "fanIn": 5,
+        "file": "infrastructure/persistence/firestore/firestore-client.ts",
+        "fanIn": 6,
         "rank": 5
       },
       {
-        "file": "domain/quest/quest-value-objects.ts",
+        "file": "application/ports/base-repository.ts",
         "fanIn": 5,
         "rank": 6
       },
       {
-        "file": "domain/quest/quest.ts",
+        "file": "domain/quest/quest-value-objects.ts",
         "fanIn": 5,
         "rank": 7
       },
       {
-        "file": "domain/shared/repo-types.ts",
+        "file": "domain/scan-run/scan-run.ts",
         "fanIn": 5,
         "rank": 8
       },
       {
-        "file": "domain/shared/team-types.ts",
-        "fanIn": 5,
+        "file": "domain/quest/quest.ts",
+        "fanIn": 4,
         "rank": 9
       },
       {

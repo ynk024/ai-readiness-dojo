@@ -83,11 +83,10 @@
     "shared/errors/domain-errors.ts"
   ],
   "domain/repo-readiness/repo-readiness.ts": [
-    "domain/quest/quest.ts",
     "domain/repo-readiness/repo-readiness-value-objects.ts",
-    "domain/scan-run/scan-run.ts",
     "domain/scan-run/scan-value-objects.ts",
-    "domain/shared/index.ts"
+    "domain/shared/index.ts",
+    "domain/shared/readiness-data.ts"
   ],
   "domain/repo/index.ts": [
     "domain/repo/repo.ts"
@@ -109,6 +108,11 @@
     "shared/errors/domain-errors.ts"
   ],
   "domain/shared/index.ts": [
+    "domain/shared/repo-types.ts",
+    "domain/shared/team-types.ts"
+  ],
+  "domain/shared/readiness-data.ts": [
+    "domain/scan-run/scan-value-objects.ts",
     "domain/shared/repo-types.ts",
     "domain/shared/team-types.ts"
   ],

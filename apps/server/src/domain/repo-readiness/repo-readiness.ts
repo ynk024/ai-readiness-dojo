@@ -1,7 +1,6 @@
-import { Quest } from '../quest/quest.js';
-import { ScanRun } from '../scan-run/scan-run.js';
 import { ScanRunId } from '../scan-run/scan-value-objects.js';
 import { RepoId, TeamId } from '../shared/index.js';
+import { QuestDefinition, ScanRunSummary } from '../shared/readiness-data.js';
 
 import {
   ReadinessStatus,
@@ -27,13 +26,16 @@ export class RepoReadiness {
   private constructor(private props: RepoReadinessProps) {}
 
   /**
-   * Compute repo readiness from a scan run and quest catalog
+   * Compute repo readiness from a scan run summary and quest catalog definitions
    *
-   * @param scanRun - The scan run containing quest results
-   * @param questCatalog - Map of quest keys to Quest entities for enrichment
+   * @param scanRun - Summary of the scan run results
+   * @param questCatalog - Map of quest keys to quest definitions
    * @returns New RepoReadiness instance
    */
-  static computeFromScanRun(scanRun: ScanRun, questCatalog: Map<string, Quest>): RepoReadiness {
+  static computeFromScanRun(
+    scanRun: ScanRunSummary,
+    questCatalog: Map<string, QuestDefinition>,
+  ): RepoReadiness {
     const questMap = new Map<string, QuestReadinessEntry>();
 
     // Process each quest result from the scan run
