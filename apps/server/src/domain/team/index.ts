@@ -1,1 +1,1 @@
-export { Team, type TeamProps } from './team.js';
+export { Team, type TeamProps, RepoEntity, type RepoEntityProps } from './team.js';

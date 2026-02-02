@@ -1,7 +1,8 @@
 import { ValidationError } from '../../shared/errors/domain-errors.js';
-import { RepoId, RepoFullName, RepoUrl, TeamId } from '../shared/index.js';
+import { RepoId, RepoFullName, RepoUrl } from '../shared/repo-types.js';
+import { TeamId } from '../shared/team-types.js';
 
-export interface RepoProps {
+export interface RepoEntityProps {
   id: RepoId;
   provider: string;
   fullName: RepoFullName;
@@ -13,10 +14,10 @@ export interface RepoProps {
   updatedAt: Date;
 }
 
-export class Repo {
-  private constructor(private props: RepoProps) {}
+export class RepoEntity {
+  private constructor(private props: RepoEntityProps) {}
 
-  static create(input: Omit<RepoProps, 'createdAt' | 'updatedAt'>): Repo {
+  static create(input: Omit<RepoEntityProps, 'createdAt' | 'updatedAt'>): RepoEntity {
     const trimmedProvider = input.provider.trim();
     const trimmedDefaultBranch = input.defaultBranch.trim();
 
@@ -29,7 +30,7 @@ export class Repo {
     }
 
     const now = new Date();
-    return new Repo({
+    return new RepoEntity({
       ...input,
       provider: trimmedProvider,
       defaultBranch: trimmedDefaultBranch,
@@ -38,8 +39,8 @@ export class Repo {
     });
   }
 
-  static reconstitute(props: RepoProps): Repo {
-    return new Repo(props);
+  static reconstitute(props: RepoEntityProps): RepoEntity {
+    return new RepoEntity(props);
   }
 
   get id(): RepoId {
@@ -97,5 +98,9 @@ export class Repo {
 
     this.props.defaultBranch = trimmedBranch;
     this.props.updatedAt = new Date();
+  }
+
+  equals(other: RepoEntity): boolean {
+    return this.props.id.equals(other.props.id);
   }
 }

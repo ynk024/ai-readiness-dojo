@@ -4,7 +4,6 @@ import { TeamRepoResolver } from '../services/team-repo-resolver.js';
 
 import type { ComputeRepoReadinessUseCase } from './compute-repo-readiness.use-case.js';
 import type { IngestScanRunDto } from '../dto/ingest-scan-run.dto.js';
-import type { RepoRepository } from '../ports/repo-repository.js';
 import type { ScanRunRepository } from '../ports/scan-run-repository.js';
 import type { TeamRepository } from '../ports/team-repository.js';
 
@@ -37,11 +36,10 @@ export class IngestScanRunUseCase {
 
   constructor(
     teamRepository: TeamRepository,
-    repoRepository: RepoRepository,
     private readonly scanRunRepository: ScanRunRepository,
     private readonly computeRepoReadinessUseCase: ComputeRepoReadinessUseCase,
   ) {
-    this.teamRepoResolver = new TeamRepoResolver(teamRepository, repoRepository);
+    this.teamRepoResolver = new TeamRepoResolver(teamRepository);
   }
 
   /**

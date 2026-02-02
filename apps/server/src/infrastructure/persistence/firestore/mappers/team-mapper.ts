@@ -1,5 +1,8 @@
-import { RepoId, TeamId, TeamSlug } from '../../../../domain/shared/index.js';
-import { Team } from '../../../../domain/team/team.js';
+import { Timestamp } from 'firebase-admin/firestore';
+
+import { TeamId, TeamSlug } from '../../../../domain/shared/index.js';
+import { RepoId, RepoFullName, RepoUrl } from '../../../../domain/shared/repo-types.js';
+import { Team, RepoEntity } from '../../../../domain/team/team.js';
 
 /**
  * Firestore Document Data for Team
@@ -11,7 +14,17 @@ export interface TeamFirestoreData {
   id: string;
   name: string;
   slug: string;
-  repoIds: string[];
+  repos: Array<{
+    id: string;
+    provider: string;
+    fullName: string;
+    url: string;
+    defaultBranch: string;
+    teamId: string;
+    archived: boolean;
+    createdAt: FirebaseFirestore.Timestamp;
+    updatedAt: FirebaseFirestore.Timestamp;
+  }>;
   createdAt: FirebaseFirestore.Timestamp;
   updatedAt: FirebaseFirestore.Timestamp;
 }
@@ -29,11 +42,25 @@ export interface TeamFirestoreData {
  * @returns Domain Team entity
  */
 export function teamToDomain(data: TeamFirestoreData): Team {
+  const repos = data.repos.map((repoData) =>
+    RepoEntity.reconstitute({
+      id: RepoId.create(repoData.id),
+      provider: repoData.provider,
+      fullName: RepoFullName.create(repoData.fullName),
+      url: RepoUrl.create(repoData.url),
+      defaultBranch: repoData.defaultBranch,
+      teamId: TeamId.create(repoData.teamId),
+      archived: repoData.archived,
+      createdAt: repoData.createdAt.toDate(),
+      updatedAt: repoData.updatedAt.toDate(),
+    }),
+  );
+
   return Team.reconstitute({
     id: TeamId.create(data.id),
     name: data.name,
     slug: TeamSlug.create(data.slug),
-    repoIds: data.repoIds.map((id) => RepoId.create(id)),
+    repos,
     createdAt: data.createdAt.toDate(),
     updatedAt: data.updatedAt.toDate(),
   });
@@ -52,7 +79,17 @@ export function teamToFirestore(team: Team): Omit<TeamFirestoreData, 'createdAt'
     id: team.id.value,
     name: team.name,
     slug: team.slug.value,
-    repoIds: Array.from(team.repoIds).map((id) => id.value),
+    repos: Array.from(team.repos).map((repo) => ({
+      id: repo.id.value,
+      provider: repo.provider,
+      fullName: repo.fullName.value,
+      url: repo.url.value,
+      defaultBranch: repo.defaultBranch,
+      teamId: repo.teamId.value,
+      archived: repo.archived,
+      createdAt: Timestamp.fromDate(repo.createdAt),
+      updatedAt: Timestamp.fromDate(repo.updatedAt),
+    })),
     createdAt: team.createdAt,
     updatedAt: team.updatedAt,
   };

@@ -4,13 +4,11 @@ import { FirebaseConfig } from '../config/firebase.config.js';
 import { FirestoreClient } from '../persistence/firestore/firestore-client.js';
 import { FirestoreQuestRepository } from '../persistence/firestore/repositories/firestore-quest-repository.js';
 import { FirestoreRepoReadinessRepository } from '../persistence/firestore/repositories/firestore-repo-readiness-repository.js';
-import { FirestoreRepoRepository } from '../persistence/firestore/repositories/firestore-repo-repository.js';
 import { FirestoreScanRunRepository } from '../persistence/firestore/repositories/firestore-scan-run-repository.js';
 import { FirestoreTeamRepository } from '../persistence/firestore/repositories/firestore-team-repository.js';
 
 import type { QuestRepository } from '../../application/ports/quest-repository.js';
 import type { RepoReadinessRepository } from '../../application/ports/repo-readiness-repository.js';
-import type { RepoRepository } from '../../application/ports/repo-repository.js';
 import type { ScanRunRepository } from '../../application/ports/scan-run-repository.js';
 import type { TeamRepository } from '../../application/ports/team-repository.js';
 import type { EnvironmentConfig } from '../config/environment.js';
@@ -27,7 +25,6 @@ import type { FastifyInstance } from 'fastify';
 declare module 'fastify' {
   interface FastifyInstance {
     teamRepository: TeamRepository;
-    repoRepository: RepoRepository;
     scanRunRepository: ScanRunRepository;
     questRepository: QuestRepository;
     repoReadinessRepository: RepoReadinessRepository;
@@ -55,34 +52,24 @@ export function registerDependencies(
   let firestoreClient: FirestoreClient;
 
   if (testFirestoreClient) {
-    // Use provided test client (for integration tests)
     firestoreClient = testFirestoreClient;
-    // Note: We don't initialize Firebase or add cleanup hooks when using test client
   } else {
-    // Initialize Firebase (production/normal flow)
     const firebaseConfig = new FirebaseConfig(config);
     firebaseConfig.initialize();
     fastify.decorate('firebaseConfig', firebaseConfig);
 
-    // Create Firestore client
     const firestore = firebaseConfig.getFirestore();
     firestoreClient = new FirestoreClient(firestore);
 
-    // Register cleanup hook
     fastify.addHook('onClose', async () => {
       await firebaseConfig.close();
     });
   }
 
-  // Decorate Firestore client
   fastify.decorate('firestoreClient', firestoreClient);
 
-  // Register repositories (driven adapters)
   const teamRepository = new FirestoreTeamRepository(firestoreClient);
   fastify.decorate('teamRepository', teamRepository);
-
-  const repoRepository = new FirestoreRepoRepository(firestoreClient);
-  fastify.decorate('repoRepository', repoRepository);
 
   const scanRunRepository = new FirestoreScanRunRepository(firestoreClient);
   fastify.decorate('scanRunRepository', scanRunRepository);
@@ -93,7 +80,6 @@ export function registerDependencies(
   const repoReadinessRepository = new FirestoreRepoReadinessRepository(firestoreClient);
   fastify.decorate('repoReadinessRepository', repoReadinessRepository);
 
-  // Register use cases with factory pattern
   const computeRepoReadinessUseCase = new ComputeRepoReadinessUseCase(
     questRepository,
     repoReadinessRepository,
@@ -101,12 +87,7 @@ export function registerDependencies(
 
   fastify.decorate('useCases', {
     ingestScanRun: () =>
-      new IngestScanRunUseCase(
-        teamRepository,
-        repoRepository,
-        scanRunRepository,
-        computeRepoReadinessUseCase,
-      ),
+      new IngestScanRunUseCase(teamRepository, scanRunRepository, computeRepoReadinessUseCase),
     computeRepoReadiness: () => computeRepoReadinessUseCase,
   });
 }

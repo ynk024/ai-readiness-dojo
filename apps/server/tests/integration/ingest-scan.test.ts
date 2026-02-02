@@ -126,10 +126,16 @@ describe('POST /api/ingest-scan - Integration Test', () => {
       name: 'ynk024',
       slug: 'ynk024',
     });
-    expect(teamData?.repoIds).toContain('repo_ynk024_workouttrackerdesign');
+    expect(teamData?.repos).toBeDefined();
+    expect(Array.isArray(teamData?.repos)).toBe(true);
+    const repo = teamData?.repos.find(
+      (r: { id: string }) => r.id === 'repo_ynk024_workouttrackerdesign',
+    );
+    expect(repo).toBeDefined();
+    expect(repo.fullName).toBe('ynk024/Workouttrackerdesign');
   });
 
-  it('should persist repo data to Firestore', async () => {
+  it('should persist repo data to Firestore (embedded in team)', async () => {
     const response = await server.inject({
       method: 'POST',
       url: '/api/ingest-scan',
@@ -138,23 +144,22 @@ describe('POST /api/ingest-scan - Integration Test', () => {
 
     expect(response.statusCode).toBe(200);
 
-    // Verify repo was created in Firestore
     const firestoreClient = server.firestoreClient;
-    const repoDoc = await firestoreClient
-      .document('repos', 'repo_ynk024_workouttrackerdesign')
-      .get();
+    const teamDoc = await firestoreClient.document('teams', 'team_ynk024').get();
 
-    expect(repoDoc.exists).toBe(true);
-    const repoData = repoDoc.data();
-    expect(repoData).toMatchObject({
-      id: 'repo_ynk024_workouttrackerdesign',
-      provider: 'github',
-      fullName: 'ynk024/Workouttrackerdesign',
-      url: 'https://github.com/ynk024/Workouttrackerdesign',
-      defaultBranch: 'main',
-      teamId: 'team_ynk024',
-      archived: false,
-    });
+    expect(teamDoc.exists).toBe(true);
+    const teamData = teamDoc.data();
+    expect(teamData?.repos).toBeDefined();
+    const repo = teamData?.repos.find(
+      (r: { id: string }) => r.id === 'repo_ynk024_workouttrackerdesign',
+    );
+    expect(repo).toBeDefined();
+    expect(repo.fullName).toBe('ynk024/Workouttrackerdesign');
+    expect(repo.provider).toBe('github');
+    expect(repo.url).toBe('https://github.com/ynk024/Workouttrackerdesign');
+    expect(repo.defaultBranch).toBe('main');
+    expect(repo.teamId).toBe('team_ynk024');
+    expect(repo.archived).toBe(false);
   });
 
   it('should persist scan run data to Firestore', async () => {

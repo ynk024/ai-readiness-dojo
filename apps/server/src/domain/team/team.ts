@@ -1,11 +1,17 @@
 import { ValidationError, BusinessRuleViolationError } from '../../shared/errors/domain-errors.js';
-import { RepoId, TeamId, TeamSlug } from '../shared/index.js';
+import { RepoId, RepoFullName } from '../shared/repo-types.js';
+import { TeamId, TeamSlug } from '../shared/team-types.js';
+
+import { RepoEntity, type RepoEntityProps } from './repo-entity.js';
+
+export type { RepoEntityProps };
+export { RepoEntity };
 
 export interface TeamProps {
   id: TeamId;
   name: string;
   slug: TeamSlug;
-  repoIds: RepoId[];
+  repos: RepoEntity[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -13,7 +19,9 @@ export interface TeamProps {
 export class Team {
   private constructor(private props: TeamProps) {}
 
-  static create(input: Omit<TeamProps, 'createdAt' | 'updatedAt'>): Team {
+  static create(
+    input: Omit<TeamProps, 'createdAt' | 'updatedAt' | 'repos'> & { repos?: never[] },
+  ): Team {
     const trimmedName = input.name.trim();
 
     if (trimmedName.length === 0) {
@@ -24,6 +32,7 @@ export class Team {
     return new Team({
       ...input,
       name: trimmedName,
+      repos: input.repos ?? [],
       createdAt: now,
       updatedAt: now,
     });
@@ -45,8 +54,8 @@ export class Team {
     return this.props.slug;
   }
 
-  get repoIds(): ReadonlyArray<RepoId> {
-    return this.props.repoIds;
+  get repos(): ReadonlyArray<RepoEntity> {
+    return this.props.repos;
   }
 
   get createdAt(): Date {
@@ -57,30 +66,52 @@ export class Team {
     return this.props.updatedAt;
   }
 
-  addRepo(repoId: RepoId): void {
-    if (this.hasRepo(repoId)) {
+  addRepo(input: Omit<RepoEntityProps, 'createdAt' | 'updatedAt'>): RepoEntity {
+    if (this.hasRepo(input.id)) {
       throw new BusinessRuleViolationError(
-        `Repo ${repoId.value} is already part of team ${this.id.value}`,
+        `Repo ${input.id.value} is already part of team ${this.id.value}`,
       );
     }
 
-    this.props.repoIds.push(repoId);
+    const repo = RepoEntity.create(input);
+    this.props.repos.push(repo);
     this.props.updatedAt = new Date();
+    return repo;
   }
 
   removeRepo(repoId: RepoId): void {
-    const index = this.props.repoIds.findIndex((id) => id.equals(repoId));
+    const index = this.props.repos.findIndex((repo) => repo.id.equals(repoId));
     if (index !== -1) {
-      this.props.repoIds.splice(index, 1);
+      this.props.repos.splice(index, 1);
+      this.props.updatedAt = new Date();
+    }
+  }
+
+  getRepo(repoId: RepoId): RepoEntity | undefined {
+    return this.props.repos.find((repo) => repo.id.equals(repoId));
+  }
+
+  getRepoByFullName(fullName: RepoFullName): RepoEntity | undefined {
+    return this.props.repos.find((repo) => repo.fullName.equals(fullName));
+  }
+
+  getActiveRepos(): RepoEntity[] {
+    return this.props.repos.filter((repo) => !repo.archived);
+  }
+
+  archiveRepo(repoId: RepoId): void {
+    const repo = this.getRepo(repoId);
+    if (repo) {
+      repo.archive();
       this.props.updatedAt = new Date();
     }
   }
 
   hasRepo(repoId: RepoId): boolean {
-    return this.props.repoIds.some((id) => id.equals(repoId));
+    return this.props.repos.some((repo) => repo.id.equals(repoId));
   }
 
   getRepoCount(): number {
-    return this.props.repoIds.length;
+    return this.props.repos.length;
   }
 }

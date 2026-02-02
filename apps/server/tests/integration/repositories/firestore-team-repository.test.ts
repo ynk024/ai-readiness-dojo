@@ -1,6 +1,12 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
-import { RepoId, TeamId, TeamSlug } from '../../../src/domain/shared/index.js';
+import {
+  TeamId,
+  TeamSlug,
+  RepoId,
+  RepoFullName,
+  RepoUrl,
+} from '../../../src/domain/shared/index.js';
 import { Team } from '../../../src/domain/team/team.js';
 import { FirestoreTeamRepository } from '../../../src/infrastructure/persistence/firestore/repositories/firestore-team-repository.js';
 import {
@@ -31,7 +37,6 @@ describe('FirestoreTeamRepository - Integration Tests', () => {
   });
 
   afterEach(async () => {
-    // Clear test data between tests in the same file
     await clearCollection('teams', testFirestore);
   });
 
@@ -45,7 +50,6 @@ describe('FirestoreTeamRepository - Integration Tests', () => {
         id: TeamId.create('team_testorg'),
         name: 'Test Organization',
         slug: TeamSlug.create('test-organization'),
-        repoIds: [],
       });
 
       const savedTeam = await repository.save(team);
@@ -53,7 +57,7 @@ describe('FirestoreTeamRepository - Integration Tests', () => {
       expect(savedTeam.id.value).toBe('team_testorg');
       expect(savedTeam.name).toBe('Test Organization');
       expect(savedTeam.slug.value).toBe('test-organization');
-      expect(savedTeam.repoIds).toHaveLength(0);
+      expect(savedTeam.repos).toHaveLength(0);
 
       const exists = await documentExists('teams', 'team_testorg', testFirestore);
       expect(exists).toBe(true);
@@ -64,14 +68,35 @@ describe('FirestoreTeamRepository - Integration Tests', () => {
         id: TeamId.create('team_testorg'),
         name: 'Test Organization',
         slug: TeamSlug.create('test-organization'),
-        repoIds: [RepoId.create('repo_testorg_project1'), RepoId.create('repo_testorg_project2')],
+      });
+
+      team.addRepo({
+        id: RepoId.create('repo_testorg_project1'),
+        provider: 'github',
+        fullName: RepoFullName.create('testorg/project1'),
+        url: RepoUrl.create('https://github.com/testorg/project1'),
+        defaultBranch: 'main',
+        teamId: TeamId.create('team_testorg'),
+        archived: false,
+      });
+
+      team.addRepo({
+        id: RepoId.create('repo_testorg_project2'),
+        provider: 'github',
+        fullName: RepoFullName.create('testorg/project2'),
+        url: RepoUrl.create('https://github.com/testorg/project2'),
+        defaultBranch: 'main',
+        teamId: TeamId.create('team_testorg'),
+        archived: false,
       });
 
       const savedTeam = await repository.save(team);
 
-      expect(savedTeam.repoIds).toHaveLength(2);
-      expect(savedTeam.repoIds[0]?.value).toBe('repo_testorg_project1');
-      expect(savedTeam.repoIds[1]?.value).toBe('repo_testorg_project2');
+      expect(savedTeam.repos).toHaveLength(2);
+      expect(savedTeam.repos[0]?.id.value).toBe('repo_testorg_project1');
+      expect(savedTeam.repos[0]?.fullName.value).toBe('testorg/project1');
+      expect(savedTeam.repos[1]?.id.value).toBe('repo_testorg_project2');
+      expect(savedTeam.repos[1]?.fullName.value).toBe('testorg/project2');
     });
 
     it('should update an existing team when saved again', async () => {
@@ -79,18 +104,23 @@ describe('FirestoreTeamRepository - Integration Tests', () => {
         id: TeamId.create('team_testorg'),
         name: 'Test Organization',
         slug: TeamSlug.create('test-organization'),
-        repoIds: [],
       });
 
       await repository.save(team);
 
-      // Add a repo and save again
-      team.addRepo(RepoId.create('repo_testorg_newproject'));
+      team.addRepo({
+        id: RepoId.create('repo_testorg_newproject'),
+        provider: 'github',
+        fullName: RepoFullName.create('testorg/newproject'),
+        url: RepoUrl.create('https://github.com/testorg/newproject'),
+        defaultBranch: 'main',
+        teamId: TeamId.create('team_testorg'),
+        archived: false,
+      });
       const updatedTeam = await repository.save(team);
 
-      expect(updatedTeam.repoIds).toHaveLength(1);
+      expect(updatedTeam.repos).toHaveLength(1);
 
-      // Should still be only one document
       const count = await getCollectionCount('teams', testFirestore);
       expect(count).toBe(1);
     });
@@ -102,7 +132,6 @@ describe('FirestoreTeamRepository - Integration Tests', () => {
         id: TeamId.create('team_testorg'),
         name: 'Test Organization',
         slug: TeamSlug.create('test-organization'),
-        repoIds: [],
       });
       await repository.save(team);
 
@@ -124,16 +153,27 @@ describe('FirestoreTeamRepository - Integration Tests', () => {
         id: TeamId.create('team_testorg'),
         name: 'Test Organization',
         slug: TeamSlug.create('test-organization'),
-        repoIds: [RepoId.create('repo_testorg_project1')],
       });
+
+      team.addRepo({
+        id: RepoId.create('repo_testorg_project1'),
+        provider: 'github',
+        fullName: RepoFullName.create('testorg/project1'),
+        url: RepoUrl.create('https://github.com/testorg/project1'),
+        defaultBranch: 'main',
+        teamId: TeamId.create('team_testorg'),
+        archived: false,
+      });
+
       await repository.save(team);
 
       const foundTeam = await repository.findById(TeamId.create('team_testorg'));
 
       expect(foundTeam).not.toBeNull();
       expect(foundTeam?.slug.value).toBe('test-organization');
-      expect(foundTeam?.repoIds).toHaveLength(1);
-      expect(foundTeam?.repoIds[0]?.value).toBe('repo_testorg_project1');
+      expect(foundTeam?.repos).toHaveLength(1);
+      expect(foundTeam?.repos[0]?.id.value).toBe('repo_testorg_project1');
+      expect(foundTeam?.repos[0]?.fullName.value).toBe('testorg/project1');
       expect(foundTeam?.createdAt).toBeInstanceOf(Date);
       expect(foundTeam?.updatedAt).toBeInstanceOf(Date);
     });
@@ -145,7 +185,6 @@ describe('FirestoreTeamRepository - Integration Tests', () => {
         id: TeamId.create('team_testorg'),
         name: 'Test Organization',
         slug: TeamSlug.create('test-organization'),
-        repoIds: [],
       });
       await repository.save(team);
 
@@ -167,13 +206,11 @@ describe('FirestoreTeamRepository - Integration Tests', () => {
         id: TeamId.create('team_org1'),
         name: 'Organization 1',
         slug: TeamSlug.create('organization-1'),
-        repoIds: [],
       });
       const team2 = Team.create({
         id: TeamId.create('team_org2'),
         name: 'Organization 2',
         slug: TeamSlug.create('organization-2'),
-        repoIds: [],
       });
 
       await repository.save(team1);
@@ -199,13 +236,11 @@ describe('FirestoreTeamRepository - Integration Tests', () => {
         id: TeamId.create('team_org1'),
         name: 'Organization 1',
         slug: TeamSlug.create('organization-1'),
-        repoIds: [],
       });
       const team2 = Team.create({
         id: TeamId.create('team_org2'),
         name: 'Organization 2',
         slug: TeamSlug.create('organization-2'),
-        repoIds: [],
       });
 
       await repository.save(team1);
@@ -226,7 +261,6 @@ describe('FirestoreTeamRepository - Integration Tests', () => {
         id: TeamId.create('team_testorg'),
         name: 'Test Organization',
         slug: TeamSlug.create('test-organization'),
-        repoIds: [],
       });
       await repository.save(team);
 
@@ -250,7 +284,6 @@ describe('FirestoreTeamRepository - Integration Tests', () => {
         id: TeamId.create('team_testorg'),
         name: 'Test Organization',
         slug: TeamSlug.create('test-organization'),
-        repoIds: [],
       });
       await repository.save(team);
 
