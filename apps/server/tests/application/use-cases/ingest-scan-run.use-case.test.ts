@@ -81,7 +81,18 @@ describe('IngestScanRunUseCase', () => {
     };
 
     computeRepoReadinessUseCase = {
-      execute: vi.fn(),
+      execute: vi.fn().mockResolvedValue({
+        repoId: { value: 'repo_id' },
+        teamId: { value: 'team_id' },
+        scanRunId: { value: 'scan_id' },
+        scannedAt: new Date(),
+        quests: new Map(),
+        getTotalQuests: () => 8,
+        getCompletedQuests: () => Array(6).fill({}) as unknown[],
+        getIncompleteQuests: () => Array(2).fill({}) as unknown[],
+        getForQuest: () => undefined,
+        getCompletionPercentage: () => 75,
+      }),
     } as unknown as ComputeRepoReadinessUseCase;
 
     useCase = new IngestScanRunUseCase(

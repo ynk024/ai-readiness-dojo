@@ -33,6 +33,7 @@ export class ComputeRepoReadinessUseCase {
         q.key,
         {
           key: q.key,
+          levels: q.levels,
         },
       ]),
     );

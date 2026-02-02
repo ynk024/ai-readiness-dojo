@@ -105,56 +105,22 @@ export class QuestKey {
   }
 }
 
-type QuestStatusValue = 'pass' | 'fail' | 'unknown';
+export class ScanResult {
+  private readonly _data: Record<string, unknown>;
 
-export class QuestStatus {
-  private readonly _value: QuestStatusValue;
-
-  private constructor(value: QuestStatusValue) {
-    this._value = value;
+  private constructor(data: Record<string, unknown>) {
+    this._data = data;
   }
 
-  static create(value: string): QuestStatus {
-    if (value !== 'pass' && value !== 'fail' && value !== 'unknown') {
-      throw new ValidationError('QuestStatus must be one of: pass, fail, unknown');
-    }
-
-    return new QuestStatus(value);
+  static create(data: Record<string, unknown>): ScanResult {
+    return new ScanResult(data);
   }
 
-  static pass(): QuestStatus {
-    return new QuestStatus('pass');
+  get data(): Record<string, unknown> {
+    return { ...this._data };
   }
 
-  static fail(): QuestStatus {
-    return new QuestStatus('fail');
-  }
-
-  static unknown(): QuestStatus {
-    return new QuestStatus('unknown');
-  }
-
-  get value(): QuestStatusValue {
-    return this._value;
-  }
-
-  isPass(): boolean {
-    return this._value === 'pass';
-  }
-
-  isFail(): boolean {
-    return this._value === 'fail';
-  }
-
-  isUnknown(): boolean {
-    return this._value === 'unknown';
-  }
-
-  equals(other: QuestStatus): boolean {
-    return this._value === other._value;
-  }
-
-  toString(): string {
-    return this._value;
+  equals(other: ScanResult): boolean {
+    return JSON.stringify(this._data) === JSON.stringify(other._data);
   }
 }

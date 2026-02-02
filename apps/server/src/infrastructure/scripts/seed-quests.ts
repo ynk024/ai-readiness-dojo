@@ -18,7 +18,7 @@
  */
 
 import { QuestId } from '../../domain/quest/quest-value-objects.js';
-import { Quest } from '../../domain/quest/quest.js';
+import { Quest, QuestLevel } from '../../domain/quest/quest.js';
 import { loadEnvironmentConfig } from '../config/environment.js';
 import { FirebaseConfig } from '../config/firebase.config.js';
 import { FirestoreClient } from '../persistence/firestore/firestore-client.js';
@@ -27,13 +27,23 @@ import { FirestoreQuestRepository } from '../persistence/firestore/repositories/
 /**
  * Initial quest definitions based on current ingest mapper
  */
-const SEED_QUESTS = [
+interface SeedQuest {
+  key: string;
+  title: string;
+  category: string;
+  description: string;
+  active: boolean;
+  levels: QuestLevel[];
+}
+
+const SEED_QUESTS: SeedQuest[] = [
   {
     key: 'docs.agents_md_present',
     title: 'AGENTS.md exists',
     category: 'documentation',
     description: 'Checks if AGENTS.md file is present in repository',
     active: true,
+    levels: [{ level: 1, description: 'Present', condition: { type: 'pass' } }],
   },
   {
     key: 'docs.skill_md_count',
@@ -41,6 +51,7 @@ const SEED_QUESTS = [
     category: 'documentation',
     description: 'Checks if skill markdown files exist (count > 0)',
     active: true,
+    levels: [{ level: 1, description: 'Count > 0', condition: { type: 'count', min: 1 } }],
   },
   {
     key: 'formatters.javascript.prettier_present',
@@ -48,6 +59,7 @@ const SEED_QUESTS = [
     category: 'formatters',
     description: 'Checks if Prettier formatter is configured',
     active: true,
+    levels: [{ level: 1, description: 'Present', condition: { type: 'pass' } }],
   },
   {
     key: 'linting.javascript.eslint_present',
@@ -55,6 +67,7 @@ const SEED_QUESTS = [
     category: 'linting',
     description: 'Checks if ESLint linter is configured',
     active: true,
+    levels: [{ level: 1, description: 'Present', condition: { type: 'pass' } }],
   },
   {
     key: 'sast.codeql_present',
@@ -62,6 +75,7 @@ const SEED_QUESTS = [
     category: 'sast',
     description: 'Checks if CodeQL SAST scanning is configured',
     active: true,
+    levels: [{ level: 1, description: 'Present', condition: { type: 'pass' } }],
   },
   {
     key: 'sast.semgrep_present',
@@ -69,6 +83,7 @@ const SEED_QUESTS = [
     category: 'sast',
     description: 'Checks if Semgrep SAST scanning is configured',
     active: true,
+    levels: [{ level: 1, description: 'Present', condition: { type: 'pass' } }],
   },
   {
     key: 'quality.coverage_available',
@@ -76,6 +91,7 @@ const SEED_QUESTS = [
     category: 'quality',
     description: 'Checks if test coverage data is available',
     active: true,
+    levels: [{ level: 1, description: 'Available', condition: { type: 'pass' } }],
   },
   {
     key: 'quality.coverage_threshold_met',
@@ -83,6 +99,7 @@ const SEED_QUESTS = [
     category: 'quality',
     description: 'Checks if test coverage meets defined threshold',
     active: true,
+    levels: [{ level: 1, description: 'Threshold met', condition: { type: 'pass' } }],
   },
 ];
 
@@ -121,6 +138,7 @@ async function seedSingleQuest(
     category: seedQuest.category,
     description: seedQuest.description,
     active: seedQuest.active,
+    levels: seedQuest.levels,
   });
 
   await questRepository.save(quest);

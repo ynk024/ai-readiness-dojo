@@ -20,6 +20,7 @@ describe('QuestMapper', () => {
         category: 'documentation',
         description: 'Checks if AGENTS.md file is present in repository',
         active: true,
+        levels: [],
         createdAt: Timestamp.fromDate(new Date('2025-01-01T00:00:00.000Z')),
         updatedAt: Timestamp.fromDate(new Date('2025-01-02T00:00:00.000Z')),
       };
@@ -45,6 +46,7 @@ describe('QuestMapper', () => {
         category: 'test',
         description: 'Test description',
         active: false,
+        levels: [],
         createdAt: Timestamp.fromDate(new Date('2025-01-01T00:00:00.000Z')),
         updatedAt: Timestamp.fromDate(new Date('2025-01-01T00:00:00.000Z')),
       };
@@ -65,6 +67,7 @@ describe('QuestMapper', () => {
         category: 'test',
         description: 'Test description',
         active: true,
+        levels: [],
         createdAt: Timestamp.fromDate(createdDate),
         updatedAt: Timestamp.fromDate(updatedDate),
       };
@@ -85,6 +88,7 @@ describe('QuestMapper', () => {
         category: 'documentation',
         description: 'Checks if AGENTS.md file is present in repository',
         active: true,
+        levels: [],
       });
 
       const firestoreData = questToFirestore(quest);
@@ -107,6 +111,7 @@ describe('QuestMapper', () => {
         category: 'test',
         description: 'Test description',
         active: false,
+        levels: [],
       });
 
       const firestoreData = questToFirestore(quest);
@@ -125,6 +130,7 @@ describe('QuestMapper', () => {
         category: 'test',
         description: 'Test description',
         active: true,
+        levels: [],
         createdAt,
         updatedAt,
       });
@@ -145,6 +151,7 @@ describe('QuestMapper', () => {
         category: 'test',
         description: 'Test description',
         active: true,
+        levels: [],
       });
 
       const documentId = questToDocumentId(quest);
@@ -162,6 +169,7 @@ describe('QuestMapper', () => {
         category: 'quality',
         description: 'Checks if test coverage meets defined threshold',
         active: true,
+        levels: [],
         createdAt: Timestamp.fromDate(new Date('2025-01-01T00:00:00.000Z')),
         updatedAt: Timestamp.fromDate(new Date('2025-01-02T00:00:00.000Z')),
       };

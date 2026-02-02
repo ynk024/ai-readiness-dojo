@@ -62,6 +62,10 @@
   "domain/quest/quest-value-objects.ts": [
     "shared/errors/domain-errors.ts"
   ],
+  "domain/quest/quest.spec.ts": [
+    "domain/quest/quest-value-objects.ts",
+    "domain/quest/quest.ts"
+  ],
   "domain/quest/quest.ts": [
     "domain/quest/quest-value-objects.ts",
     "shared/errors/domain-errors.ts"
@@ -72,6 +76,12 @@
   ],
   "domain/repo-readiness/repo-readiness-value-objects.ts": [
     "shared/errors/domain-errors.ts"
+  ],
+  "domain/repo-readiness/repo-readiness.spec.ts": [
+    "domain/repo-readiness/repo-readiness.ts",
+    "domain/scan-run/scan-value-objects.ts",
+    "domain/shared/index.ts",
+    "domain/shared/readiness-data.ts"
   ],
   "domain/repo-readiness/repo-readiness.ts": [
     "domain/repo-readiness/repo-readiness-value-objects.ts",
@@ -213,6 +223,10 @@
   "presentation/dto/ingest-scan.dto.ts": [],
   "presentation/dto/quest.dto.ts": [],
   "presentation/dto/repo-readiness.dto.ts": [],
+  "presentation/mappers/ingest-scan-run.mapper.spec.ts": [
+    "presentation/dto/ingest-scan.dto.ts",
+    "presentation/mappers/ingest-scan-run.mapper.ts"
+  ],
   "presentation/mappers/ingest-scan-run.mapper.ts": [
     "application/dto/ingest-scan-run.dto.ts",
     "application/dto/repo-metadata.dto.ts",

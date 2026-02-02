@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { ScanRun } from '../../../../../src/domain/scan-run/scan-run.js';
 import {
   CommitSha,
-  QuestStatus,
+  ScanResult,
   ScanRunId,
 } from '../../../../../src/domain/scan-run/scan-value-objects.js';
 import { RepoId, TeamId } from '../../../../../src/domain/shared/index.js';
@@ -29,9 +29,9 @@ describe('ScanRunMapper', () => {
         workflowVersion: '1.0.0',
         scannedAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
         questResults: {
-          'docs.agents_md_present': 'pass',
-          'quality.prettier_configured': 'pass',
-          'quality.eslint_configured': 'fail',
+          'docs.agents_md_present': { passed: true },
+          'quality.prettier_configured': { passed: true },
+          'quality.eslint_configured': { passed: false },
         },
       };
 
@@ -48,9 +48,9 @@ describe('ScanRunMapper', () => {
       expect(scanRun.workflowVersion).toBe('1.0.0');
       expect(scanRun.scannedAt).toEqual(new Date('2024-01-01T00:00:00.000Z'));
       expect(scanRun.questResults.size).toBe(3);
-      expect(scanRun.questResults.get('docs.agents_md_present')?.value).toBe('pass');
-      expect(scanRun.questResults.get('quality.prettier_configured')?.value).toBe('pass');
-      expect(scanRun.questResults.get('quality.eslint_configured')?.value).toBe('fail');
+      expect(scanRun.questResults.get('docs.agents_md_present')?.data.passed).toBe(true);
+      expect(scanRun.questResults.get('quality.prettier_configured')?.data.passed).toBe(true);
+      expect(scanRun.questResults.get('quality.eslint_configured')?.data.passed).toBe(false);
     });
 
     it('should handle empty quest results', () => {
@@ -92,39 +92,14 @@ describe('ScanRunMapper', () => {
 
       expect(scanRun.scannedAt.getTime()).toBe(scannedDate.getTime());
     });
-
-    it('should handle all quest status types', () => {
-      const firestoreData: ScanRunFirestoreData = {
-        id: 'scan_run_123',
-        teamId: 'team_testorg',
-        repoId: 'repo_testorg_myproject',
-        commitSha: '7a01375',
-        refName: 'refs/heads/main',
-        providerRunId: '12345678',
-        runUrl: 'https://github.com/testorg/myproject/actions/runs/12345678',
-        workflowVersion: '1.0.0',
-        scannedAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
-        questResults: {
-          'quest.pass': 'pass',
-          'quest.fail': 'fail',
-          'quest.unknown': 'unknown',
-        },
-      };
-
-      const scanRun = scanRunToDomain(firestoreData);
-
-      expect(scanRun.questResults.get('quest.pass')?.isPass()).toBe(true);
-      expect(scanRun.questResults.get('quest.fail')?.isFail()).toBe(true);
-      expect(scanRun.questResults.get('quest.unknown')?.isUnknown()).toBe(true);
-    });
   });
 
   describe('scanRunToFirestore', () => {
     it('should convert domain ScanRun entity to Firestore data', () => {
-      const questResults = new Map<string, QuestStatus>([
-        ['docs.agents_md_present', QuestStatus.pass()],
-        ['quality.prettier_configured', QuestStatus.pass()],
-        ['quality.eslint_configured', QuestStatus.fail()],
+      const questResults = new Map<string, ScanResult>([
+        ['docs.agents_md_present', ScanResult.create({ passed: true })],
+        ['quality.prettier_configured', ScanResult.create({ passed: true })],
+        ['quality.eslint_configured', ScanResult.create({ passed: false })],
       ]);
 
       const scanRun = ScanRun.create({
@@ -154,14 +129,14 @@ describe('ScanRunMapper', () => {
       expect(firestoreData.workflowVersion).toBe('1.0.0');
       expect(firestoreData.scannedAt).toBeInstanceOf(Date);
       expect(firestoreData.questResults).toEqual({
-        'docs.agents_md_present': 'pass',
-        'quality.prettier_configured': 'pass',
-        'quality.eslint_configured': 'fail',
+        'docs.agents_md_present': { passed: true },
+        'quality.prettier_configured': { passed: true },
+        'quality.eslint_configured': { passed: false },
       });
     });
 
     it('should handle empty quest results', () => {
-      const questResults = new Map<string, QuestStatus>();
+      const questResults = new Map<string, ScanResult>();
 
       const scanRun = ScanRun.create({
         id: ScanRunId.create('scan_run_123'),
@@ -213,7 +188,7 @@ describe('ScanRunMapper', () => {
         runUrl: 'https://github.com/testorg/myproject/actions/runs/12345678',
         workflowVersion: '1.0.0',
         scannedAt: new Date('2024-01-01T00:00:00.000Z'),
-        questResults: new Map([['quest.test', QuestStatus.pass()]]),
+        questResults: new Map([['quest.test', ScanResult.create({ passed: true })]]),
       });
 
       const firestoreData = scanRunToFirestore(scanRun);
@@ -228,97 +203,98 @@ describe('ScanRunMapper', () => {
       expect(typeof firestoreData.runUrl).toBe('string');
       expect(typeof firestoreData.workflowVersion).toBe('string');
       expect(typeof firestoreData.questResults).toBe('object');
-      expect(typeof firestoreData.questResults['quest.test']).toBe('string');
+      expect(typeof firestoreData.questResults['quest.test']).toBe('object');
+      expect((firestoreData.questResults['quest.test'] as Record<string, unknown>).passed).toBe(true);
     });
   });
+});
 
-  describe('scanRunToDocumentId', () => {
-    it('should extract document ID from ScanRun entity', () => {
-      const scanRun = ScanRun.create({
-        id: ScanRunId.create('scan_run_123'),
-        teamId: TeamId.create('team_testorg'),
-        repoId: RepoId.create('repo_testorg_myproject'),
-        commitSha: CommitSha.create('7a01375'),
-        refName: 'refs/heads/main',
-        providerRunId: '12345678',
-        runUrl: 'https://github.com/testorg/myproject/actions/runs/12345678',
-        workflowVersion: '1.0.0',
-        scannedAt: new Date('2024-01-01T00:00:00.000Z'),
-        questResults: new Map(),
-      });
-
-      const docId = scanRunToDocumentId(scanRun);
-
-      expect(docId).toBe('scan_run_123');
+describe('scanRunToDocumentId', () => {
+  it('should extract document ID from ScanRun entity', () => {
+    const scanRun = ScanRun.create({
+      id: ScanRunId.create('scan_run_123'),
+      teamId: TeamId.create('team_testorg'),
+      repoId: RepoId.create('repo_testorg_myproject'),
+      commitSha: CommitSha.create('7a01375'),
+      refName: 'refs/heads/main',
+      providerRunId: '12345678',
+      runUrl: 'https://github.com/testorg/myproject/actions/runs/12345678',
+      workflowVersion: '1.0.0',
+      scannedAt: new Date('2024-01-01T00:00:00.000Z'),
+      questResults: new Map(),
     });
 
-    it('should return string type', () => {
-      const scanRun = ScanRun.create({
-        id: ScanRunId.create('scan_run_123'),
-        teamId: TeamId.create('team_testorg'),
-        repoId: RepoId.create('repo_testorg_myproject'),
-        commitSha: CommitSha.create('7a01375'),
-        refName: 'refs/heads/main',
-        providerRunId: '12345678',
-        runUrl: 'https://github.com/testorg/myproject/actions/runs/12345678',
-        workflowVersion: '1.0.0',
-        scannedAt: new Date('2024-01-01T00:00:00.000Z'),
-        questResults: new Map(),
-      });
+    const docId = scanRunToDocumentId(scanRun);
 
-      const docId = scanRunToDocumentId(scanRun);
-
-      expect(typeof docId).toBe('string');
-    });
+    expect(docId).toBe('scan_run_123');
   });
 
-  describe('round-trip conversion', () => {
-    it('should preserve all data through toDomain -> toFirestore -> toDomain', () => {
-      const originalFirestoreData: ScanRunFirestoreData = {
-        id: 'scan_run_123',
-        teamId: 'team_testorg',
-        repoId: 'repo_testorg_myproject',
-        commitSha: '7a01375',
-        refName: 'refs/heads/main',
-        providerRunId: '12345678',
-        runUrl: 'https://github.com/testorg/myproject/actions/runs/12345678',
-        workflowVersion: '1.0.0',
-        scannedAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
-        questResults: {
-          'docs.agents_md_present': 'pass',
-          'quality.prettier_configured': 'pass',
-          'quality.eslint_configured': 'fail',
-        },
-      };
-
-      // Convert to domain
-      const scanRun = scanRunToDomain(originalFirestoreData);
-
-      // Convert back to Firestore format
-      const convertedFirestoreData = scanRunToFirestore(scanRun);
-
-      // Convert to domain again
-      const finalScanRun = scanRunToDomain({
-        ...convertedFirestoreData,
-        scannedAt: Timestamp.fromDate(convertedFirestoreData.scannedAt),
-      });
-
-      // Verify data is preserved
-      expect(finalScanRun.id.value).toBe(originalFirestoreData.id);
-      expect(finalScanRun.teamId.value).toBe(originalFirestoreData.teamId);
-      expect(finalScanRun.repoId.value).toBe(originalFirestoreData.repoId);
-      expect(finalScanRun.commitSha.value).toBe(originalFirestoreData.commitSha);
-      expect(finalScanRun.refName).toBe(originalFirestoreData.refName);
-      expect(finalScanRun.providerRunId).toBe(originalFirestoreData.providerRunId);
-      expect(finalScanRun.runUrl).toBe(originalFirestoreData.runUrl);
-      expect(finalScanRun.workflowVersion).toBe(originalFirestoreData.workflowVersion);
-      expect(finalScanRun.scannedAt.getTime()).toBe(
-        originalFirestoreData.scannedAt.toDate().getTime(),
-      );
-      expect(finalScanRun.questResults.size).toBe(3);
-      expect(finalScanRun.questResults.get('docs.agents_md_present')?.value).toBe('pass');
-      expect(finalScanRun.questResults.get('quality.prettier_configured')?.value).toBe('pass');
-      expect(finalScanRun.questResults.get('quality.eslint_configured')?.value).toBe('fail');
+  it('should return string type', () => {
+    const scanRun = ScanRun.create({
+      id: ScanRunId.create('scan_run_123'),
+      teamId: TeamId.create('team_testorg'),
+      repoId: RepoId.create('repo_testorg_myproject'),
+      commitSha: CommitSha.create('7a01375'),
+      refName: 'refs/heads/main',
+      providerRunId: '12345678',
+      runUrl: 'https://github.com/testorg/myproject/actions/runs/12345678',
+      workflowVersion: '1.0.0',
+      scannedAt: new Date('2024-01-01T00:00:00.000Z'),
+      questResults: new Map(),
     });
+
+    const docId = scanRunToDocumentId(scanRun);
+
+    expect(typeof docId).toBe('string');
+  });
+});
+
+describe('round-trip conversion', () => {
+  it('should preserve all data through toDomain -> toFirestore -> toDomain', () => {
+    const originalFirestoreData: ScanRunFirestoreData = {
+      id: 'scan_run_123',
+      teamId: 'team_testorg',
+      repoId: 'repo_testorg_myproject',
+      commitSha: '7a01375',
+      refName: 'refs/heads/main',
+      providerRunId: '12345678',
+      runUrl: 'https://github.com/testorg/myproject/actions/runs/12345678',
+      workflowVersion: '1.0.0',
+      scannedAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
+      questResults: {
+        'docs.agents_md_present': { passed: true },
+        'quality.prettier_configured': { passed: true },
+        'quality.eslint_configured': { passed: false },
+      },
+    };
+
+    // Convert to domain
+    const scanRun = scanRunToDomain(originalFirestoreData);
+
+    // Convert back to Firestore format
+    const convertedFirestoreData = scanRunToFirestore(scanRun);
+
+    // Convert to domain again
+    const finalScanRun = scanRunToDomain({
+      ...convertedFirestoreData,
+      scannedAt: Timestamp.fromDate(convertedFirestoreData.scannedAt),
+    });
+
+    // Verify data is preserved
+    expect(finalScanRun.id.value).toBe(originalFirestoreData.id);
+    expect(finalScanRun.teamId.value).toBe(originalFirestoreData.teamId);
+    expect(finalScanRun.repoId.value).toBe(originalFirestoreData.repoId);
+    expect(finalScanRun.commitSha.value).toBe(originalFirestoreData.commitSha);
+    expect(finalScanRun.refName).toBe(originalFirestoreData.refName);
+    expect(finalScanRun.providerRunId).toBe(originalFirestoreData.providerRunId);
+    expect(finalScanRun.runUrl).toBe(originalFirestoreData.runUrl);
+    expect(finalScanRun.workflowVersion).toBe(originalFirestoreData.workflowVersion);
+    expect(finalScanRun.scannedAt.getTime()).toBe(
+      originalFirestoreData.scannedAt.toDate().getTime(),
+    );
+    expect(finalScanRun.questResults.size).toBe(3);
+    expect(finalScanRun.questResults.get('docs.agents_md_present')?.data.passed).toBe(true);
+    expect(finalScanRun.questResults.get('quality.prettier_configured')?.data.passed).toBe(true);
+    expect(finalScanRun.questResults.get('quality.eslint_configured')?.data.passed).toBe(false);
   });
 });

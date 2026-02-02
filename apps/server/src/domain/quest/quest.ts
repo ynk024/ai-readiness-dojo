@@ -5,19 +5,32 @@ import { QuestId } from './quest-value-objects.js';
 const MAX_TITLE_LENGTH = 100;
 const MAX_DESCRIPTION_LENGTH = 500;
 
+export type QuestCondition =
+  | { type: 'pass' }
+  | { type: 'count'; min: number }
+  | { type: 'score'; min: number }
+  | { type: 'exists' };
+
+export interface QuestLevel {
+  level: number;
+  description: string;
+  condition: QuestCondition;
+}
+
 export interface QuestProps {
   id: QuestId;
   key: string;
   title: string;
   category: string;
   description: string;
+  levels: QuestLevel[];
   active: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export class Quest {
-  private constructor(private props: QuestProps) {}
+  private constructor(private props: QuestProps) { }
 
   static create(input: Omit<QuestProps, 'createdAt' | 'updatedAt'>): Quest {
     const trimmedKey = input.key.trim();
@@ -58,6 +71,7 @@ export class Quest {
       title: trimmedTitle,
       category: trimmedCategory,
       description: trimmedDescription,
+      levels: input.levels,
       createdAt: now,
       updatedAt: now,
     });
@@ -85,6 +99,10 @@ export class Quest {
 
   get description(): string {
     return this.props.description;
+  }
+
+  get levels(): QuestLevel[] {
+    return [...this.props.levels];
   }
 
   get active(): boolean {

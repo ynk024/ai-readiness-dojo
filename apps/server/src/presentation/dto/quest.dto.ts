@@ -5,6 +5,12 @@
  * from the domain models, allowing independent evolution.
  */
 
+export interface QuestLevelDto {
+  level: number;
+  description: string;
+  condition: { type: string; min?: number };
+}
+
 export interface QuestResponseDto {
   id: string;
   key: string;
@@ -12,6 +18,7 @@ export interface QuestResponseDto {
   category: string;
   description: string;
   active: boolean;
+  levels: QuestLevelDto[];
   createdAt: string;
   updatedAt: string;
 }

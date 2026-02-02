@@ -1,7 +1,7 @@
 import { ValidationError } from '../../shared/errors/domain-errors.js';
 import { RepoId, TeamId } from '../shared/index.js';
 
-import { ScanRunId, CommitSha, QuestKey, QuestStatus } from './scan-value-objects.js';
+import { ScanResult, ScanRunId, CommitSha, QuestKey } from './scan-value-objects.js';
 
 export interface ScanRunProps {
   id: ScanRunId;
@@ -13,7 +13,7 @@ export interface ScanRunProps {
   runUrl: string;
   workflowVersion: string;
   scannedAt: Date;
-  questResults: ReadonlyMap<string, QuestStatus>;
+  questResults: ReadonlyMap<string, ScanResult>;
 }
 
 export class ScanRun {
@@ -90,32 +90,12 @@ export class ScanRun {
     return this.props.scannedAt;
   }
 
-  get questResults(): ReadonlyMap<string, QuestStatus> {
+  get questResults(): ReadonlyMap<string, ScanResult> {
     return this.props.questResults;
   }
 
-  getQuestStatus(questKey: QuestKey): QuestStatus | undefined {
+  getScanResult(questKey: QuestKey): ScanResult | undefined {
     return this.props.questResults.get(questKey.value);
-  }
-
-  getPassedQuests(): QuestKey[] {
-    const passed: QuestKey[] = [];
-    for (const [key, status] of this.props.questResults) {
-      if (status.isPass()) {
-        passed.push(QuestKey.create(key));
-      }
-    }
-    return passed;
-  }
-
-  getFailedQuests(): QuestKey[] {
-    const failed: QuestKey[] = [];
-    for (const [key, status] of this.props.questResults) {
-      if (status.isFail()) {
-        failed.push(QuestKey.create(key));
-      }
-    }
-    return failed;
   }
 
   getTotalQuests(): number {

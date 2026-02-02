@@ -60,9 +60,61 @@ describe('POST /api/ingest-scan - Integration Test', () => {
     },
   };
 
+  async function seedQuests() {
+    // Clear quests first to ensure clean state
+    const collection = testFirestore.collection('quests');
+    const snapshot = await collection.get();
+    if (!snapshot.empty) {
+      const batch = testFirestore.batch();
+      snapshot.docs.forEach((doc) => batch.delete(doc.ref));
+      await batch.commit();
+    }
+
+    // Seed quests so readiness computation works
+    const quests = [
+      { key: 'docs.agents_md_present', levels: [{ level: 1, condition: { type: 'pass' } }] },
+      { key: 'docs.skill_md_count', levels: [{ level: 1, condition: { type: 'count', min: 1 } }] },
+      {
+        key: 'formatters.javascript.prettier_present',
+        levels: [{ level: 1, condition: { type: 'pass' } }],
+      },
+      {
+        key: 'linting.javascript.eslint_present',
+        levels: [{ level: 1, condition: { type: 'pass' } }],
+      },
+      { key: 'sast.codeql_present', levels: [{ level: 1, condition: { type: 'pass' } }] },
+      { key: 'sast.semgrep_present', levels: [{ level: 1, condition: { type: 'pass' } }] },
+      { key: 'quality.coverage_available', levels: [{ level: 1, condition: { type: 'pass' } }] },
+      {
+        key: 'quality.coverage_threshold_met',
+        levels: [{ level: 1, condition: { type: 'pass' } }],
+      },
+    ];
+
+    const batch = testFirestore.batch();
+    for (const q of quests) {
+      const ref = testFirestore.document('quests', q.key);
+      const data = {
+        ...q,
+        id: q.key,
+        title: `Quest ${q.key}`,
+        description: 'Test Quest Description',
+        active: true,
+        category: 'general',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      batch.set(ref, data);
+    }
+    await batch.commit();
+  }
+
   beforeAll(async () => {
     // Initialize isolated Firestore test client
     testFirestore = createTestFirestoreClient('ingest_scan_test');
+
+    // Seed quests
+    await seedQuests();
 
     // Build server with test Firestore client
     server = await buildServer(testFirestore);
@@ -198,11 +250,13 @@ describe('POST /api/ingest-scan - Integration Test', () => {
       expect(scannedAtTimestamp.toDate().toISOString()).toBe('2026-01-31T17:39:21.414Z');
     }
 
-    // Verify quest results
+    // Verify quest results persistence as objects
     expect(scanRunData?.questResults).toBeDefined();
-    expect(scanRunData?.questResults['docs.agents_md_present']).toBe('pass');
-    expect(scanRunData?.questResults['sast.semgrep_present']).toBe('fail');
-    expect(scanRunData?.questResults['quality.coverage_threshold_met']).toBe('fail');
+    expect(scanRunData?.questResults['docs.agents_md_present']).toEqual({ present: true });
+    expect(scanRunData?.questResults['sast.semgrep_present']).toEqual({ present: false });
+    expect(scanRunData?.questResults['quality.coverage_threshold_met']).toEqual({
+      meets_threshold: false,
+    });
   });
 
   it('should handle missing request body with 400 error', async () => {

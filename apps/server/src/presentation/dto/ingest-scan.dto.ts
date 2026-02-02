@@ -44,6 +44,11 @@ export interface IngestScanRequestDto {
     test_coverage?: {
       available: boolean;
       meets_threshold: boolean;
+      coverage?: {
+        lines: {
+          percentage: number;
+        };
+      };
     };
   };
 }

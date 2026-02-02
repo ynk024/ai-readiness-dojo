@@ -44,6 +44,7 @@ describe('Quest Routes', () => {
       category: 'Version Control',
       description: 'Learn git',
       active: true,
+      levels: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -55,6 +56,7 @@ describe('Quest Routes', () => {
       category: 'Version Control',
       description: 'Learn advanced git',
       active: true,
+      levels: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -66,6 +68,7 @@ describe('Quest Routes', () => {
       category: 'Architecture',
       description: 'Write clean code',
       active: true,
+      levels: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -96,6 +99,7 @@ describe('Quest Routes', () => {
       category: 'Architecture',
       description: 'Write clean code',
       active: true,
+      levels: [],
       createdAt: expect.any(String),
       updatedAt: expect.any(String),
     });

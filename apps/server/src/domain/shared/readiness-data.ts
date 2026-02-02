@@ -1,4 +1,4 @@
-import { ScanRunId, QuestStatus } from '../scan-run/scan-value-objects.js';
+import { ScanRunId, ScanResult } from '../scan-run/scan-value-objects.js';
 
 import { RepoId } from './repo-types.js';
 import { TeamId } from './team-types.js';
@@ -9,7 +9,14 @@ import { TeamId } from './team-types.js';
  */
 export interface QuestDefinition {
   key: string;
-  // level: number; // To be added when Quest entity supports levels
+  levels: {
+    level: number;
+    condition:
+      | { type: 'pass' }
+      | { type: 'count'; min: number }
+      | { type: 'score'; min: number }
+      | { type: 'exists' };
+  }[];
 }
 
 /**
@@ -21,5 +28,5 @@ export interface ScanRunSummary {
   repoId: RepoId;
   teamId: TeamId;
   scannedAt: Date;
-  questResults: ReadonlyMap<string, QuestStatus>;
+  questResults: ReadonlyMap<string, ScanResult>;
 }

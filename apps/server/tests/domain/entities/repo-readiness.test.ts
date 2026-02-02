@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
 import { ReadinessStatus, RepoReadiness } from '../../../src/domain/repo-readiness/index.js';
-import { QuestStatus, ScanRunId } from '../../../src/domain/scan-run/scan-value-objects.js';
+import { ScanResult, ScanRunId } from '../../../src/domain/scan-run/scan-value-objects.js';
 import { RepoId, TeamId } from '../../../src/domain/shared/index.js';
 import { QuestDefinition, ScanRunSummary } from '../../../src/domain/shared/readiness-data.js';
 
@@ -13,9 +13,9 @@ describe('RepoReadiness Aggregate', () => {
 
   it('should compute readiness from scan run summary', () => {
     // Arrange: Create lightweight DTOs instead of full entities
-    const questResults = new Map<string, QuestStatus>();
-    questResults.set('quest_1', QuestStatus.pass());
-    questResults.set('quest_2', QuestStatus.fail());
+    const questResults = new Map<string, ScanResult>();
+    questResults.set('quest_1', ScanResult.create({ passed: true }));
+    questResults.set('quest_2', ScanResult.create({ passed: false }));
 
     const scanRunSummary: ScanRunSummary = {
       id: scanRunId,
@@ -26,8 +26,14 @@ describe('RepoReadiness Aggregate', () => {
     };
 
     const questCatalog = new Map<string, QuestDefinition>();
-    questCatalog.set('quest_1', { key: 'quest_1' });
-    questCatalog.set('quest_2', { key: 'quest_2' });
+    questCatalog.set('quest_1', {
+      key: 'quest_1',
+      levels: [{ level: 1, condition: { type: 'pass' } }],
+    });
+    questCatalog.set('quest_2', {
+      key: 'quest_2',
+      levels: [{ level: 1, condition: { type: 'pass' } }],
+    });
 
     // Act
     const readiness = RepoReadiness.computeFromScanRun(scanRunSummary, questCatalog);
@@ -54,8 +60,8 @@ describe('RepoReadiness Aggregate', () => {
 
   it('should ignore quests not in catalog', () => {
     // Arrange
-    const questResults = new Map<string, QuestStatus>();
-    questResults.set('unknown_quest', QuestStatus.pass());
+    const questResults = new Map<string, ScanResult>();
+    questResults.set('unknown_quest', ScanResult.create({ passed: true }));
 
     const scanRunSummary: ScanRunSummary = {
       id: scanRunId,
@@ -74,3 +80,4 @@ describe('RepoReadiness Aggregate', () => {
     expect(readiness.getTotalQuests()).toBe(0);
   });
 });
+

@@ -73,7 +73,7 @@ export class IngestScanRunUseCase {
     await this.scanRunRepository.save(scanRun);
 
     // Step 5: Compute and persist repo readiness
-    await this.computeRepoReadinessUseCase.execute(scanRun);
+    const readiness = await this.computeRepoReadinessUseCase.execute(scanRun);
 
     // Step 6: Return result with summary
     return {
@@ -81,9 +81,9 @@ export class IngestScanRunUseCase {
       teamId: team.id.value,
       repoId: repo.id.value,
       summary: {
-        totalQuests: scanRun.getTotalQuests(),
-        passedQuests: scanRun.getPassedQuests().length,
-        failedQuests: scanRun.getFailedQuests().length,
+        totalQuests: readiness.getTotalQuests(),
+        passedQuests: readiness.getCompletedQuests().length,
+        failedQuests: readiness.getIncompleteQuests().length,
       },
     };
   }

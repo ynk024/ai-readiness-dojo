@@ -14,6 +14,11 @@ export interface QuestFirestoreData {
   category: string;
   description: string;
   active: boolean;
+  levels: {
+    level: number;
+    description: string;
+    condition: { type: string; min?: number };
+  }[];
   createdAt: FirebaseFirestore.Timestamp;
   updatedAt: FirebaseFirestore.Timestamp;
 }
@@ -38,6 +43,12 @@ export function questToDomain(data: QuestFirestoreData): Quest {
     category: data.category,
     description: data.description,
     active: data.active,
+    levels: data.levels.map((l) => ({
+      level: l.level,
+      description: l.description,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
+      condition: l.condition as any, // Cast to QuestCondition union - validated by domain model on creation
+    })),
     createdAt: data.createdAt.toDate(),
     updatedAt: data.updatedAt.toDate(),
   });
@@ -55,6 +66,11 @@ export function questToFirestore(quest: Quest): {
   category: string;
   description: string;
   active: boolean;
+  levels: {
+    level: number;
+    description: string;
+    condition: { type: string; min?: number };
+  }[];
   createdAt: Date;
   updatedAt: Date;
 } {
@@ -65,6 +81,7 @@ export function questToFirestore(quest: Quest): {
     category: quest.category,
     description: quest.description,
     active: quest.active,
+    levels: quest.levels,
     createdAt: quest.createdAt,
     updatedAt: quest.updatedAt,
   };

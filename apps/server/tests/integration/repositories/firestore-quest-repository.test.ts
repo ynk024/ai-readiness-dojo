@@ -47,6 +47,7 @@ describe('FirestoreQuestRepository - Integration Tests', () => {
         category: 'documentation',
         description: 'Checks if AGENTS.md file is present in repository',
         active: true,
+        levels: [],
       });
 
       const savedQuest = await repository.save(quest);
@@ -70,6 +71,7 @@ describe('FirestoreQuestRepository - Integration Tests', () => {
         category: 'test',
         description: 'A deprecated test check',
         active: false,
+        levels: [],
       });
 
       const savedQuest = await repository.save(quest);
@@ -85,6 +87,7 @@ describe('FirestoreQuestRepository - Integration Tests', () => {
         category: 'quality',
         description: 'Original description',
         active: true,
+        levels: [],
       });
 
       await repository.save(quest);
@@ -109,6 +112,7 @@ describe('FirestoreQuestRepository - Integration Tests', () => {
         category: 'sast',
         description: 'Checks if CodeQL SAST scanning is configured',
         active: true,
+        levels: [],
       });
 
       await repository.save(quest);
@@ -137,6 +141,7 @@ describe('FirestoreQuestRepository - Integration Tests', () => {
         category: 'formatters',
         description: 'Checks if Prettier formatter is configured',
         active: true,
+        levels: [],
       });
 
       await repository.save(quest);
@@ -164,6 +169,7 @@ describe('FirestoreQuestRepository - Integration Tests', () => {
         category: 'documentation',
         description: 'Checks if AGENTS.md file is present',
         active: true,
+        levels: [],
       });
 
       const quest2 = Quest.create({
@@ -173,6 +179,7 @@ describe('FirestoreQuestRepository - Integration Tests', () => {
         category: 'documentation',
         description: 'Checks if skill markdown files exist',
         active: true,
+        levels: [],
       });
 
       const quest3 = Quest.create({
@@ -182,6 +189,7 @@ describe('FirestoreQuestRepository - Integration Tests', () => {
         category: 'quality',
         description: 'Checks if test coverage data is available',
         active: true,
+        levels: [],
       });
 
       await repository.save(quest1);
@@ -211,6 +219,7 @@ describe('FirestoreQuestRepository - Integration Tests', () => {
         category: 'test',
         description: 'Active quest description 1',
         active: true,
+        levels: [],
       });
 
       const activeQuest2 = Quest.create({
@@ -220,6 +229,7 @@ describe('FirestoreQuestRepository - Integration Tests', () => {
         category: 'test',
         description: 'Active quest description 2',
         active: true,
+        levels: [],
       });
 
       const inactiveQuest = Quest.create({
@@ -229,6 +239,7 @@ describe('FirestoreQuestRepository - Integration Tests', () => {
         category: 'test',
         description: 'Inactive quest description',
         active: false,
+        levels: [],
       });
 
       await repository.save(activeQuest1);
@@ -251,6 +262,7 @@ describe('FirestoreQuestRepository - Integration Tests', () => {
         category: 'test',
         description: 'Inactive quest description',
         active: false,
+        levels: [],
       });
 
       await repository.save(inactiveQuest);
@@ -270,6 +282,7 @@ describe('FirestoreQuestRepository - Integration Tests', () => {
         category: 'test',
         description: 'Quest 1 description',
         active: true,
+        levels: [],
       });
 
       const quest2 = Quest.create({
@@ -279,6 +292,7 @@ describe('FirestoreQuestRepository - Integration Tests', () => {
         category: 'test',
         description: 'Quest 2 description',
         active: false,
+        levels: [],
       });
 
       await repository.save(quest1);
@@ -305,6 +319,7 @@ describe('FirestoreQuestRepository - Integration Tests', () => {
         category: 'test',
         description: 'This quest will be deleted',
         active: true,
+        levels: [],
       });
 
       await repository.save(quest);
@@ -332,6 +347,7 @@ describe('FirestoreQuestRepository - Integration Tests', () => {
         category: 'test',
         description: 'This quest exists',
         active: true,
+        levels: [],
       });
 
       await repository.save(quest);

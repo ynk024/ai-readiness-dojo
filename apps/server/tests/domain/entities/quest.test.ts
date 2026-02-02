@@ -14,6 +14,7 @@ describe('Quest Entity', () => {
         category: 'documentation',
         description: 'Checks if AGENTS.md file is present in repository',
         active: true,
+        levels: [],
       });
 
       expect(quest.id.value).toBe('quest_123');
@@ -34,6 +35,7 @@ describe('Quest Entity', () => {
         category: '  documentation  ',
         description: '  Checks if AGENTS.md file is present  ',
         active: true,
+        levels: [],
       });
 
       expect(quest.key).toBe('docs.agents_md_present');
@@ -51,6 +53,7 @@ describe('Quest Entity', () => {
           category: 'test',
           description: 'Test description',
           active: true,
+          levels: [],
         });
       }).toThrow(ValidationError);
       expect(() => {
@@ -61,6 +64,7 @@ describe('Quest Entity', () => {
           category: 'test',
           description: 'Test description',
           active: true,
+          levels: [],
         });
       }).toThrow('Quest key cannot be empty');
     });
@@ -74,6 +78,7 @@ describe('Quest Entity', () => {
           category: 'test',
           description: 'Test description',
           active: true,
+          levels: [],
         });
       }).toThrow(ValidationError);
     });
@@ -87,6 +92,7 @@ describe('Quest Entity', () => {
           category: 'test',
           description: 'Test description',
           active: true,
+          levels: [],
         });
       }).toThrow('Quest title cannot be empty');
     });
@@ -100,6 +106,7 @@ describe('Quest Entity', () => {
           category: 'test',
           description: 'Test description',
           active: true,
+          levels: [],
         }),
       ).toThrow(ValidationError);
     });
@@ -113,6 +120,7 @@ describe('Quest Entity', () => {
           category: '',
           description: 'Test description',
           active: true,
+          levels: [],
         }),
       ).toThrow('Quest category cannot be empty');
     });
@@ -126,6 +134,7 @@ describe('Quest Entity', () => {
           category: '   ',
           description: 'Test description',
           active: true,
+          levels: [],
         }),
       ).toThrow(ValidationError);
     });
@@ -139,6 +148,7 @@ describe('Quest Entity', () => {
           category: 'test',
           description: '',
           active: true,
+          levels: [],
         }),
       ).toThrow('Quest description cannot be empty');
     });
@@ -152,6 +162,7 @@ describe('Quest Entity', () => {
           category: 'test',
           description: '   ',
           active: true,
+          levels: [],
         }),
       ).toThrow(ValidationError);
     });
@@ -166,6 +177,7 @@ describe('Quest Entity', () => {
           category: 'test',
           description: 'Test description',
           active: true,
+          levels: [],
         }),
       ).toThrow('Quest title must not exceed 100 characters');
     });
@@ -180,6 +192,7 @@ describe('Quest Entity', () => {
           category: 'test',
           description: longDescription,
           active: true,
+          levels: [],
         }),
       ).toThrow('Quest description must not exceed 500 characters');
     });
@@ -193,6 +206,7 @@ describe('Quest Entity', () => {
         category: 'test',
         description: 'Test description',
         active: true,
+        levels: [],
       });
 
       expect(quest.title).toBe(maxTitle);
@@ -207,6 +221,7 @@ describe('Quest Entity', () => {
         category: 'test',
         description: maxDescription,
         active: true,
+        levels: [],
       });
 
       expect(quest.description).toBe(maxDescription);
@@ -225,6 +240,7 @@ describe('Quest Entity', () => {
         category: 'documentation',
         description: 'Checks if AGENTS.md file is present',
         active: true,
+        levels: [],
         createdAt,
         updatedAt,
       });
@@ -249,6 +265,7 @@ describe('Quest Entity', () => {
         category: 'test',
         description: 'Test description',
         active: false,
+        levels: [],
       });
 
       const originalUpdatedAt = quest.updatedAt;
@@ -272,6 +289,7 @@ describe('Quest Entity', () => {
         category: 'test',
         description: 'Test description',
         active: true,
+        levels: [],
       });
 
       const originalUpdatedAt = quest.updatedAt;
@@ -294,6 +312,7 @@ describe('Quest Entity', () => {
         category: 'test',
         description: 'Original description',
         active: true,
+        levels: [],
       });
 
       const originalUpdatedAt = quest.updatedAt;
@@ -314,6 +333,7 @@ describe('Quest Entity', () => {
         category: 'test',
         description: 'Original description',
         active: true,
+        levels: [],
       });
 
       quest.updateDescription('  Updated description  ');
@@ -329,6 +349,7 @@ describe('Quest Entity', () => {
         category: 'test',
         description: 'Original description',
         active: true,
+        levels: [],
       });
 
       expect(() => {
@@ -344,6 +365,7 @@ describe('Quest Entity', () => {
         category: 'test',
         description: 'Original description',
         active: true,
+        levels: [],
       });
 
       expect(() => {
@@ -359,6 +381,7 @@ describe('Quest Entity', () => {
         category: 'test',
         description: 'Original description',
         active: true,
+        levels: [],
       });
 
       const longDescription = 'a'.repeat(501);
