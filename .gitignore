@@ -40,3 +40,6 @@ pnpm-debug.log*
 
 # Madge circular dependency reports (transient - not persisted)
 *-circular.json
+
+# Git worktrees (isolated development branches)
+.worktrees/

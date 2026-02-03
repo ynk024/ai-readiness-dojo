@@ -1,7 +1,7 @@
-import { ScanRun } from '../../../../domain/entities/scan-run.js';
-import { ScanRunRepository } from '../../../../domain/repositories/scan-run-repository.js';
-import { RepoId } from '../../../../domain/value-objects/repo-value-objects.js';
-import { ScanRunId } from '../../../../domain/value-objects/scan-value-objects.js';
+import { ScanRunRepository } from '../../../../application/ports/scan-run-repository.js';
+import { ScanRun } from '../../../../domain/scan-run/scan-run.js';
+import { ScanRunId } from '../../../../domain/scan-run/scan-value-objects.js';
+import { RepoId } from '../../../../domain/shared/repo-types.js';
 import { EntityNotFoundError } from '../../../../shared/errors/domain-errors.js';
 import { FirestoreClient } from '../firestore-client.js';
 import {

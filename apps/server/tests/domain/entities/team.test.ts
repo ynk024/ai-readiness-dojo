@@ -1,8 +1,13 @@
 import { describe, it, expect } from 'vitest';
 
-import { Team } from '../../../src/domain/entities/team.js';
-import { RepoId } from '../../../src/domain/value-objects/repo-value-objects.js';
-import { TeamId, TeamSlug } from '../../../src/domain/value-objects/team-value-objects.js';
+import {
+  TeamId,
+  TeamSlug,
+  RepoId,
+  RepoFullName,
+  RepoUrl,
+} from '../../../src/domain/shared/index.js';
+import { Team } from '../../../src/domain/team/team.js';
 import {
   ValidationError,
   BusinessRuleViolationError,
@@ -15,29 +20,14 @@ describe('Team Entity', () => {
         id: TeamId.create('team_eng'),
         name: 'Engineering',
         slug: TeamSlug.create('engineering'),
-        repoIds: [],
       });
 
       expect(team.id.value).toBe('team_eng');
       expect(team.name).toBe('Engineering');
       expect(team.slug.value).toBe('engineering');
-      expect(team.repoIds).toEqual([]);
+      expect(team.repos).toEqual([]);
       expect(team.createdAt).toBeInstanceOf(Date);
       expect(team.updatedAt).toBeInstanceOf(Date);
-    });
-
-    it('should create a team with existing repos', () => {
-      const repoIds = [RepoId.create('repo_1'), RepoId.create('repo_2')];
-      const team = Team.create({
-        id: TeamId.create('team_eng'),
-        name: 'Engineering',
-        slug: TeamSlug.create('engineering'),
-        repoIds,
-      });
-
-      expect(team.repoIds).toHaveLength(2);
-      expect(team.repoIds[0]?.value).toBe('repo_1');
-      expect(team.repoIds[1]?.value).toBe('repo_2');
     });
 
     it('should throw ValidationError for empty name', () => {
@@ -46,7 +36,6 @@ describe('Team Entity', () => {
           id: TeamId.create('team_eng'),
           name: '',
           slug: TeamSlug.create('engineering'),
-          repoIds: [],
         }),
       ).toThrow(ValidationError);
       expect(() =>
@@ -54,7 +43,6 @@ describe('Team Entity', () => {
           id: TeamId.create('team_eng'),
           name: '',
           slug: TeamSlug.create('engineering'),
-          repoIds: [],
         }),
       ).toThrow('Team name cannot be empty');
     });
@@ -65,7 +53,6 @@ describe('Team Entity', () => {
           id: TeamId.create('team_eng'),
           name: '   ',
           slug: TeamSlug.create('engineering'),
-          repoIds: [],
         }),
       ).toThrow(ValidationError);
     });
@@ -75,7 +62,6 @@ describe('Team Entity', () => {
         id: TeamId.create('team_eng'),
         name: '  Engineering  ',
         slug: TeamSlug.create('engineering'),
-        repoIds: [],
       });
 
       expect(team.name).toBe('Engineering');
@@ -91,14 +77,14 @@ describe('Team Entity', () => {
         id: TeamId.create('team_eng'),
         name: 'Engineering',
         slug: TeamSlug.create('engineering'),
-        repoIds: [RepoId.create('repo_1')],
+        repos: [],
         createdAt,
         updatedAt,
       });
 
       expect(team.id.value).toBe('team_eng');
       expect(team.name).toBe('Engineering');
-      expect(team.repoIds).toHaveLength(1);
+      expect(team.repos).toHaveLength(0);
       expect(team.createdAt).toEqual(createdAt);
       expect(team.updatedAt).toEqual(updatedAt);
     });
@@ -110,14 +96,22 @@ describe('Team Entity', () => {
         id: TeamId.create('team_eng'),
         name: 'Engineering',
         slug: TeamSlug.create('engineering'),
-        repoIds: [],
       });
 
-      const repoId = RepoId.create('repo_1');
-      team.addRepo(repoId);
+      const repo = team.addRepo({
+        id: RepoId.create('repo_1'),
+        provider: 'github',
+        fullName: RepoFullName.create('acme/repo1'),
+        url: RepoUrl.create('https://github.com/acme/repo1'),
+        defaultBranch: 'main',
+        teamId: TeamId.create('team_eng'),
+        archived: false,
+        language: null,
+      });
 
-      expect(team.repoIds).toHaveLength(1);
-      expect(team.repoIds[0]?.value).toBe('repo_1');
+      expect(team.getRepoCount()).toBe(1);
+      expect(team.getRepo(RepoId.create('repo_1'))?.fullName.value).toBe('acme/repo1');
+      expect(repo.fullName.value).toBe('acme/repo1');
     });
 
     it('should update updatedAt when adding a repo', () => {
@@ -125,14 +119,21 @@ describe('Team Entity', () => {
         id: TeamId.create('team_eng'),
         name: 'Engineering',
         slug: TeamSlug.create('engineering'),
-        repoIds: [],
       });
 
       const originalUpdatedAt = team.updatedAt.getTime();
 
-      team.addRepo(RepoId.create('repo_1'));
+      team.addRepo({
+        id: RepoId.create('repo_1'),
+        provider: 'github',
+        fullName: RepoFullName.create('acme/repo1'),
+        url: RepoUrl.create('https://github.com/acme/repo1'),
+        defaultBranch: 'main',
+        teamId: TeamId.create('team_eng'),
+        archived: false,
+        language: null,
+      });
 
-      // updatedAt should be updated (may be same millisecond or later)
       expect(team.updatedAt.getTime()).toBeGreaterThanOrEqual(originalUpdatedAt);
       expect(team.updatedAt).toBeInstanceOf(Date);
     });
@@ -142,51 +143,93 @@ describe('Team Entity', () => {
         id: TeamId.create('team_eng'),
         name: 'Engineering',
         slug: TeamSlug.create('engineering'),
-        repoIds: [],
       });
 
-      const repoId = RepoId.create('repo_1');
-      team.addRepo(repoId);
+      team.addRepo({
+        id: RepoId.create('repo_1'),
+        provider: 'github',
+        fullName: RepoFullName.create('acme/repo1'),
+        url: RepoUrl.create('https://github.com/acme/repo1'),
+        defaultBranch: 'main',
+        teamId: TeamId.create('team_eng'),
+        archived: false,
+        language: null,
+      });
 
       expect(() => {
-        team.addRepo(repoId);
+        team.addRepo({
+          id: RepoId.create('repo_1'),
+          provider: 'github',
+          fullName: RepoFullName.create('acme/repo1'),
+          url: RepoUrl.create('https://github.com/acme/repo1'),
+          defaultBranch: 'main',
+          teamId: TeamId.create('team_eng'),
+          archived: false,
+          language: null,
+        });
       }).toThrow(BusinessRuleViolationError);
       expect(() => {
-        team.addRepo(repoId);
+        team.addRepo({
+          id: RepoId.create('repo_1'),
+          provider: 'github',
+          fullName: RepoFullName.create('acme/repo1'),
+          url: RepoUrl.create('https://github.com/acme/repo1'),
+          defaultBranch: 'main',
+          teamId: TeamId.create('team_eng'),
+          archived: false,
+          language: null,
+        });
       }).toThrow('Repo repo_1 is already part of team team_eng');
-      expect(team.repoIds).toHaveLength(1);
+      expect(team.getRepoCount()).toBe(1);
     });
   });
 
   describe('removeRepo', () => {
     it('should remove a repo from the team', () => {
-      const repoId = RepoId.create('repo_1');
       const team = Team.create({
         id: TeamId.create('team_eng'),
         name: 'Engineering',
         slug: TeamSlug.create('engineering'),
-        repoIds: [repoId],
       });
 
-      team.removeRepo(repoId);
+      team.addRepo({
+        id: RepoId.create('repo_1'),
+        provider: 'github',
+        fullName: RepoFullName.create('acme/repo1'),
+        url: RepoUrl.create('https://github.com/acme/repo1'),
+        defaultBranch: 'main',
+        teamId: TeamId.create('team_eng'),
+        archived: false,
+        language: null,
+      });
 
-      expect(team.repoIds).toHaveLength(0);
+      team.removeRepo(RepoId.create('repo_1'));
+
+      expect(team.getRepoCount()).toBe(0);
     });
 
     it('should update updatedAt when removing a repo', () => {
-      const repoId = RepoId.create('repo_1');
       const team = Team.create({
         id: TeamId.create('team_eng'),
         name: 'Engineering',
         slug: TeamSlug.create('engineering'),
-        repoIds: [repoId],
+      });
+
+      team.addRepo({
+        id: RepoId.create('repo_1'),
+        provider: 'github',
+        fullName: RepoFullName.create('acme/repo1'),
+        url: RepoUrl.create('https://github.com/acme/repo1'),
+        defaultBranch: 'main',
+        teamId: TeamId.create('team_eng'),
+        archived: false,
+        language: null,
       });
 
       const originalUpdatedAt = team.updatedAt.getTime();
 
-      team.removeRepo(repoId);
+      team.removeRepo(RepoId.create('repo_1'));
 
-      // updatedAt should be updated (may be same millisecond or later)
       expect(team.updatedAt.getTime()).toBeGreaterThanOrEqual(originalUpdatedAt);
       expect(team.updatedAt).toBeInstanceOf(Date);
     });
@@ -196,27 +239,35 @@ describe('Team Entity', () => {
         id: TeamId.create('team_eng'),
         name: 'Engineering',
         slug: TeamSlug.create('engineering'),
-        repoIds: [],
       });
 
       expect(() => {
         team.removeRepo(RepoId.create('repo_1'));
       }).not.toThrow();
-      expect(team.repoIds).toHaveLength(0);
+      expect(team.getRepoCount()).toBe(0);
     });
   });
 
   describe('hasRepo', () => {
     it('should return true if team has the repo', () => {
-      const repoId = RepoId.create('repo_1');
       const team = Team.create({
         id: TeamId.create('team_eng'),
         name: 'Engineering',
         slug: TeamSlug.create('engineering'),
-        repoIds: [repoId],
       });
 
-      expect(team.hasRepo(repoId)).toBe(true);
+      team.addRepo({
+        id: RepoId.create('repo_1'),
+        provider: 'github',
+        fullName: RepoFullName.create('acme/repo1'),
+        url: RepoUrl.create('https://github.com/acme/repo1'),
+        defaultBranch: 'main',
+        teamId: TeamId.create('team_eng'),
+        archived: false,
+        language: null,
+      });
+
+      expect(team.hasRepo(RepoId.create('repo_1'))).toBe(true);
     });
 
     it('should return false if team does not have the repo', () => {
@@ -224,7 +275,6 @@ describe('Team Entity', () => {
         id: TeamId.create('team_eng'),
         name: 'Engineering',
         slug: TeamSlug.create('engineering'),
-        repoIds: [RepoId.create('repo_1')],
       });
 
       expect(team.hasRepo(RepoId.create('repo_2'))).toBe(false);
@@ -235,7 +285,6 @@ describe('Team Entity', () => {
         id: TeamId.create('team_eng'),
         name: 'Engineering',
         slug: TeamSlug.create('engineering'),
-        repoIds: [],
       });
 
       expect(team.hasRepo(RepoId.create('repo_1'))).toBe(false);
@@ -248,7 +297,28 @@ describe('Team Entity', () => {
         id: TeamId.create('team_eng'),
         name: 'Engineering',
         slug: TeamSlug.create('engineering'),
-        repoIds: [RepoId.create('repo_1'), RepoId.create('repo_2')],
+      });
+
+      team.addRepo({
+        id: RepoId.create('repo_1'),
+        provider: 'github',
+        fullName: RepoFullName.create('acme/repo1'),
+        url: RepoUrl.create('https://github.com/acme/repo1'),
+        defaultBranch: 'main',
+        teamId: TeamId.create('team_eng'),
+        archived: false,
+        language: null,
+      });
+
+      team.addRepo({
+        id: RepoId.create('repo_2'),
+        provider: 'github',
+        fullName: RepoFullName.create('acme/repo2'),
+        url: RepoUrl.create('https://github.com/acme/repo2'),
+        defaultBranch: 'main',
+        teamId: TeamId.create('team_eng'),
+        archived: false,
+        language: null,
       });
 
       expect(team.getRepoCount()).toBe(2);
@@ -259,7 +329,6 @@ describe('Team Entity', () => {
         id: TeamId.create('team_eng'),
         name: 'Engineering',
         slug: TeamSlug.create('engineering'),
-        repoIds: [],
       });
 
       expect(team.getRepoCount()).toBe(0);

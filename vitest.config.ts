@@ -14,6 +14,13 @@ export default defineConfig({
         'apps/client/src/main.ts',
         'apps/client/vitest-setup.ts',
       ],
+      enabled: true,
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 80,
+        statements: 80,
+      },
     },
   },
 });

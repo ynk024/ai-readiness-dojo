@@ -1,5 +1,5 @@
 import type { RepoMetadata } from './repo-metadata.dto.js';
-import type { QuestStatus } from '../../domain/value-objects/scan-value-objects.js';
+import type { ScanResult } from '../../domain/scan-run/scan-value-objects.js';
 
 /**
  * Application-layer DTO for ingesting a scan run.
@@ -14,5 +14,5 @@ export interface IngestScanRunDto {
   metadata: RepoMetadata;
 
   // Quest results (using domain value object)
-  questResults: Map<string, QuestStatus>;
+  questResults: Map<string, ScanResult>;
 }

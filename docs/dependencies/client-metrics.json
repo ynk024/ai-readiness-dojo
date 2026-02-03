@@ -1,16 +1,15 @@
 {
   "metadata": {
-    "timestamp": "2026-02-01T12:52:39.612Z",
     "app": "client",
     "generator": "generate-metrics.js v1.0.0"
   },
   "summary": {
-    "totalModules": 5,
-    "totalDependencies": 2,
-    "graphDensity": 0.1,
-    "avgFanOut": 0.4,
-    "avgFanIn": 0.4,
-    "healthScore": 88,
+    "totalModules": 4,
+    "totalDependencies": 0,
+    "graphDensity": 0,
+    "avgFanOut": 0,
+    "avgFanIn": 0,
+    "healthScore": 75,
     "status": "PASS"
   },
   "circular": {
@@ -21,34 +20,36 @@
     "cycles": []
   },
   "coupling": {
-    "avgFanOut": 0.4,
-    "maxFanOut": 2,
-    "maxFanOutFile": "main.ts",
-    "avgFanIn": 0.4,
-    "maxFanIn": 1,
+    "avgFanOut": 0,
+    "maxFanOut": 0,
+    "maxFanOutFile": "App.svelte",
+    "avgFanIn": 0,
+    "maxFanIn": 0,
     "maxFanInFile": "App.svelte",
     "criticalCoupling": [],
     "highCoupling": [],
     "godModules": []
   },
   "depth": {
-    "longestChain": 1,
-    "avgDepth": 0.2,
+    "longestChain": 0,
+    "avgDepth": 0,
     "criticalDepth": [],
     "deepModules": []
   },
   "cohesion": {
     "orphanedModules": [
+      "App.svelte",
+      "app.css",
       "lib/Counter.svelte",
       "vite-env.d.ts"
     ],
-    "isolatedCount": 2,
+    "isolatedCount": 4,
     "byDirectory": {
       "./": {
-        "totalModules": 4,
-        "internalImports": 2,
+        "totalModules": 3,
+        "internalImports": 0,
         "externalImports": 0,
-        "cohesionScore": 100
+        "cohesionScore": 0
       },
       "lib/": {
         "totalModules": 1,
@@ -56,73 +57,64 @@
         "externalImports": 0,
         "cohesionScore": 0
       }
+    },
+    "byBoundedContext": {},
+    "byLayer": {},
+    "dependencyViolations": [],
+    "moduleIsolation": {
+      "orphaned": [
+        "App.svelte",
+        "app.css",
+        "lib/Counter.svelte",
+        "vite-env.d.ts"
+      ],
+      "leafModules": [],
+      "rootModules": []
     }
   },
   "graph": {
-    "nodeCount": 5,
-    "edgeCount": 2,
-    "density": 0.1,
-    "avgDegree": 0.8,
-    "maxPossibleEdges": 20
+    "nodeCount": 4,
+    "edgeCount": 0,
+    "density": 0,
+    "avgDegree": 0,
+    "maxPossibleEdges": 12
   },
   "topModules": {
     "mostCoupled": [
       {
-        "file": "main.ts",
-        "fanOut": 2,
-        "rank": 1
-      },
-      {
         "file": "App.svelte",
         "fanOut": 0,
-        "rank": 2
+        "rank": 1
       },
       {
         "file": "app.css",
         "fanOut": 0,
-        "rank": 3
+        "rank": 2
       },
       {
         "file": "lib/Counter.svelte",
         "fanOut": 0,
-        "rank": 4
+        "rank": 3
       },
       {
         "file": "vite-env.d.ts",
         "fanOut": 0,
-        "rank": 5
+        "rank": 4
       }
     ],
-    "mostDepended": [
-      {
-        "file": "App.svelte",
-        "fanIn": 1,
-        "rank": 1
-      },
-      {
-        "file": "app.css",
-        "fanIn": 1,
-        "rank": 2
-      }
-    ],
-    "deepest": [
-      {
-        "file": "main.ts",
-        "maxDepth": 1,
-        "rank": 1
-      }
-    ]
+    "mostDepended": [],
+    "deepest": []
   },
   "violations": {
     "critical": [],
     "warnings": []
   },
   "healthScore": {
-    "overall": 88,
+    "overall": 75,
     "breakdown": {
       "coupling": 100,
       "depth": 100,
-      "cohesion": 50,
+      "cohesion": 0,
       "modularity": 100
     }
   }

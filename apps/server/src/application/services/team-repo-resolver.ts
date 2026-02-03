@@ -1,18 +1,17 @@
-import { Repo } from '../../domain/entities/repo.js';
-import { Team } from '../../domain/entities/team.js';
-import { RepoId, RepoFullName, RepoUrl } from '../../domain/value-objects/repo-value-objects.js';
-import { TeamId, TeamSlug } from '../../domain/value-objects/team-value-objects.js';
+import { ProgrammingLanguage } from '../../domain/shared/programming-language.js';
+import { RepoId, RepoFullName, RepoUrl } from '../../domain/shared/repo-types.js';
+import { TeamId, TeamSlug } from '../../domain/shared/team-types.js';
+import { Team, type RepoEntity } from '../../domain/team/team.js';
 
-import type { RepoRepository } from '../../domain/repositories/repo-repository.js';
-import type { TeamRepository } from '../../domain/repositories/team-repository.js';
 import type { RepoMetadata } from '../dto/repo-metadata.dto.js';
+import type { TeamRepository } from '../ports/team-repository.js';
 
 /**
  * Result of resolving team and repo from metadata
  */
 export interface TeamRepoResult {
   team: Team;
-  repo: Repo;
+  repo: RepoEntity;
 }
 
 /**
@@ -20,10 +19,7 @@ export interface TeamRepoResult {
  * Implements the auto-creation logic for teams and repos during scan ingestion.
  */
 export class TeamRepoResolver {
-  constructor(
-    private readonly teamRepository: TeamRepository,
-    private readonly repoRepository: RepoRepository,
-  ) {}
+  constructor(private readonly teamRepository: TeamRepository) {}
 
   /**
    * Resolve team and repo from metadata, creating them if they don't exist.
@@ -31,44 +27,41 @@ export class TeamRepoResolver {
    * Auto-creation logic:
    * 1. Extract owner from repo metadata → derive team slug
    * 2. Find or create team using owner as team name/slug
-   * 3. Find or create repo
-   * 4. Link repo to team if not already linked
+   * 3. Find or create repo within team
+   * 4. Extract and update language from metadata
+   * 5. Return both team and repo
    *
    * @param metadata - Repository metadata from AI-Readiness report
    * @returns Team and Repo entities
    */
   async resolveFromMetadata(metadata: RepoMetadata): Promise<TeamRepoResult> {
-    // Generate IDs based on naming convention
     const teamId = TeamRepoResolver.generateTeamId(metadata.owner);
     const repoId = TeamRepoResolver.generateRepoId(metadata.owner, metadata.name);
     const teamSlug = TeamSlug.create(metadata.owner.toLowerCase());
 
-    // Try to find existing team by slug
     let team = await this.teamRepository.findBySlug(teamSlug);
 
-    // Create team if it doesn't exist
     if (!team) {
       team = Team.create({
         id: teamId,
         name: metadata.owner,
         slug: teamSlug,
-        repoIds: [],
       });
       await this.teamRepository.save(team);
     }
 
-    // Try to find existing repo by full name
     const repoFullName = RepoFullName.create(metadata.fullName);
-    let repo = await this.repoRepository.findByFullName(repoFullName);
+    let repo = team.getRepoByFullName(repoFullName);
 
-    // Create repo if it doesn't exist
+    // Parse language from metadata
+    const language = ProgrammingLanguage.fromString(metadata.primaryLanguage);
+
     if (!repo) {
-      // Extract branch name (remove refs/heads/ prefix if present)
       const defaultBranch = metadata.refName.startsWith('refs/heads/')
         ? metadata.refName.substring('refs/heads/'.length)
         : metadata.refName;
 
-      repo = Repo.create({
+      repo = team.addRepo({
         id: repoId,
         provider: 'github',
         fullName: repoFullName,
@@ -76,12 +69,19 @@ export class TeamRepoResolver {
         defaultBranch,
         teamId,
         archived: false,
+        language,
       });
-      await this.repoRepository.save(repo);
+      await this.teamRepository.save(team);
+    } else {
+      // Update language if it changed
+      const currentLanguage = repo.language;
 
-      // Link repo to team (if not already linked)
-      if (!team.hasRepo(repo.id)) {
-        team.addRepo(repo.id);
+      const languagesMatch =
+        (language === null && currentLanguage === null) ||
+        (language !== null && currentLanguage !== null && language.equals(currentLanguage));
+
+      if (!languagesMatch) {
+        repo.updateLanguage(language);
         await this.teamRepository.save(team);
       }
     }
@@ -92,9 +92,6 @@ export class TeamRepoResolver {
   /**
    * Generate team ID from owner name
    * Convention: team_{lowercase_owner}
-   *
-   * @param owner - Repository owner
-   * @returns TeamId
    */
   static generateTeamId(owner: string): TeamId {
     const normalizedOwner = owner.toLowerCase();
@@ -104,10 +101,6 @@ export class TeamRepoResolver {
   /**
    * Generate repo ID from owner and repo name
    * Convention: repo_{lowercase_owner}_{lowercase_name}
-   *
-   * @param owner - Repository owner
-   * @param name - Repository name
-   * @returns RepoId
    */
   static generateRepoId(owner: string, name: string): RepoId {
     const normalizedOwner = owner.toLowerCase();

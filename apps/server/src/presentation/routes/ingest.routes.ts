@@ -1,3 +1,4 @@
+import { ValidationError } from '../../shared/errors/domain-errors.js';
 import { toApplicationDto } from '../mappers/ingest-scan-run.mapper.js';
 
 import type { IngestScanRequestDto, IngestScanResponseDto } from '../dto/ingest-scan.dto.js';
@@ -68,10 +69,15 @@ async function ingestScan(
       summary: result.summary,
     });
   } catch (error) {
-    // Log error for debugging
+    if (error instanceof ValidationError) {
+      return reply.code(HTTP_BAD_REQUEST).send({
+        error: ERROR_BAD_REQUEST,
+        message: error.message,
+      });
+    }
+
     fastify.log.error(error, 'Error ingesting scan run');
 
-    // Return generic error response
     return reply.code(HTTP_INTERNAL_SERVER_ERROR).send({
       error: ERROR_INTERNAL_SERVER,
       message: error instanceof Error ? error.message : 'An unexpected error occurred',

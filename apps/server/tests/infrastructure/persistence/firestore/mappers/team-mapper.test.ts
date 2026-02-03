@@ -1,9 +1,14 @@
 import { Timestamp } from 'firebase-admin/firestore';
 import { describe, it, expect } from 'vitest';
 
-import { Team } from '../../../../../src/domain/entities/team.js';
-import { RepoId } from '../../../../../src/domain/value-objects/repo-value-objects.js';
-import { TeamId, TeamSlug } from '../../../../../src/domain/value-objects/team-value-objects.js';
+import {
+  TeamId,
+  TeamSlug,
+  RepoId,
+  RepoFullName,
+  RepoUrl,
+} from '../../../../../src/domain/shared/index.js';
+import { Team } from '../../../../../src/domain/team/team.js';
 import {
   teamToDomain,
   teamToFirestore,
@@ -18,7 +23,32 @@ describe('TeamMapper', () => {
         id: 'team_testorg',
         name: 'Test Organization',
         slug: 'test-organization',
-        repoIds: ['repo_testorg_project1', 'repo_testorg_project2'],
+        repos: [
+          {
+            id: 'repo_testorg_project1',
+            provider: 'github',
+            fullName: 'testorg/project1',
+            url: 'https://github.com/testorg/project1',
+            defaultBranch: 'main',
+            teamId: 'team_testorg',
+            archived: false,
+            language: null,
+            createdAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
+            updatedAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
+          },
+          {
+            id: 'repo_testorg_project2',
+            provider: 'github',
+            fullName: 'testorg/project2',
+            url: 'https://github.com/testorg/project2',
+            defaultBranch: 'main',
+            teamId: 'team_testorg',
+            archived: false,
+            language: null,
+            createdAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
+            updatedAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
+          },
+        ],
         createdAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
         updatedAt: Timestamp.fromDate(new Date('2024-01-02T00:00:00.000Z')),
       };
@@ -29,26 +59,28 @@ describe('TeamMapper', () => {
       expect(team.id.value).toBe('team_testorg');
       expect(team.name).toBe('Test Organization');
       expect(team.slug.value).toBe('test-organization');
-      expect(team.repoIds).toHaveLength(2);
-      expect(team.repoIds[0]?.value).toBe('repo_testorg_project1');
-      expect(team.repoIds[1]?.value).toBe('repo_testorg_project2');
+      expect(team.repos).toHaveLength(2);
+      expect(team.repos[0]?.id.value).toBe('repo_testorg_project1');
+      expect(team.repos[0]?.fullName.value).toBe('testorg/project1');
+      expect(team.repos[1]?.id.value).toBe('repo_testorg_project2');
+      expect(team.repos[1]?.fullName.value).toBe('testorg/project2');
       expect(team.createdAt).toEqual(new Date('2024-01-01T00:00:00.000Z'));
       expect(team.updatedAt).toEqual(new Date('2024-01-02T00:00:00.000Z'));
     });
 
-    it('should handle empty repoIds array', () => {
+    it('should handle empty repos array', () => {
       const firestoreData: TeamFirestoreData = {
         id: 'team_testorg',
         name: 'Test Organization',
         slug: 'test-organization',
-        repoIds: [],
+        repos: [],
         createdAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
         updatedAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
       };
 
       const team = teamToDomain(firestoreData);
 
-      expect(team.repoIds).toHaveLength(0);
+      expect(team.repos).toHaveLength(0);
     });
 
     it('should convert timestamps to Date objects correctly', () => {
@@ -59,7 +91,7 @@ describe('TeamMapper', () => {
         id: 'team_testorg',
         name: 'Test Organization',
         slug: 'test-organization',
-        repoIds: [],
+        repos: [],
         createdAt: Timestamp.fromDate(createdDate),
         updatedAt: Timestamp.fromDate(updatedDate),
       };
@@ -77,7 +109,28 @@ describe('TeamMapper', () => {
         id: TeamId.create('team_testorg'),
         name: 'Test Organization',
         slug: TeamSlug.create('test-organization'),
-        repoIds: [RepoId.create('repo_testorg_project1'), RepoId.create('repo_testorg_project2')],
+      });
+
+      team.addRepo({
+        id: RepoId.create('repo_testorg_project1'),
+        provider: 'github',
+        fullName: RepoFullName.create('testorg/project1'),
+        url: RepoUrl.create('https://github.com/testorg/project1'),
+        defaultBranch: 'main',
+        teamId: TeamId.create('team_testorg'),
+        archived: false,
+        language: null,
+      });
+
+      team.addRepo({
+        id: RepoId.create('repo_testorg_project2'),
+        provider: 'github',
+        fullName: RepoFullName.create('testorg/project2'),
+        url: RepoUrl.create('https://github.com/testorg/project2'),
+        defaultBranch: 'main',
+        teamId: TeamId.create('team_testorg'),
+        archived: false,
+        language: null,
       });
 
       const firestoreData = teamToFirestore(team);
@@ -85,22 +138,25 @@ describe('TeamMapper', () => {
       expect(firestoreData.id).toBe('team_testorg');
       expect(firestoreData.name).toBe('Test Organization');
       expect(firestoreData.slug).toBe('test-organization');
-      expect(firestoreData.repoIds).toEqual(['repo_testorg_project1', 'repo_testorg_project2']);
+      expect(firestoreData.repos).toHaveLength(2);
+      expect(firestoreData.repos[0]?.id).toBe('repo_testorg_project1');
+      expect(firestoreData.repos[0]?.fullName).toBe('testorg/project1');
+      expect(firestoreData.repos[1]?.id).toBe('repo_testorg_project2');
+      expect(firestoreData.repos[1]?.fullName).toBe('testorg/project2');
       expect(firestoreData.createdAt).toBeInstanceOf(Date);
       expect(firestoreData.updatedAt).toBeInstanceOf(Date);
     });
 
-    it('should handle empty repoIds array', () => {
+    it('should handle empty repos array', () => {
       const team = Team.create({
         id: TeamId.create('team_testorg'),
         name: 'Test Organization',
         slug: TeamSlug.create('test-organization'),
-        repoIds: [],
       });
 
       const firestoreData = teamToFirestore(team);
 
-      expect(firestoreData.repoIds).toEqual([]);
+      expect(firestoreData.repos).toEqual([]);
     });
 
     it('should preserve Date objects for timestamps', () => {
@@ -111,7 +167,7 @@ describe('TeamMapper', () => {
         id: TeamId.create('team_testorg'),
         name: 'Test Organization',
         slug: TeamSlug.create('test-organization'),
-        repoIds: [],
+        repos: [],
         createdAt: createdDate,
         updatedAt: updatedDate,
       });
@@ -127,16 +183,26 @@ describe('TeamMapper', () => {
         id: TeamId.create('team_testorg'),
         name: 'Test Organization',
         slug: TeamSlug.create('test-organization'),
-        repoIds: [RepoId.create('repo_testorg_project1')],
+      });
+
+      team.addRepo({
+        id: RepoId.create('repo_testorg_project1'),
+        provider: 'github',
+        fullName: RepoFullName.create('testorg/project1'),
+        url: RepoUrl.create('https://github.com/testorg/project1'),
+        defaultBranch: 'main',
+        teamId: TeamId.create('team_testorg'),
+        archived: false,
+        language: null,
       });
 
       const firestoreData = teamToFirestore(team);
 
-      // Ensure we're storing primitives, not value objects
       expect(typeof firestoreData.id).toBe('string');
       expect(typeof firestoreData.slug).toBe('string');
-      expect(Array.isArray(firestoreData.repoIds)).toBe(true);
-      expect(typeof firestoreData.repoIds[0]).toBe('string');
+      expect(Array.isArray(firestoreData.repos)).toBe(true);
+      expect(firestoreData.repos[0]?.id).toBe('repo_testorg_project1');
+      expect(firestoreData.repos[0]?.fullName).toBe('testorg/project1');
     });
   });
 
@@ -146,7 +212,6 @@ describe('TeamMapper', () => {
         id: TeamId.create('team_testorg'),
         name: 'Test Organization',
         slug: TeamSlug.create('test-organization'),
-        repoIds: [],
       });
 
       const docId = teamToDocumentId(team);
@@ -159,7 +224,6 @@ describe('TeamMapper', () => {
         id: TeamId.create('team_testorg'),
         name: 'Test Organization',
         slug: TeamSlug.create('test-organization'),
-        repoIds: [],
       });
 
       const docId = teamToDocumentId(team);
@@ -174,30 +238,54 @@ describe('TeamMapper', () => {
         id: 'team_testorg',
         name: 'Test Organization',
         slug: 'test-organization',
-        repoIds: ['repo_testorg_project1', 'repo_testorg_project2'],
+        repos: [
+          {
+            id: 'repo_testorg_project1',
+            provider: 'github',
+            fullName: 'testorg/project1',
+            url: 'https://github.com/testorg/project1',
+            defaultBranch: 'main',
+            teamId: 'team_testorg',
+            archived: false,
+            language: null,
+            createdAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
+            updatedAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
+          },
+          {
+            id: 'repo_testorg_project2',
+            provider: 'github',
+            fullName: 'testorg/project2',
+            url: 'https://github.com/testorg/project2',
+            defaultBranch: 'main',
+            teamId: 'team_testorg',
+            archived: false,
+            language: null,
+            createdAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
+            updatedAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
+          },
+        ],
         createdAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
         updatedAt: Timestamp.fromDate(new Date('2024-01-02T00:00:00.000Z')),
       };
 
-      // Convert to domain
       const team = teamToDomain(originalFirestoreData);
 
-      // Convert back to Firestore format
       const convertedFirestoreData = teamToFirestore(team);
 
-      // Convert to domain again
       const finalTeam = teamToDomain({
         ...convertedFirestoreData,
         createdAt: Timestamp.fromDate(convertedFirestoreData.createdAt),
         updatedAt: Timestamp.fromDate(convertedFirestoreData.updatedAt),
       });
 
-      // Verify data is preserved
       expect(finalTeam.id.value).toBe(originalFirestoreData.id);
       expect(finalTeam.name).toBe(originalFirestoreData.name);
       expect(finalTeam.slug.value).toBe(originalFirestoreData.slug);
-      expect(finalTeam.repoIds.map((id: RepoId) => id.value)).toEqual(
-        originalFirestoreData.repoIds,
+      expect(finalTeam.repos.map((repo) => repo.id.value)).toEqual(
+        originalFirestoreData.repos.map((r) => r.id),
+      );
+      expect(finalTeam.repos.map((repo) => repo.fullName.value)).toEqual(
+        originalFirestoreData.repos.map((r) => r.fullName),
       );
       expect(finalTeam.createdAt.getTime()).toBe(
         originalFirestoreData.createdAt.toDate().getTime(),

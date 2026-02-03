@@ -1,11 +1,10 @@
-import { ScanRun } from '../../../../domain/entities/scan-run.js';
-import { RepoId } from '../../../../domain/value-objects/repo-value-objects.js';
+import { ScanRun } from '../../../../domain/scan-run/scan-run.js';
 import {
   CommitSha,
-  QuestStatus,
+  ScanResult,
   ScanRunId,
-} from '../../../../domain/value-objects/scan-value-objects.js';
-import { TeamId } from '../../../../domain/value-objects/team-value-objects.js';
+} from '../../../../domain/scan-run/scan-value-objects.js';
+import { RepoId, TeamId } from '../../../../domain/shared/index.js';
 
 /**
  * Firestore Document Data for ScanRun
@@ -13,8 +12,8 @@ import { TeamId } from '../../../../domain/value-objects/team-value-objects.js';
  * Represents how ScanRun data is stored in Firestore.
  * This is decoupled from the domain model to allow independent evolution.
  *
- * Note: questResults is stored as a Record<string, string> in Firestore
- * but converted to Map<string, QuestStatus> in the domain model
+ * Note: questResults is stored as a Record<string, Record<string, unknown>> in Firestore
+ * mapping quest key to the raw result data.
  */
 export interface ScanRunFirestoreData {
   id: string;
@@ -26,7 +25,7 @@ export interface ScanRunFirestoreData {
   runUrl: string;
   workflowVersion: string;
   scannedAt: FirebaseFirestore.Timestamp;
-  questResults: Record<string, string>;
+  questResults: Record<string, Record<string, unknown>>;
 }
 
 /**
@@ -42,10 +41,10 @@ export interface ScanRunFirestoreData {
  * @returns Domain ScanRun entity
  */
 export function scanRunToDomain(data: ScanRunFirestoreData): ScanRun {
-  // Convert Record<string, string> to Map<string, QuestStatus>
-  const questResults = new Map<string, QuestStatus>();
+  // Convert Record<string, Record<string, unknown>> to Map<string, ScanResult>
+  const questResults = new Map<string, ScanResult>();
   for (const [key, value] of Object.entries(data.questResults)) {
-    questResults.set(key, QuestStatus.create(value));
+    questResults.set(key, ScanResult.create(value));
   }
 
   return ScanRun.reconstitute({
@@ -70,10 +69,10 @@ export function scanRunToDomain(data: ScanRunFirestoreData): ScanRun {
 export function scanRunToFirestore(scanRun: ScanRun): Omit<ScanRunFirestoreData, 'scannedAt'> & {
   scannedAt: Date;
 } {
-  // Convert Map<string, QuestStatus> to Record<string, string>
-  const questResults: Record<string, string> = {};
-  for (const [key, status] of scanRun.questResults) {
-    questResults[key] = status.value;
+  // Convert Map<string, ScanResult> to Record<string, Record<string, unknown>>
+  const questResults: Record<string, Record<string, unknown>> = {};
+  for (const [key, result] of scanRun.questResults) {
+    questResults[key] = result.data;
   }
 
   return {

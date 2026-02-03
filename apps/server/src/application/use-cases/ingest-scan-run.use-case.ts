@@ -1,11 +1,11 @@
-import { ScanRun } from '../../domain/entities/scan-run.js';
-import { ScanRunId, CommitSha } from '../../domain/value-objects/scan-value-objects.js';
+import { ScanRun } from '../../domain/scan-run/scan-run.js';
+import { ScanRunId, CommitSha } from '../../domain/scan-run/scan-value-objects.js';
 import { TeamRepoResolver } from '../services/team-repo-resolver.js';
 
-import type { RepoRepository } from '../../domain/repositories/repo-repository.js';
-import type { ScanRunRepository } from '../../domain/repositories/scan-run-repository.js';
-import type { TeamRepository } from '../../domain/repositories/team-repository.js';
+import type { ComputeRepoReadinessUseCase } from './compute-repo-readiness.use-case.js';
 import type { IngestScanRunDto } from '../dto/ingest-scan-run.dto.js';
+import type { ScanRunRepository } from '../ports/scan-run-repository.js';
+import type { TeamRepository } from '../ports/team-repository.js';
 
 /**
  * Result of ingesting a scan run
@@ -28,17 +28,18 @@ export interface IngestScanRunResult {
  * 1. Resolve or create team and repo
  * 2. Create ScanRun entity with quest results
  * 3. Persist ScanRun to repository
- * 4. Return summary with IDs and quest counts
+ * 4. Compute and persist repo readiness
+ * 5. Return summary with IDs and quest counts
  */
 export class IngestScanRunUseCase {
   private readonly teamRepoResolver: TeamRepoResolver;
 
   constructor(
     teamRepository: TeamRepository,
-    repoRepository: RepoRepository,
     private readonly scanRunRepository: ScanRunRepository,
+    private readonly computeRepoReadinessUseCase: ComputeRepoReadinessUseCase,
   ) {
-    this.teamRepoResolver = new TeamRepoResolver(teamRepository, repoRepository);
+    this.teamRepoResolver = new TeamRepoResolver(teamRepository);
   }
 
   /**
@@ -71,15 +72,18 @@ export class IngestScanRunUseCase {
     // Step 4: Persist scan run
     await this.scanRunRepository.save(scanRun);
 
-    // Step 5: Return result with summary
+    // Step 5: Compute and persist repo readiness (passing repo language for quest filtering)
+    const readiness = await this.computeRepoReadinessUseCase.execute(scanRun, repo.language);
+
+    // Step 6: Return result with summary
     return {
       scanRunId: scanRun.id.value,
       teamId: team.id.value,
       repoId: repo.id.value,
       summary: {
-        totalQuests: scanRun.getTotalQuests(),
-        passedQuests: scanRun.getPassedQuests().length,
-        failedQuests: scanRun.getFailedQuests().length,
+        totalQuests: readiness.getTotalQuests(),
+        passedQuests: readiness.getCompletedQuests().length,
+        failedQuests: readiness.getIncompleteQuests().length,
       },
     };
   }

@@ -1,4 +1,4 @@
-import { QuestStatus } from '../../domain/value-objects/scan-value-objects.js';
+import { ScanResult } from '../../domain/scan-run/scan-value-objects.js';
 
 import type { IngestScanRunDto } from '../../application/dto/ingest-scan-run.dto.js';
 import type { RepoMetadata } from '../../application/dto/repo-metadata.dto.js';
@@ -13,7 +13,7 @@ const EXPECTED_NAME_PARTS = 2;
  * @throws Error if repository name format is invalid or timestamp is invalid
  */
 function extractRepoMetadata(request: IngestScanRequestDto): RepoMetadata {
-  const { repository, timestamp, workflow_version: workflowVersion } = request.metadata;
+  const { repository, timestamp, workflow_version: workflowVersion, languages } = request.metadata;
 
   // Parse repository name (format: "owner/repo-name")
   const nameParts = repository.name.split('/');
@@ -41,6 +41,7 @@ function extractRepoMetadata(request: IngestScanRequestDto): RepoMetadata {
     runUrl: repository.run_url,
     workflowVersion,
     scannedAt,
+    primaryLanguage: languages?.primary ?? null,
   };
 }
 
@@ -48,19 +49,18 @@ function extractRepoMetadata(request: IngestScanRequestDto): RepoMetadata {
  * Add documentation quest results to the results map
  */
 function addDocumentationResults(
-  results: Map<string, QuestStatus>,
+  results: Map<string, ScanResult>,
   documentation: IngestScanRequestDto['checks']['documentation'],
 ): void {
   if (documentation?.agents_md !== undefined) {
-    const status = documentation.agents_md.present ? QuestStatus.pass() : QuestStatus.fail();
-    results.set('docs.agents_md_present', status);
+    results.set(
+      'docs.agents_md_present',
+      ScanResult.create({ present: documentation.agents_md.present }),
+    );
   }
 
   if (documentation?.skill_md !== undefined) {
-    const passThreshold = 0;
-    const hasSkills = documentation.skill_md.count > passThreshold;
-    const status = hasSkills ? QuestStatus.pass() : QuestStatus.fail();
-    results.set('docs.skill_md_count', status);
+    results.set('docs.skill_md_count', ScanResult.create({ count: documentation.skill_md.count }));
   }
 }
 
@@ -68,12 +68,14 @@ function addDocumentationResults(
  * Add formatter quest results to the results map
  */
 function addFormatterResults(
-  results: Map<string, QuestStatus>,
+  results: Map<string, ScanResult>,
   formatters: IngestScanRequestDto['checks']['formatters'],
 ): void {
   if (formatters?.javascript?.prettier !== undefined) {
-    const status = formatters.javascript.prettier.present ? QuestStatus.pass() : QuestStatus.fail();
-    results.set('formatters.javascript.prettier_present', status);
+    results.set(
+      'formatters.javascript.prettier_present',
+      ScanResult.create({ present: formatters.javascript.prettier.present }),
+    );
   }
 }
 
@@ -81,12 +83,14 @@ function addFormatterResults(
  * Add linting quest results to the results map
  */
 function addLintingResults(
-  results: Map<string, QuestStatus>,
+  results: Map<string, ScanResult>,
   linting: IngestScanRequestDto['checks']['linting'],
 ): void {
   if (linting?.javascript?.eslint !== undefined) {
-    const status = linting.javascript.eslint.present ? QuestStatus.pass() : QuestStatus.fail();
-    results.set('linting.javascript.eslint_present', status);
+    results.set(
+      'linting.javascript.eslint_present',
+      ScanResult.create({ present: linting.javascript.eslint.present }),
+    );
   }
 }
 
@@ -94,17 +98,15 @@ function addLintingResults(
  * Add SAST quest results to the results map
  */
 function addSastResults(
-  results: Map<string, QuestStatus>,
+  results: Map<string, ScanResult>,
   sast: IngestScanRequestDto['checks']['sast'],
 ): void {
   if (sast?.codeql !== undefined) {
-    const status = sast.codeql.present ? QuestStatus.pass() : QuestStatus.fail();
-    results.set('sast.codeql_present', status);
+    results.set('sast.codeql_present', ScanResult.create({ present: sast.codeql.present }));
   }
 
   if (sast?.semgrep !== undefined) {
-    const status = sast.semgrep.present ? QuestStatus.pass() : QuestStatus.fail();
-    results.set('sast.semgrep_present', status);
+    results.set('sast.semgrep_present', ScanResult.create({ present: sast.semgrep.present }));
   }
 }
 
@@ -112,23 +114,29 @@ function addSastResults(
  * Add test coverage quest results to the results map
  */
 function addCoverageResults(
-  results: Map<string, QuestStatus>,
+  results: Map<string, ScanResult>,
   coverage: IngestScanRequestDto['checks']['test_coverage'],
 ): void {
   if (coverage?.available !== undefined) {
-    const status = coverage.available ? QuestStatus.pass() : QuestStatus.fail();
-    results.set('quality.coverage_available', status);
+    results.set('quality.coverage_available', ScanResult.create({ available: coverage.available }));
   }
 
   if (coverage?.meets_threshold !== undefined) {
-    const status = coverage.meets_threshold ? QuestStatus.pass() : QuestStatus.fail();
-    results.set('quality.coverage_threshold_met', status);
+    const data: Record<string, unknown> = {
+      meets_threshold: coverage.meets_threshold,
+    };
+
+    if (coverage.coverage?.lines.percentage !== undefined) {
+      data.score = coverage.coverage.lines.percentage;
+    }
+
+    results.set('quality.coverage_threshold_met', ScanResult.create(data));
   }
 }
 
 /**
  * Extract quest results from ingest scan request checks
- * Maps the nested checks structure to flat quest keys with pass/fail/unknown status
+ * Maps the nested checks structure to flat quest keys with unopinionated data
  *
  * Quest key mapping:
  * - documentation.agents_md.present → "docs.agents_md_present"
@@ -143,8 +151,8 @@ function addCoverageResults(
  * @param request - The ingest scan request DTO
  * @returns Map of quest keys to quest status
  */
-function extractQuestResults(request: IngestScanRequestDto): Map<string, QuestStatus> {
-  const results = new Map<string, QuestStatus>();
+function extractQuestResults(request: IngestScanRequestDto): Map<string, ScanResult> {
+  const results = new Map<string, ScanResult>();
   const { checks } = request;
 
   addDocumentationResults(results, checks.documentation);

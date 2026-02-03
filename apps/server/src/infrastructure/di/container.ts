@@ -1,15 +1,17 @@
+import { ApproveQuestManuallyUseCase } from '../../application/use-cases/approve-quest-manually.use-case.js';
+import { ComputeRepoReadinessUseCase } from '../../application/use-cases/compute-repo-readiness.use-case.js';
 import { IngestScanRunUseCase } from '../../application/use-cases/ingest-scan-run.use-case.js';
 import { FirebaseConfig } from '../config/firebase.config.js';
 import { FirestoreClient } from '../persistence/firestore/firestore-client.js';
-import { FirestoreItemRepository } from '../persistence/firestore/repositories/firestore-item-repository.js';
-import { FirestoreRepoRepository } from '../persistence/firestore/repositories/firestore-repo-repository.js';
+import { FirestoreQuestRepository } from '../persistence/firestore/repositories/firestore-quest-repository.js';
+import { FirestoreRepoReadinessRepository } from '../persistence/firestore/repositories/firestore-repo-readiness-repository.js';
 import { FirestoreScanRunRepository } from '../persistence/firestore/repositories/firestore-scan-run-repository.js';
 import { FirestoreTeamRepository } from '../persistence/firestore/repositories/firestore-team-repository.js';
 
-import type { ItemRepository } from '../../domain/repositories/item-repository.js';
-import type { RepoRepository } from '../../domain/repositories/repo-repository.js';
-import type { ScanRunRepository } from '../../domain/repositories/scan-run-repository.js';
-import type { TeamRepository } from '../../domain/repositories/team-repository.js';
+import type { QuestRepository } from '../../application/ports/quest-repository.js';
+import type { RepoReadinessRepository } from '../../application/ports/repo-readiness-repository.js';
+import type { ScanRunRepository } from '../../application/ports/scan-run-repository.js';
+import type { TeamRepository } from '../../application/ports/team-repository.js';
 import type { EnvironmentConfig } from '../config/environment.js';
 import type { FastifyInstance } from 'fastify';
 
@@ -23,14 +25,16 @@ import type { FastifyInstance } from 'fastify';
 // Extend Fastify types to include our decorators
 declare module 'fastify' {
   interface FastifyInstance {
-    itemRepository: ItemRepository;
     teamRepository: TeamRepository;
-    repoRepository: RepoRepository;
     scanRunRepository: ScanRunRepository;
+    questRepository: QuestRepository;
+    repoReadinessRepository: RepoReadinessRepository;
     firebaseConfig: FirebaseConfig;
     firestoreClient: FirestoreClient;
     useCases: {
       ingestScanRun: () => IngestScanRunUseCase;
+      computeRepoReadiness: () => ComputeRepoReadinessUseCase;
+      approveQuestManually: () => ApproveQuestManuallyUseCase;
     };
   }
 }
@@ -50,44 +54,49 @@ export function registerDependencies(
   let firestoreClient: FirestoreClient;
 
   if (testFirestoreClient) {
-    // Use provided test client (for integration tests)
     firestoreClient = testFirestoreClient;
-    // Note: We don't initialize Firebase or add cleanup hooks when using test client
   } else {
-    // Initialize Firebase (production/normal flow)
     const firebaseConfig = new FirebaseConfig(config);
     firebaseConfig.initialize();
     fastify.decorate('firebaseConfig', firebaseConfig);
 
-    // Create Firestore client
     const firestore = firebaseConfig.getFirestore();
     firestoreClient = new FirestoreClient(firestore);
 
-    // Register cleanup hook
     fastify.addHook('onClose', async () => {
       await firebaseConfig.close();
     });
   }
 
-  // Decorate Firestore client
   fastify.decorate('firestoreClient', firestoreClient);
-
-  // Register repositories (driven adapters)
-  const itemRepository = new FirestoreItemRepository(firestoreClient);
-  fastify.decorate('itemRepository', itemRepository);
 
   const teamRepository = new FirestoreTeamRepository(firestoreClient);
   fastify.decorate('teamRepository', teamRepository);
 
-  const repoRepository = new FirestoreRepoRepository(firestoreClient);
-  fastify.decorate('repoRepository', repoRepository);
-
   const scanRunRepository = new FirestoreScanRunRepository(firestoreClient);
   fastify.decorate('scanRunRepository', scanRunRepository);
 
-  // Register use cases with factory pattern
+  const questRepository = new FirestoreQuestRepository(firestoreClient);
+  fastify.decorate('questRepository', questRepository);
+
+  const repoReadinessRepository = new FirestoreRepoReadinessRepository(firestoreClient);
+  fastify.decorate('repoReadinessRepository', repoReadinessRepository);
+
+  const computeRepoReadinessUseCase = new ComputeRepoReadinessUseCase(
+    questRepository,
+    repoReadinessRepository,
+  );
+
+  const approveQuestManuallyUseCase = new ApproveQuestManuallyUseCase(
+    questRepository,
+    teamRepository,
+    repoReadinessRepository,
+  );
+
   fastify.decorate('useCases', {
     ingestScanRun: () =>
-      new IngestScanRunUseCase(teamRepository, repoRepository, scanRunRepository),
+      new IngestScanRunUseCase(teamRepository, scanRunRepository, computeRepoReadinessUseCase),
+    computeRepoReadiness: () => computeRepoReadinessUseCase,
+    approveQuestManually: () => approveQuestManuallyUseCase,
   });
 }

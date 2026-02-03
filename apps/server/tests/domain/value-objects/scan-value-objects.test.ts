@@ -4,8 +4,8 @@ import {
   ScanRunId,
   CommitSha,
   QuestKey,
-  QuestStatus,
-} from '../../../src/domain/value-objects/scan-value-objects.js';
+  ScanResult,
+} from '../../../src/domain/scan-run/scan-value-objects.js';
 import { ValidationError } from '../../../src/shared/errors/domain-errors.js';
 
 describe('ScanRunId', () => {
@@ -98,68 +98,30 @@ describe('QuestKey', () => {
   });
 });
 
-describe('QuestStatus', () => {
+describe('ScanResult', () => {
   describe('create', () => {
-    it('should create PASS status', () => {
-      const status = QuestStatus.create('pass');
-      expect(status.value).toBe('pass');
-      expect(status.isPass()).toBe(true);
-      expect(status.isFail()).toBe(false);
-      expect(status.isUnknown()).toBe(false);
+    it('should create a ScanResult with data', () => {
+      const data = { present: true, count: 5 };
+      const result = ScanResult.create(data);
+      expect(result.data).toEqual(data);
     });
 
-    it('should create FAIL status', () => {
-      const status = QuestStatus.create('fail');
-      expect(status.value).toBe('fail');
-      expect(status.isPass()).toBe(false);
-      expect(status.isFail()).toBe(true);
-      expect(status.isUnknown()).toBe(false);
+    it('should be immutable', () => {
+      const data = { count: 1 };
+      const result = ScanResult.create(data);
+      // Modify the returned data object
+      result.data.count = 2;
+      // Original data should not be changed
+      expect(result.data.count).toBe(1);
     });
 
-    it('should create UNKNOWN status', () => {
-      const status = QuestStatus.create('unknown');
-      expect(status.value).toBe('unknown');
-      expect(status.isPass()).toBe(false);
-      expect(status.isFail()).toBe(false);
-      expect(status.isUnknown()).toBe(true);
-    });
+    it('should check equality correctly', () => {
+      const r1 = ScanResult.create({ a: 1 });
+      const r2 = ScanResult.create({ a: 1 });
+      const r3 = ScanResult.create({ a: 2 });
 
-    it('should throw ValidationError for invalid status', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument -- Testing invalid input
-      expect(() => QuestStatus.create('invalid' as any)).toThrow(ValidationError);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument -- Testing invalid input
-      expect(() => QuestStatus.create('invalid' as any)).toThrow(
-        'QuestStatus must be one of: pass, fail, unknown',
-      );
-    });
-
-    it('should be case-sensitive', () => {
-      // Testing that invalid case-variants are rejected
-      type InvalidStatus = 'PASS' | 'Pass';
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument -- Testing invalid input
-      expect(() => QuestStatus.create('PASS' as InvalidStatus as any)).toThrow(ValidationError);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument -- Testing invalid input
-      expect(() => QuestStatus.create('Pass' as InvalidStatus as any)).toThrow(ValidationError);
-    });
-  });
-
-  describe('static factory methods', () => {
-    it('should create PASS via static method', () => {
-      const status = QuestStatus.pass();
-      expect(status.value).toBe('pass');
-      expect(status.isPass()).toBe(true);
-    });
-
-    it('should create FAIL via static method', () => {
-      const status = QuestStatus.fail();
-      expect(status.value).toBe('fail');
-      expect(status.isFail()).toBe(true);
-    });
-
-    it('should create UNKNOWN via static method', () => {
-      const status = QuestStatus.unknown();
-      expect(status.value).toBe('unknown');
-      expect(status.isUnknown()).toBe(true);
+      expect(r1.equals(r2)).toBe(true);
+      expect(r1.equals(r3)).toBe(false);
     });
   });
 });

@@ -1,13 +1,12 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
-import { ScanRun } from '../../../src/domain/entities/scan-run.js';
-import { RepoId } from '../../../src/domain/value-objects/repo-value-objects.js';
+import { ScanRun } from '../../../src/domain/scan-run/scan-run.js';
 import {
   CommitSha,
-  QuestStatus,
+  ScanResult,
   ScanRunId,
-} from '../../../src/domain/value-objects/scan-value-objects.js';
-import { TeamId } from '../../../src/domain/value-objects/team-value-objects.js';
+} from '../../../src/domain/scan-run/scan-value-objects.js';
+import { RepoId, TeamId } from '../../../src/domain/shared/index.js';
 import { FirestoreScanRunRepository } from '../../../src/infrastructure/persistence/firestore/repositories/firestore-scan-run-repository.js';
 import {
   clearCollection,
@@ -36,9 +35,9 @@ describe('FirestoreScanRunRepository - Integration Tests', () => {
 
   describe('save() and findById()', () => {
     it('should save and retrieve a scan run', async () => {
-      const questResults = new Map<string, QuestStatus>([
-        ['docs.agents_md_present', QuestStatus.pass()],
-        ['quality.eslint_configured', QuestStatus.fail()],
+      const questResults = new Map<string, ScanResult>([
+        ['docs.agents_md_present', ScanResult.create({ present: true })],
+        ['quality.eslint_configured', ScanResult.create({ present: false })],
       ]);
 
       const scanRun = ScanRun.create({

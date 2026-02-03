@@ -10,7 +10,7 @@
     "build": "pnpm build:client && pnpm build:server",
     "build:client": "pnpm --filter client build",
     "build:server": "pnpm --filter server build",
-    "test": "vitest",
+    "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "type-check": "pnpm -r run type-check",
     "lint": "eslint .",

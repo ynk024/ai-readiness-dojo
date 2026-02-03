@@ -1,22 +1,20 @@
 import { describe, it, expect } from 'vitest';
 
-import { ScanRun } from '../../../src/domain/entities/scan-run.js';
-import { RepoId } from '../../../src/domain/value-objects/repo-value-objects.js';
+import { ScanRun } from '../../../src/domain/scan-run/scan-run.js';
 import {
   ScanRunId,
   CommitSha,
-  QuestKey,
-  QuestStatus,
-} from '../../../src/domain/value-objects/scan-value-objects.js';
-import { TeamId } from '../../../src/domain/value-objects/team-value-objects.js';
+  ScanResult,
+} from '../../../src/domain/scan-run/scan-value-objects.js';
+import { RepoId, TeamId } from '../../../src/domain/shared/index.js';
 import { ValidationError } from '../../../src/shared/errors/domain-errors.js';
 
 describe('ScanRun Entity', () => {
   describe('create', () => {
     it('should create a new scan run with valid data', () => {
-      const questResults = new Map<string, QuestStatus>([
-        ['docs.agents_md_present', QuestStatus.pass()],
-        ['quality.coverage_threshold_met', QuestStatus.fail()],
+      const questResults = new Map<string, ScanResult>([
+        ['docs.agents_md_present', ScanResult.create({ passed: true })],
+        ['quality.coverage_threshold_met', ScanResult.create({ passed: false })],
       ]);
 
       const scanRun = ScanRun.create({
@@ -130,8 +128,8 @@ describe('ScanRun Entity', () => {
   describe('reconstitute', () => {
     it('should reconstitute an existing scan run from storage', () => {
       const scannedAt = new Date('2024-01-01T00:00:00Z');
-      const questResults = new Map<string, QuestStatus>([
-        ['docs.agents_md_present', QuestStatus.pass()],
+      const questResults = new Map<string, ScanResult>([
+        ['docs.agents_md_present', ScanResult.create({ passed: true })],
       ]);
 
       const scanRun = ScanRun.reconstitute({
@@ -153,11 +151,10 @@ describe('ScanRun Entity', () => {
     });
   });
 
-  describe('getQuestStatus', () => {
-    it('should return quest status if it exists', () => {
-      const questResults = new Map<string, QuestStatus>([
-        ['docs.agents_md_present', QuestStatus.pass()],
-        ['quality.coverage_threshold_met', QuestStatus.fail()],
+  describe('questResults', () => {
+    it('should return readonly quest results map', () => {
+      const questResults = new Map<string, ScanResult>([
+        ['docs.agents_md_present', ScanResult.create({ passed: true })],
       ]);
 
       const scanRun = ScanRun.create({
@@ -173,117 +170,18 @@ describe('ScanRun Entity', () => {
         questResults,
       });
 
-      const status = scanRun.getQuestStatus(QuestKey.create('docs.agents_md_present'));
-      expect(status?.value).toBe('pass');
-    });
-
-    it('should return undefined if quest not found', () => {
-      const scanRun = ScanRun.create({
-        id: ScanRunId.create('scan_123'),
-        teamId: TeamId.create('team_eng'),
-        repoId: RepoId.create('repo_test'),
-        commitSha: CommitSha.create('7a01375'),
-        refName: 'main',
-        providerRunId: '12345',
-        runUrl: 'https://github.com/owner/repo/actions/runs/12345',
-        workflowVersion: '1.0.0',
-        scannedAt: new Date(),
-        questResults: new Map(),
-      });
-
-      const status = scanRun.getQuestStatus(QuestKey.create('docs.agents_md_present'));
-      expect(status).toBeUndefined();
-    });
-  });
-
-  describe('getPassedQuests', () => {
-    it('should return all passed quests', () => {
-      const questResults = new Map<string, QuestStatus>([
-        ['docs.agents_md_present', QuestStatus.pass()],
-        ['quality.coverage_threshold_met', QuestStatus.fail()],
-        ['sast.codeql_present', QuestStatus.pass()],
-      ]);
-
-      const scanRun = ScanRun.create({
-        id: ScanRunId.create('scan_123'),
-        teamId: TeamId.create('team_eng'),
-        repoId: RepoId.create('repo_test'),
-        commitSha: CommitSha.create('7a01375'),
-        refName: 'main',
-        providerRunId: '12345',
-        runUrl: 'https://github.com/owner/repo/actions/runs/12345',
-        workflowVersion: '1.0.0',
-        scannedAt: new Date(),
-        questResults,
-      });
-
-      const passedQuests = scanRun.getPassedQuests();
-      expect(passedQuests).toHaveLength(2);
-      expect(passedQuests.map((q: QuestKey) => q.value)).toEqual([
-        'docs.agents_md_present',
-        'sast.codeql_present',
-      ]);
-    });
-
-    it('should return empty array if no quests passed', () => {
-      const questResults = new Map<string, QuestStatus>([
-        ['quality.coverage_threshold_met', QuestStatus.fail()],
-      ]);
-
-      const scanRun = ScanRun.create({
-        id: ScanRunId.create('scan_123'),
-        teamId: TeamId.create('team_eng'),
-        repoId: RepoId.create('repo_test'),
-        commitSha: CommitSha.create('7a01375'),
-        refName: 'main',
-        providerRunId: '12345',
-        runUrl: 'https://github.com/owner/repo/actions/runs/12345',
-        workflowVersion: '1.0.0',
-        scannedAt: new Date(),
-        questResults,
-      });
-
-      const passedQuests = scanRun.getPassedQuests();
-      expect(passedQuests).toHaveLength(0);
-    });
-  });
-
-  describe('getFailedQuests', () => {
-    it('should return all failed quests', () => {
-      const questResults = new Map<string, QuestStatus>([
-        ['docs.agents_md_present', QuestStatus.pass()],
-        ['quality.coverage_threshold_met', QuestStatus.fail()],
-        ['sast.semgrep_present', QuestStatus.fail()],
-      ]);
-
-      const scanRun = ScanRun.create({
-        id: ScanRunId.create('scan_123'),
-        teamId: TeamId.create('team_eng'),
-        repoId: RepoId.create('repo_test'),
-        commitSha: CommitSha.create('7a01375'),
-        refName: 'main',
-        providerRunId: '12345',
-        runUrl: 'https://github.com/owner/repo/actions/runs/12345',
-        workflowVersion: '1.0.0',
-        scannedAt: new Date(),
-        questResults,
-      });
-
-      const failedQuests = scanRun.getFailedQuests();
-      expect(failedQuests).toHaveLength(2);
-      expect(failedQuests.map((q: QuestKey) => q.value)).toEqual([
-        'quality.coverage_threshold_met',
-        'sast.semgrep_present',
-      ]);
+      const results = scanRun.questResults;
+      expect(results.get('docs.agents_md_present')?.data.passed).toBe(true);
+      expect(results.size).toBe(1);
     });
   });
 
   describe('getTotalQuests', () => {
     it('should return total number of quests', () => {
-      const questResults = new Map<string, QuestStatus>([
-        ['docs.agents_md_present', QuestStatus.pass()],
-        ['quality.coverage_threshold_met', QuestStatus.fail()],
-        ['sast.codeql_present', QuestStatus.pass()],
+      const questResults = new Map<string, ScanResult>([
+        ['docs.agents_md_present', ScanResult.create({ passed: true })],
+        ['quality.coverage_threshold_met', ScanResult.create({ passed: false })],
+        ['sast.codeql_present', ScanResult.create({ passed: true })],
       ]);
 
       const scanRun = ScanRun.create({
