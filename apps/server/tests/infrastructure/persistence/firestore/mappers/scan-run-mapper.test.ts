@@ -204,7 +204,9 @@ describe('ScanRunMapper', () => {
       expect(typeof firestoreData.workflowVersion).toBe('string');
       expect(typeof firestoreData.questResults).toBe('object');
       expect(typeof firestoreData.questResults['quest.test']).toBe('object');
-      expect((firestoreData.questResults['quest.test'] as Record<string, unknown>).passed).toBe(true);
+      expect((firestoreData.questResults['quest.test'] as Record<string, unknown>).passed).toBe(
+        true,
+      );
     });
   });
 });

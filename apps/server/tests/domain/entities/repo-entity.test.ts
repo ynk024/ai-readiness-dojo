@@ -16,6 +16,7 @@ describe('RepoEntity (Child Entity)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       };
 
       const repo = RepoEntity.create(props);
@@ -38,6 +39,7 @@ describe('RepoEntity (Child Entity)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       };
 
       const repo = RepoEntity.create(props);
@@ -53,6 +55,7 @@ describe('RepoEntity (Child Entity)', () => {
         defaultBranch: '  main  ',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       };
 
       const repo = RepoEntity.create(props);
@@ -68,6 +71,7 @@ describe('RepoEntity (Child Entity)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       };
 
       expect(() => RepoEntity.create(props)).toThrow(ValidationError);
@@ -83,6 +87,7 @@ describe('RepoEntity (Child Entity)', () => {
         defaultBranch: '',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       };
 
       expect(() => RepoEntity.create(props)).toThrow(ValidationError);
@@ -98,6 +103,7 @@ describe('RepoEntity (Child Entity)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       };
 
       const before = new Date();
@@ -124,6 +130,7 @@ describe('RepoEntity (Child Entity)', () => {
         defaultBranch: 'develop',
         teamId: TeamId.create('team_test'),
         archived: true,
+        language: null,
         createdAt,
         updatedAt,
       };
@@ -150,6 +157,7 @@ describe('RepoEntity (Child Entity)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       };
 
       const repo = RepoEntity.create(props);
@@ -170,6 +178,7 @@ describe('RepoEntity (Child Entity)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       };
 
       const repo = RepoEntity.create(props);
@@ -191,6 +200,7 @@ describe('RepoEntity (Child Entity)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: true,
+        language: null,
       };
 
       const repo = RepoEntity.create(props);
@@ -212,6 +222,7 @@ describe('RepoEntity (Child Entity)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       };
 
       const repo = RepoEntity.create(props);
@@ -231,6 +242,7 @@ describe('RepoEntity (Child Entity)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       };
 
       const repo = RepoEntity.create(props);
@@ -248,6 +260,7 @@ describe('RepoEntity (Child Entity)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       };
 
       const repo = RepoEntity.create(props);
@@ -274,6 +287,7 @@ describe('RepoEntity (Child Entity)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -286,6 +300,7 @@ describe('RepoEntity (Child Entity)', () => {
         defaultBranch: 'develop',
         teamId: TeamId.create('team_test'),
         archived: true,
+        language: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -298,6 +313,7 @@ describe('RepoEntity (Child Entity)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };

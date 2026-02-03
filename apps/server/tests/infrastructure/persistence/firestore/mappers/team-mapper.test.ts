@@ -32,6 +32,7 @@ describe('TeamMapper', () => {
             defaultBranch: 'main',
             teamId: 'team_testorg',
             archived: false,
+            language: null,
             createdAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
             updatedAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
           },
@@ -43,6 +44,7 @@ describe('TeamMapper', () => {
             defaultBranch: 'main',
             teamId: 'team_testorg',
             archived: false,
+            language: null,
             createdAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
             updatedAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
           },
@@ -117,6 +119,7 @@ describe('TeamMapper', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_testorg'),
         archived: false,
+        language: null,
       });
 
       team.addRepo({
@@ -127,6 +130,7 @@ describe('TeamMapper', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_testorg'),
         archived: false,
+        language: null,
       });
 
       const firestoreData = teamToFirestore(team);
@@ -189,6 +193,7 @@ describe('TeamMapper', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_testorg'),
         archived: false,
+        language: null,
       });
 
       const firestoreData = teamToFirestore(team);
@@ -242,6 +247,7 @@ describe('TeamMapper', () => {
             defaultBranch: 'main',
             teamId: 'team_testorg',
             archived: false,
+            language: null,
             createdAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
             updatedAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
           },
@@ -253,6 +259,7 @@ describe('TeamMapper', () => {
             defaultBranch: 'main',
             teamId: 'team_testorg',
             archived: false,
+            language: null,
             createdAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
             updatedAt: Timestamp.fromDate(new Date('2024-01-01T00:00:00.000Z')),
           },

@@ -72,8 +72,8 @@ export class IngestScanRunUseCase {
     // Step 4: Persist scan run
     await this.scanRunRepository.save(scanRun);
 
-    // Step 5: Compute and persist repo readiness
-    const readiness = await this.computeRepoReadinessUseCase.execute(scanRun);
+    // Step 5: Compute and persist repo readiness (passing repo language for quest filtering)
+    const readiness = await this.computeRepoReadinessUseCase.execute(scanRun, repo.language);
 
     // Step 6: Return result with summary
     return {

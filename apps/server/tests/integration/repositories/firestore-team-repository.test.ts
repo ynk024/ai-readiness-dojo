@@ -78,6 +78,7 @@ describe('FirestoreTeamRepository - Integration Tests', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_testorg'),
         archived: false,
+        language: null,
       });
 
       team.addRepo({
@@ -88,6 +89,7 @@ describe('FirestoreTeamRepository - Integration Tests', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_testorg'),
         archived: false,
+        language: null,
       });
 
       const savedTeam = await repository.save(team);
@@ -116,6 +118,7 @@ describe('FirestoreTeamRepository - Integration Tests', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_testorg'),
         archived: false,
+        language: null,
       });
       const updatedTeam = await repository.save(team);
 
@@ -163,6 +166,7 @@ describe('FirestoreTeamRepository - Integration Tests', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_testorg'),
         archived: false,
+        language: null,
       });
 
       await repository.save(team);

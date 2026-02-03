@@ -1,6 +1,7 @@
 import { QuestRepository } from '../../../../application/ports/quest-repository.js';
 import { QuestId } from '../../../../domain/quest/quest-value-objects.js';
 import { Quest } from '../../../../domain/quest/quest.js';
+import { ProgrammingLanguage } from '../../../../domain/shared/programming-language.js';
 import { EntityNotFoundError } from '../../../../shared/errors/domain-errors.js';
 import { FirestoreClient } from '../firestore-client.js';
 import {
@@ -79,6 +80,15 @@ export class FirestoreQuestRepository implements QuestRepository {
       const data = doc.data() as QuestFirestoreData;
       return questToDomain(data);
     });
+  }
+
+  /**
+   * Finds all active quests that apply to a specific language
+   * Filters in-memory using Quest.appliesToLanguage() business logic
+   */
+  async findActiveByLanguage(language: ProgrammingLanguage | null): Promise<Quest[]> {
+    const activeQuests = await this.findActive();
+    return activeQuests.filter((quest) => quest.appliesToLanguage(language));
   }
 
   /**

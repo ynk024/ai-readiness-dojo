@@ -80,4 +80,3 @@ describe('RepoReadiness Aggregate', () => {
     expect(readiness.getTotalQuests()).toBe(0);
   });
 });
-

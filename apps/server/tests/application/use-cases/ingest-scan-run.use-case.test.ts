@@ -121,6 +121,7 @@ describe('IngestScanRunUseCase', () => {
         defaultBranch: 'main',
         teamId,
         archived: false,
+        language: null,
       });
 
       vi.mocked(teamRepository.findBySlug).mockResolvedValue(existingTeam);

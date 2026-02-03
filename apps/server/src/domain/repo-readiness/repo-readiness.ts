@@ -23,7 +23,7 @@ export interface RepoReadinessProps {
 }
 
 export class RepoReadiness {
-  private constructor(private props: RepoReadinessProps) { }
+  private constructor(private props: RepoReadinessProps) {}
 
   /**
    * Compute repo readiness from a scan run summary and quest catalog definitions

@@ -4,12 +4,12 @@
     "generator": "generate-metrics.js v1.0.0"
   },
   "summary": {
-    "totalModules": 45,
-    "totalDependencies": 110,
-    "graphDensity": 0.056,
-    "avgFanOut": 2.44,
-    "avgFanIn": 2.44,
-    "healthScore": 88,
+    "totalModules": 46,
+    "totalDependencies": 121,
+    "graphDensity": 0.058,
+    "avgFanOut": 2.63,
+    "avgFanIn": 2.63,
+    "healthScore": 87,
     "status": "WARN"
   },
   "circular": {
@@ -20,11 +20,11 @@
     "cycles": []
   },
   "coupling": {
-    "avgFanOut": 2.44,
+    "avgFanOut": 2.63,
     "maxFanOut": 7,
     "maxFanOutFile": "application/use-cases/ingest-scan-run.use-case.ts",
-    "avgFanIn": 2.44,
-    "maxFanIn": 12,
+    "avgFanIn": 2.63,
+    "maxFanIn": 14,
     "maxFanInFile": "shared/errors/domain-errors.ts",
     "criticalCoupling": [],
     "highCoupling": [],
@@ -32,7 +32,7 @@
   },
   "depth": {
     "longestChain": 6,
-    "avgDepth": 2.44,
+    "avgDepth": 2.41,
     "criticalDepth": [],
     "deepModules": [
       {
@@ -57,26 +57,26 @@
       "application/ports/": {
         "totalModules": 5,
         "internalImports": 4,
-        "externalImports": 9,
-        "cohesionScore": 30.8
+        "externalImports": 10,
+        "cohesionScore": 28.6
       },
       "application/services/": {
         "totalModules": 1,
         "internalImports": 0,
-        "externalImports": 5,
+        "externalImports": 6,
         "cohesionScore": 0
       },
       "application/use-cases/": {
         "totalModules": 2,
         "internalImports": 1,
-        "externalImports": 10,
-        "cohesionScore": 9.1
+        "externalImports": 11,
+        "cohesionScore": 8.3
       },
       "domain/quest/": {
         "totalModules": 3,
         "internalImports": 3,
-        "externalImports": 2,
-        "cohesionScore": 60
+        "externalImports": 3,
+        "cohesionScore": 50
       },
       "domain/repo-readiness/": {
         "totalModules": 3,
@@ -91,16 +91,16 @@
         "cohesionScore": 33.3
       },
       "domain/shared/": {
-        "totalModules": 3,
+        "totalModules": 4,
         "internalImports": 2,
-        "externalImports": 3,
-        "cohesionScore": 40
+        "externalImports": 4,
+        "cohesionScore": 33.3
       },
       "domain/team/": {
         "totalModules": 2,
         "internalImports": 1,
-        "externalImports": 6,
-        "cohesionScore": 14.3
+        "externalImports": 7,
+        "cohesionScore": 12.5
       },
       "infrastructure/config/": {
         "totalModules": 2,
@@ -117,19 +117,19 @@
       "infrastructure/persistence/firestore/mappers/": {
         "totalModules": 4,
         "internalImports": 0,
-        "externalImports": 9,
+        "externalImports": 11,
         "cohesionScore": 0
       },
       "infrastructure/persistence/firestore/repositories/": {
         "totalModules": 4,
         "internalImports": 0,
-        "externalImports": 25,
+        "externalImports": 26,
         "cohesionScore": 0
       },
       "infrastructure/scripts/": {
         "totalModules": 1,
         "internalImports": 0,
-        "externalImports": 6,
+        "externalImports": 7,
         "cohesionScore": 0
       },
       "presentation/dto/": {
@@ -147,7 +147,7 @@
       "presentation/routes/": {
         "totalModules": 4,
         "internalImports": 0,
-        "externalImports": 5,
+        "externalImports": 6,
         "cohesionScore": 0
       },
       "shared/errors/": {
@@ -170,8 +170,8 @@
         ],
         "totalModules": 7,
         "internalImports": 11,
-        "externalImports": 5,
-        "cohesionScore": 68.8
+        "externalImports": 9,
+        "cohesionScore": 55
       },
       "repo-readiness": {
         "modules": [
@@ -211,34 +211,34 @@
         ],
         "totalModules": 5,
         "internalImports": 6,
-        "externalImports": 12,
-        "cohesionScore": 33.3
+        "externalImports": 14,
+        "cohesionScore": 30
       }
     },
     "byLayer": {
       "domain": {
-        "totalModules": 13,
-        "internalImports": 18,
-        "externalImports": 9,
+        "totalModules": 14,
+        "internalImports": 20,
+        "externalImports": 10,
         "cohesionScore": 66.7
       },
       "application": {
         "totalModules": 10,
         "internalImports": 14,
-        "externalImports": 17,
-        "cohesionScore": 45.2
+        "externalImports": 20,
+        "cohesionScore": 41.2
       },
       "infrastructure": {
         "totalModules": 12,
         "internalImports": 13,
-        "externalImports": 28,
-        "cohesionScore": 31.7
+        "externalImports": 32,
+        "cohesionScore": 28.9
       },
       "presentation": {
         "totalModules": 9,
         "internalImports": 7,
-        "externalImports": 4,
-        "cohesionScore": 63.6
+        "externalImports": 5,
+        "cohesionScore": 58.3
       },
       "shared": {
         "totalModules": 1,
@@ -278,11 +278,11 @@
     }
   },
   "graph": {
-    "nodeCount": 45,
-    "edgeCount": 110,
-    "density": 0.056,
-    "avgDegree": 4.89,
-    "maxPossibleEdges": 1980
+    "nodeCount": 46,
+    "edgeCount": 121,
+    "density": 0.058,
+    "avgDegree": 5.26,
+    "maxPossibleEdges": 2070
   },
   "topModules": {
     "mostCoupled": [
@@ -292,47 +292,47 @@
         "rank": 1
       },
       {
-        "file": "infrastructure/persistence/firestore/repositories/firestore-scan-run-repository.ts",
+        "file": "infrastructure/persistence/firestore/repositories/firestore-quest-repository.ts",
         "fanOut": 7,
         "rank": 2
       },
       {
-        "file": "infrastructure/persistence/firestore/repositories/firestore-quest-repository.ts",
-        "fanOut": 6,
+        "file": "infrastructure/persistence/firestore/repositories/firestore-scan-run-repository.ts",
+        "fanOut": 7,
         "rank": 3
       },
       {
-        "file": "infrastructure/persistence/firestore/repositories/firestore-repo-readiness-repository.ts",
-        "fanOut": 6,
+        "file": "infrastructure/scripts/seed-quests.ts",
+        "fanOut": 7,
         "rank": 4
       },
       {
-        "file": "infrastructure/persistence/firestore/repositories/firestore-team-repository.ts",
+        "file": "application/services/team-repo-resolver.ts",
         "fanOut": 6,
         "rank": 5
       },
       {
-        "file": "infrastructure/scripts/seed-quests.ts",
+        "file": "infrastructure/persistence/firestore/repositories/firestore-repo-readiness-repository.ts",
         "fanOut": 6,
         "rank": 6
       },
       {
-        "file": "application/services/team-repo-resolver.ts",
-        "fanOut": 5,
+        "file": "infrastructure/persistence/firestore/repositories/firestore-team-repository.ts",
+        "fanOut": 6,
         "rank": 7
       },
       {
-        "file": "application/ports/repo-readiness-repository.ts",
-        "fanOut": 4,
+        "file": "application/use-cases/compute-repo-readiness.use-case.ts",
+        "fanOut": 5,
         "rank": 8
       },
       {
-        "file": "application/use-cases/compute-repo-readiness.use-case.ts",
+        "file": "application/ports/quest-repository.ts",
         "fanOut": 4,
         "rank": 9
       },
       {
-        "file": "domain/team/team.ts",
+        "file": "application/ports/repo-readiness-repository.ts",
         "fanOut": 4,
         "rank": 10
       }
@@ -340,7 +340,7 @@
     "mostDepended": [
       {
         "file": "shared/errors/domain-errors.ts",
-        "fanIn": 12,
+        "fanIn": 14,
         "rank": 1
       },
       {
@@ -349,43 +349,43 @@
         "rank": 2
       },
       {
-        "file": "domain/shared/repo-types.ts",
+        "file": "domain/shared/programming-language.ts",
         "fanIn": 9,
         "rank": 3
       },
       {
+        "file": "domain/shared/repo-types.ts",
+        "fanIn": 9,
+        "rank": 4
+      },
+      {
         "file": "domain/shared/team-types.ts",
         "fanIn": 8,
-        "rank": 4
+        "rank": 5
       },
       {
         "file": "domain/quest/quest-value-objects.ts",
         "fanIn": 6,
-        "rank": 5
+        "rank": 6
       },
       {
         "file": "domain/quest/quest.ts",
         "fanIn": 5,
-        "rank": 6
+        "rank": 7
       },
       {
         "file": "domain/repo-readiness/repo-readiness.ts",
         "fanIn": 5,
-        "rank": 7
+        "rank": 8
       },
       {
         "file": "domain/scan-run/scan-run.ts",
         "fanIn": 5,
-        "rank": 8
+        "rank": 9
       },
       {
         "file": "infrastructure/persistence/firestore/firestore-client.ts",
         "fanIn": 5,
-        "rank": 9
-      },
-      {
-        "file": "application/ports/base-repository.ts",
-        "fanIn": 4,
         "rank": 10
       }
     ],
@@ -456,11 +456,11 @@
     ]
   },
   "healthScore": {
-    "overall": 88,
+    "overall": 87,
     "breakdown": {
       "coupling": 100,
       "depth": 100,
-      "cohesion": 51,
+      "cohesion": 46,
       "modularity": 100
     }
   }

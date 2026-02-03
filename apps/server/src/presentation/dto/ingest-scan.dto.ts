@@ -21,6 +21,10 @@ export interface IngestScanRequestDto {
     };
     timestamp: string; // ISO 8601 format
     workflow_version: string;
+    languages?: {
+      detected: string[];
+      primary: string;
+    };
   };
   checks: {
     documentation?: {

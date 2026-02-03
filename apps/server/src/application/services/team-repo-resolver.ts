@@ -1,3 +1,4 @@
+import { ProgrammingLanguage } from '../../domain/shared/programming-language.js';
 import { RepoId, RepoFullName, RepoUrl } from '../../domain/shared/repo-types.js';
 import { TeamId, TeamSlug } from '../../domain/shared/team-types.js';
 import { Team, type RepoEntity } from '../../domain/team/team.js';
@@ -27,7 +28,8 @@ export class TeamRepoResolver {
    * 1. Extract owner from repo metadata → derive team slug
    * 2. Find or create team using owner as team name/slug
    * 3. Find or create repo within team
-   * 4. Return both team and repo
+   * 4. Extract and update language from metadata
+   * 5. Return both team and repo
    *
    * @param metadata - Repository metadata from AI-Readiness report
    * @returns Team and Repo entities
@@ -51,6 +53,9 @@ export class TeamRepoResolver {
     const repoFullName = RepoFullName.create(metadata.fullName);
     let repo = team.getRepoByFullName(repoFullName);
 
+    // Parse language from metadata
+    const language = ProgrammingLanguage.fromString(metadata.primaryLanguage);
+
     if (!repo) {
       const defaultBranch = metadata.refName.startsWith('refs/heads/')
         ? metadata.refName.substring('refs/heads/'.length)
@@ -64,8 +69,21 @@ export class TeamRepoResolver {
         defaultBranch,
         teamId,
         archived: false,
+        language,
       });
       await this.teamRepository.save(team);
+    } else {
+      // Update language if it changed
+      const currentLanguage = repo.language;
+
+      const languagesMatch =
+        (language === null && currentLanguage === null) ||
+        (language !== null && currentLanguage !== null && language.equals(currentLanguage));
+
+      if (!languagesMatch) {
+        repo.updateLanguage(language);
+        await this.teamRepository.save(team);
+      }
     }
 
     return { team, repo };

@@ -1,6 +1,7 @@
 import { Timestamp } from 'firebase-admin/firestore';
 
 import { TeamId, TeamSlug } from '../../../../domain/shared/index.js';
+import { ProgrammingLanguage } from '../../../../domain/shared/programming-language.js';
 import { RepoId, RepoFullName, RepoUrl } from '../../../../domain/shared/repo-types.js';
 import { Team, RepoEntity } from '../../../../domain/team/team.js';
 
@@ -22,6 +23,7 @@ export interface TeamFirestoreData {
     defaultBranch: string;
     teamId: string;
     archived: boolean;
+    language: string | null;
     createdAt: FirebaseFirestore.Timestamp;
     updatedAt: FirebaseFirestore.Timestamp;
   }>;
@@ -51,6 +53,7 @@ export function teamToDomain(data: TeamFirestoreData): Team {
       defaultBranch: repoData.defaultBranch,
       teamId: TeamId.create(repoData.teamId),
       archived: repoData.archived,
+      language: ProgrammingLanguage.fromString(repoData.language),
       createdAt: repoData.createdAt.toDate(),
       updatedAt: repoData.updatedAt.toDate(),
     }),
@@ -87,6 +90,7 @@ export function teamToFirestore(team: Team): Omit<TeamFirestoreData, 'createdAt'
       defaultBranch: repo.defaultBranch,
       teamId: repo.teamId.value,
       archived: repo.archived,
+      language: repo.language?.value ?? null,
       createdAt: Timestamp.fromDate(repo.createdAt),
       updatedAt: Timestamp.fromDate(repo.updatedAt),
     })),

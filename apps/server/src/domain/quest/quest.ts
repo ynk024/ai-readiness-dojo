@@ -1,4 +1,5 @@
 import { ValidationError } from '../../shared/errors/domain-errors.js';
+import { ProgrammingLanguage } from '../shared/programming-language.js';
 
 import { QuestId } from './quest-value-objects.js';
 
@@ -24,13 +25,14 @@ export interface QuestProps {
   category: string;
   description: string;
   levels: QuestLevel[];
+  languages?: ProgrammingLanguage[];
   active: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export class Quest {
-  private constructor(private props: QuestProps) { }
+  private constructor(private props: QuestProps) {}
 
   static create(input: Omit<QuestProps, 'createdAt' | 'updatedAt'>): Quest {
     const trimmedKey = input.key.trim();
@@ -105,6 +107,10 @@ export class Quest {
     return [...this.props.levels];
   }
 
+  get languages(): ProgrammingLanguage[] | undefined {
+    return this.props.languages ? [...this.props.languages] : undefined;
+  }
+
   get active(): boolean {
     return this.props.active;
   }
@@ -142,5 +148,31 @@ export class Quest {
 
     this.props.description = trimmedDescription;
     this.props.updatedAt = new Date();
+  }
+
+  /**
+   * Check if this quest applies to a given programming language
+   *
+   * Business logic:
+   * - Quests with no languages (undefined or empty array) are universal and apply to all repos
+   * - Repos with no detected language (null) get all quests (including language-specific ones)
+   * - Otherwise, quest applies if its languages include the repo's language
+   *
+   * @param language - The repo's programming language (or null if unknown)
+   * @returns true if quest applies to this language
+   */
+  appliesToLanguage(language: ProgrammingLanguage | null): boolean {
+    // Universal quest: no languages specified means applies to all repos
+    if (!this.props.languages || this.props.languages.length === 0) {
+      return true;
+    }
+
+    // Repo has no detected language: include all quests for now
+    if (language === null) {
+      return true;
+    }
+
+    // Check if quest's languages include the repo's language
+    return this.props.languages.some((lang) => lang.equals(language));
   }
 }

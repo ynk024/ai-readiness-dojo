@@ -8,7 +8,8 @@
   "application/ports/quest-repository.ts": [
     "application/ports/base-repository.ts",
     "domain/quest/quest-value-objects.ts",
-    "domain/quest/quest.ts"
+    "domain/quest/quest.ts",
+    "domain/shared/programming-language.ts"
   ],
   "application/ports/repo-readiness-repository.ts": [
     "application/ports/base-repository.ts",
@@ -30,6 +31,7 @@
   "application/services/team-repo-resolver.ts": [
     "application/dto/repo-metadata.dto.ts",
     "application/ports/team-repository.ts",
+    "domain/shared/programming-language.ts",
     "domain/shared/repo-types.ts",
     "domain/shared/team-types.ts",
     "domain/team/team.ts"
@@ -38,7 +40,8 @@
     "application/ports/quest-repository.ts",
     "application/ports/repo-readiness-repository.ts",
     "domain/repo-readiness/repo-readiness.ts",
-    "domain/scan-run/scan-run.ts"
+    "domain/scan-run/scan-run.ts",
+    "domain/shared/programming-language.ts"
   ],
   "application/use-cases/ingest-scan-run.use-case.ts": [
     "application/dto/ingest-scan-run.dto.ts",
@@ -68,6 +71,7 @@
   ],
   "domain/quest/quest.ts": [
     "domain/quest/quest-value-objects.ts",
+    "domain/shared/programming-language.ts",
     "shared/errors/domain-errors.ts"
   ],
   "domain/repo-readiness/index.ts": [
@@ -102,8 +106,12 @@
     "shared/errors/domain-errors.ts"
   ],
   "domain/shared/index.ts": [
+    "domain/shared/programming-language.ts",
     "domain/shared/repo-types.ts",
     "domain/shared/team-types.ts"
+  ],
+  "domain/shared/programming-language.ts": [
+    "shared/errors/domain-errors.ts"
   ],
   "domain/shared/readiness-data.ts": [
     "domain/scan-run/scan-value-objects.ts",
@@ -120,6 +128,7 @@
     "domain/team/team.ts"
   ],
   "domain/team/repo-entity.ts": [
+    "domain/shared/programming-language.ts",
     "domain/shared/repo-types.ts",
     "domain/shared/team-types.ts",
     "shared/errors/domain-errors.ts"
@@ -161,7 +170,8 @@
   "infrastructure/persistence/firestore/firestore-client.ts": [],
   "infrastructure/persistence/firestore/mappers/quest-mapper.ts": [
     "domain/quest/quest-value-objects.ts",
-    "domain/quest/quest.ts"
+    "domain/quest/quest.ts",
+    "domain/shared/programming-language.ts"
   ],
   "infrastructure/persistence/firestore/mappers/repo-readiness-mapper.ts": [
     "domain/repo-readiness/repo-readiness-value-objects.ts",
@@ -176,6 +186,7 @@
   ],
   "infrastructure/persistence/firestore/mappers/team-mapper.ts": [
     "domain/shared/index.ts",
+    "domain/shared/programming-language.ts",
     "domain/shared/repo-types.ts",
     "domain/team/team.ts"
   ],
@@ -183,6 +194,7 @@
     "application/ports/quest-repository.ts",
     "domain/quest/quest-value-objects.ts",
     "domain/quest/quest.ts",
+    "domain/shared/programming-language.ts",
     "infrastructure/persistence/firestore/firestore-client.ts",
     "infrastructure/persistence/firestore/mappers/quest-mapper.ts",
     "shared/errors/domain-errors.ts"
@@ -215,6 +227,7 @@
   "infrastructure/scripts/seed-quests.ts": [
     "domain/quest/quest-value-objects.ts",
     "domain/quest/quest.ts",
+    "domain/shared/programming-language.ts",
     "infrastructure/config/environment.ts",
     "infrastructure/config/firebase.config.ts",
     "infrastructure/persistence/firestore/firestore-client.ts",
@@ -236,7 +249,8 @@
   "presentation/routes/health.ts": [],
   "presentation/routes/ingest.routes.ts": [
     "presentation/dto/ingest-scan.dto.ts",
-    "presentation/mappers/ingest-scan-run.mapper.ts"
+    "presentation/mappers/ingest-scan-run.mapper.ts",
+    "shared/errors/domain-errors.ts"
   ],
   "presentation/routes/quests.routes.ts": [
     "presentation/dto/quest.dto.ts"

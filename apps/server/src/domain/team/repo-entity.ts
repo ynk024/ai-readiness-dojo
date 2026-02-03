@@ -1,4 +1,5 @@
 import { ValidationError } from '../../shared/errors/domain-errors.js';
+import { ProgrammingLanguage } from '../shared/programming-language.js';
 import { RepoId, RepoFullName, RepoUrl } from '../shared/repo-types.js';
 import { TeamId } from '../shared/team-types.js';
 
@@ -10,6 +11,7 @@ export interface RepoEntityProps {
   defaultBranch: string;
   teamId: TeamId;
   archived: boolean;
+  language: ProgrammingLanguage | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -71,6 +73,10 @@ export class RepoEntity {
     return this.props.archived;
   }
 
+  get language(): ProgrammingLanguage | null {
+    return this.props.language;
+  }
+
   get createdAt(): Date {
     return this.props.createdAt;
   }
@@ -97,6 +103,11 @@ export class RepoEntity {
     }
 
     this.props.defaultBranch = trimmedBranch;
+    this.props.updatedAt = new Date();
+  }
+
+  updateLanguage(language: ProgrammingLanguage | null): void {
+    this.props.language = language;
     this.props.updatedAt = new Date();
   }
 

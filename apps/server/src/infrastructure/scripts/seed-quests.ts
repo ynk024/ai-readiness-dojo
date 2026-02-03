@@ -19,6 +19,7 @@
 
 import { QuestId } from '../../domain/quest/quest-value-objects.js';
 import { Quest, QuestLevel } from '../../domain/quest/quest.js';
+import { ProgrammingLanguage } from '../../domain/shared/programming-language.js';
 import { loadEnvironmentConfig } from '../config/environment.js';
 import { FirebaseConfig } from '../config/firebase.config.js';
 import { FirestoreClient } from '../persistence/firestore/firestore-client.js';
@@ -34,6 +35,7 @@ interface SeedQuest {
   description: string;
   active: boolean;
   levels: QuestLevel[];
+  languages?: string[]; // Optional: language tags for language-specific quests
 }
 
 const SEED_QUESTS: SeedQuest[] = [
@@ -44,6 +46,7 @@ const SEED_QUESTS: SeedQuest[] = [
     description: 'Checks if AGENTS.md file is present in repository',
     active: true,
     levels: [{ level: 1, description: 'Present', condition: { type: 'pass' } }],
+    // No languages = universal quest (applies to all repos)
   },
   {
     key: 'docs.skill_md_count',
@@ -52,6 +55,7 @@ const SEED_QUESTS: SeedQuest[] = [
     description: 'Checks if skill markdown files exist (count > 0)',
     active: true,
     levels: [{ level: 1, description: 'Count > 0', condition: { type: 'count', min: 1 } }],
+    // No languages = universal quest (applies to all repos)
   },
   {
     key: 'formatters.javascript.prettier_present',
@@ -60,6 +64,7 @@ const SEED_QUESTS: SeedQuest[] = [
     description: 'Checks if Prettier formatter is configured',
     active: true,
     levels: [{ level: 1, description: 'Present', condition: { type: 'pass' } }],
+    languages: ['javascript', 'typescript'], // Applies to JS and TS repos
   },
   {
     key: 'linting.javascript.eslint_present',
@@ -68,6 +73,7 @@ const SEED_QUESTS: SeedQuest[] = [
     description: 'Checks if ESLint linter is configured',
     active: true,
     levels: [{ level: 1, description: 'Present', condition: { type: 'pass' } }],
+    languages: ['javascript', 'typescript'], // Applies to JS and TS repos
   },
   {
     key: 'sast.codeql_present',
@@ -76,6 +82,7 @@ const SEED_QUESTS: SeedQuest[] = [
     description: 'Checks if CodeQL SAST scanning is configured',
     active: true,
     levels: [{ level: 1, description: 'Present', condition: { type: 'pass' } }],
+    // No languages = universal quest (CodeQL supports many languages)
   },
   {
     key: 'sast.semgrep_present',
@@ -84,6 +91,7 @@ const SEED_QUESTS: SeedQuest[] = [
     description: 'Checks if Semgrep SAST scanning is configured',
     active: true,
     levels: [{ level: 1, description: 'Present', condition: { type: 'pass' } }],
+    // No languages = universal quest (Semgrep supports many languages)
   },
   {
     key: 'quality.coverage_available',
@@ -92,6 +100,7 @@ const SEED_QUESTS: SeedQuest[] = [
     description: 'Checks if test coverage data is available',
     active: true,
     levels: [{ level: 1, description: 'Available', condition: { type: 'pass' } }],
+    // No languages = universal quest (applies to all repos)
   },
   {
     key: 'quality.coverage_threshold_met',
@@ -100,6 +109,7 @@ const SEED_QUESTS: SeedQuest[] = [
     description: 'Checks if test coverage meets defined threshold',
     active: true,
     levels: [{ level: 1, description: 'Threshold met', condition: { type: 'pass' } }],
+    // No languages = universal quest (applies to all repos)
   },
 ];
 
@@ -130,6 +140,11 @@ async function seedSingleQuest(
     return 'skipped';
   }
 
+  // Parse languages from string array to ProgrammingLanguage array
+  const languages = seedQuest.languages
+    ?.map((lang) => ProgrammingLanguage.fromString(lang))
+    .filter((lang): lang is ProgrammingLanguage => lang !== null);
+
   // Create and save the quest
   const quest = Quest.create({
     id: questId,
@@ -139,6 +154,7 @@ async function seedSingleQuest(
     description: seedQuest.description,
     active: seedQuest.active,
     levels: seedQuest.levels,
+    languages,
   });
 
   await questRepository.save(quest);

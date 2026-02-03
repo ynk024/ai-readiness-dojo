@@ -13,7 +13,7 @@ const EXPECTED_NAME_PARTS = 2;
  * @throws Error if repository name format is invalid or timestamp is invalid
  */
 function extractRepoMetadata(request: IngestScanRequestDto): RepoMetadata {
-  const { repository, timestamp, workflow_version: workflowVersion } = request.metadata;
+  const { repository, timestamp, workflow_version: workflowVersion, languages } = request.metadata;
 
   // Parse repository name (format: "owner/repo-name")
   const nameParts = repository.name.split('/');
@@ -41,6 +41,7 @@ function extractRepoMetadata(request: IngestScanRequestDto): RepoMetadata {
     runUrl: repository.run_url,
     workflowVersion,
     scannedAt,
+    primaryLanguage: languages?.primary ?? null,
   };
 }
 

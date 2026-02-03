@@ -7,6 +7,7 @@ import {
   RepoUrl,
   TeamId,
   TeamSlug,
+  ProgrammingLanguage,
 } from '../../../src/domain/shared/index.js';
 import { Team } from '../../../src/domain/team/team.js';
 
@@ -28,6 +29,7 @@ describe('TeamRepoResolver', () => {
     runUrl: 'https://github.com/ynk024/Workouttrackerdesign/actions/runs/21545800679',
     workflowVersion: '1.0.0',
     scannedAt: new Date('2026-01-31T17:39:21.414Z'),
+    primaryLanguage: null,
   };
 
   beforeEach(() => {
@@ -63,6 +65,7 @@ describe('TeamRepoResolver', () => {
         defaultBranch: 'main',
         teamId,
         archived: false,
+        language: null,
       });
 
       vi.mocked(teamRepository.findBySlug).mockResolvedValue(existingTeam);
@@ -162,6 +165,7 @@ describe('TeamRepoResolver', () => {
         defaultBranch: 'main',
         teamId,
         archived: false,
+        language: null,
       });
 
       vi.mocked(teamRepository.findBySlug).mockResolvedValue(existingTeam);
@@ -218,6 +222,183 @@ describe('TeamRepoResolver', () => {
       const result = await resolver.resolveFromMetadata(metadataWithRef);
 
       expect(result.repo.defaultBranch).toBe('feature-branch');
+    });
+
+    it('should create new repo with language from metadata', async () => {
+      const metadataWithLanguage: RepoMetadata = {
+        ...sampleMetadata,
+        primaryLanguage: 'javascript',
+      };
+
+      vi.mocked(teamRepository.findBySlug).mockResolvedValue(null);
+      vi.mocked(teamRepository.save).mockImplementation(async (team) => team);
+
+      const result = await resolver.resolveFromMetadata(metadataWithLanguage);
+
+      expect(result.repo.language).not.toBeNull();
+      expect(result.repo.language?.value).toBe('javascript');
+    });
+
+    it('should create new repo with null language when metadata has no language', async () => {
+      vi.mocked(teamRepository.findBySlug).mockResolvedValue(null);
+      vi.mocked(teamRepository.save).mockImplementation(async (team) => team);
+
+      const result = await resolver.resolveFromMetadata(sampleMetadata);
+
+      expect(result.repo.language).toBeNull();
+    });
+
+    it('should update existing repo language when it changes', async () => {
+      const teamId = TeamId.create('team_ynk024');
+      const repoId = RepoId.create('repo_ynk024_workouttrackerdesign');
+
+      const existingTeam = Team.create({
+        id: teamId,
+        name: 'ynk024',
+        slug: TeamSlug.create('ynk024'),
+      });
+
+      existingTeam.addRepo({
+        id: repoId,
+        provider: 'github',
+        fullName: RepoFullName.create('ynk024/Workouttrackerdesign'),
+        url: RepoUrl.create('https://github.com/ynk024/Workouttrackerdesign'),
+        defaultBranch: 'main',
+        teamId,
+        archived: false,
+        language: null,
+      });
+
+      const metadataWithNewLanguage: RepoMetadata = {
+        ...sampleMetadata,
+        primaryLanguage: 'typescript',
+      };
+
+      vi.mocked(teamRepository.findBySlug).mockResolvedValue(existingTeam);
+      vi.mocked(teamRepository.save).mockImplementation(async (team) => team);
+
+      const result = await resolver.resolveFromMetadata(metadataWithNewLanguage);
+
+      expect(result.repo.language).not.toBeNull();
+      expect(result.repo.language?.value).toBe('typescript');
+      expect(teamRepository.save).toHaveBeenCalledWith(expect.any(Team));
+    });
+
+    it('should not save team when language has not changed', async () => {
+      const teamId = TeamId.create('team_ynk024');
+      const repoId = RepoId.create('repo_ynk024_workouttrackerdesign');
+
+      const existingTeam = Team.create({
+        id: teamId,
+        name: 'ynk024',
+        slug: TeamSlug.create('ynk024'),
+      });
+
+      existingTeam.addRepo({
+        id: repoId,
+        provider: 'github',
+        fullName: RepoFullName.create('ynk024/Workouttrackerdesign'),
+        url: RepoUrl.create('https://github.com/ynk024/Workouttrackerdesign'),
+        defaultBranch: 'main',
+        teamId,
+        archived: false,
+        language: null,
+      });
+
+      vi.mocked(teamRepository.findBySlug).mockResolvedValue(existingTeam);
+
+      const result = await resolver.resolveFromMetadata(sampleMetadata);
+
+      expect(result.repo.language).toBeNull();
+      expect(teamRepository.save).not.toHaveBeenCalled();
+    });
+
+    it('should throw ValidationError for unsupported language', async () => {
+      const metadataWithUnsupportedLanguage: RepoMetadata = {
+        ...sampleMetadata,
+        primaryLanguage: 'python',
+      };
+
+      vi.mocked(teamRepository.findBySlug).mockResolvedValue(null);
+      vi.mocked(teamRepository.save).mockImplementation(async (team) => team);
+
+      await expect(resolver.resolveFromMetadata(metadataWithUnsupportedLanguage)).rejects.toThrow(
+        'Invalid programming language: python. Supported languages: javascript, typescript, java',
+      );
+    });
+
+    it('should update language from null to javascript', async () => {
+      const teamId = TeamId.create('team_ynk024');
+      const repoId = RepoId.create('repo_ynk024_workouttrackerdesign');
+
+      const existingTeam = Team.create({
+        id: teamId,
+        name: 'ynk024',
+        slug: TeamSlug.create('ynk024'),
+      });
+
+      existingTeam.addRepo({
+        id: repoId,
+        provider: 'github',
+        fullName: RepoFullName.create('ynk024/Workouttrackerdesign'),
+        url: RepoUrl.create('https://github.com/ynk024/Workouttrackerdesign'),
+        defaultBranch: 'main',
+        teamId,
+        archived: false,
+        language: null,
+      });
+
+      const metadataWithLanguage: RepoMetadata = {
+        ...sampleMetadata,
+        primaryLanguage: 'javascript',
+      };
+
+      vi.mocked(teamRepository.findBySlug).mockResolvedValue(existingTeam);
+      vi.mocked(teamRepository.save).mockImplementation(async (team) => team);
+
+      const result = await resolver.resolveFromMetadata(metadataWithLanguage);
+
+      expect(result.repo.language).not.toBeNull();
+      expect(result.repo.language?.value).toBe('javascript');
+      expect(teamRepository.save).toHaveBeenCalledWith(expect.any(Team));
+    });
+
+    it('should update language from javascript to typescript', async () => {
+      const teamId = TeamId.create('team_ynk024');
+      const repoId = RepoId.create('repo_ynk024_workouttrackerdesign');
+
+      const existingTeam = Team.create({
+        id: teamId,
+        name: 'ynk024',
+        slug: TeamSlug.create('ynk024'),
+      });
+
+      const jsLanguage = ProgrammingLanguage.create('javascript');
+
+      existingTeam.addRepo({
+        id: repoId,
+        provider: 'github',
+        fullName: RepoFullName.create('ynk024/Workouttrackerdesign'),
+        url: RepoUrl.create('https://github.com/ynk024/Workouttrackerdesign'),
+        defaultBranch: 'main',
+        teamId,
+        archived: false,
+        language: jsLanguage,
+      });
+
+      const metadataWithNewLanguage: RepoMetadata = {
+        ...sampleMetadata,
+        primaryLanguage: 'typescript',
+      };
+
+      vi.mocked(teamRepository.findBySlug).mockResolvedValue(existingTeam);
+      vi.mocked(teamRepository.save).mockImplementation(async (team) => team);
+
+      const result = await resolver.resolveFromMetadata(metadataWithNewLanguage);
+
+      expect(result.repo.language).not.toBeNull();
+      expect(result.repo.language?.value).toBe('typescript');
+      expect(teamRepository.save).toHaveBeenCalledWith(expect.any(Team));
     });
   });
 

@@ -1,5 +1,6 @@
 import { QuestId } from '../../../../domain/quest/quest-value-objects.js';
 import { Quest } from '../../../../domain/quest/quest.js';
+import { ProgrammingLanguage } from '../../../../domain/shared/programming-language.js';
 
 /**
  * Firestore Document Data for Quest
@@ -19,6 +20,7 @@ export interface QuestFirestoreData {
     description: string;
     condition: { type: string; min?: number };
   }[];
+  languages?: string[];
   createdAt: FirebaseFirestore.Timestamp;
   updatedAt: FirebaseFirestore.Timestamp;
 }
@@ -36,6 +38,11 @@ export interface QuestFirestoreData {
  * @returns Domain Quest entity
  */
 export function questToDomain(data: QuestFirestoreData): Quest {
+  // Map languages from string[] to ProgrammingLanguage[]
+  const languages = data.languages
+    ?.map((lang) => ProgrammingLanguage.fromString(lang))
+    .filter((lang): lang is ProgrammingLanguage => lang !== null);
+
   return Quest.reconstitute({
     id: QuestId.create(data.id),
     key: data.key,
@@ -49,6 +56,7 @@ export function questToDomain(data: QuestFirestoreData): Quest {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
       condition: l.condition as any, // Cast to QuestCondition union - validated by domain model on creation
     })),
+    languages,
     createdAt: data.createdAt.toDate(),
     updatedAt: data.updatedAt.toDate(),
   });
@@ -71,9 +79,13 @@ export function questToFirestore(quest: Quest): {
     description: string;
     condition: { type: string; min?: number };
   }[];
+  languages?: string[];
   createdAt: Date;
   updatedAt: Date;
 } {
+  // Map languages from ProgrammingLanguage[] to string[]
+  const languages = quest.languages?.map((lang) => lang.value);
+
   return {
     id: quest.id.value,
     key: quest.key,
@@ -82,6 +94,7 @@ export function questToFirestore(quest: Quest): {
     description: quest.description,
     active: quest.active,
     levels: quest.levels,
+    ...(languages && languages.length > 0 && { languages }),
     createdAt: quest.createdAt,
     updatedAt: quest.updatedAt,
   };

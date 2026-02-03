@@ -106,6 +106,7 @@ describe('Team Entity', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_eng'),
         archived: false,
+        language: null,
       });
 
       expect(team.getRepoCount()).toBe(1);
@@ -130,6 +131,7 @@ describe('Team Entity', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_eng'),
         archived: false,
+        language: null,
       });
 
       expect(team.updatedAt.getTime()).toBeGreaterThanOrEqual(originalUpdatedAt);
@@ -151,6 +153,7 @@ describe('Team Entity', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_eng'),
         archived: false,
+        language: null,
       });
 
       expect(() => {
@@ -162,6 +165,7 @@ describe('Team Entity', () => {
           defaultBranch: 'main',
           teamId: TeamId.create('team_eng'),
           archived: false,
+          language: null,
         });
       }).toThrow(BusinessRuleViolationError);
       expect(() => {
@@ -173,6 +177,7 @@ describe('Team Entity', () => {
           defaultBranch: 'main',
           teamId: TeamId.create('team_eng'),
           archived: false,
+          language: null,
         });
       }).toThrow('Repo repo_1 is already part of team team_eng');
       expect(team.getRepoCount()).toBe(1);
@@ -195,6 +200,7 @@ describe('Team Entity', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_eng'),
         archived: false,
+        language: null,
       });
 
       team.removeRepo(RepoId.create('repo_1'));
@@ -217,6 +223,7 @@ describe('Team Entity', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_eng'),
         archived: false,
+        language: null,
       });
 
       const originalUpdatedAt = team.updatedAt.getTime();
@@ -257,6 +264,7 @@ describe('Team Entity', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_eng'),
         archived: false,
+        language: null,
       });
 
       expect(team.hasRepo(RepoId.create('repo_1'))).toBe(true);
@@ -299,6 +307,7 @@ describe('Team Entity', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_eng'),
         archived: false,
+        language: null,
       });
 
       team.addRepo({
@@ -309,6 +318,7 @@ describe('Team Entity', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_eng'),
         archived: false,
+        language: null,
       });
 
       expect(team.getRepoCount()).toBe(2);

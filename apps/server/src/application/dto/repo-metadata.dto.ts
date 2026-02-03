@@ -17,4 +17,5 @@ export interface RepoMetadata {
   runUrl: string;
   workflowVersion: string;
   scannedAt: Date;
+  primaryLanguage: string | null;
 }

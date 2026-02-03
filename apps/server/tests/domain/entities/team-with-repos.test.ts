@@ -77,6 +77,7 @@ describe('Team (with Embedded Repos)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       });
 
       const props = {
@@ -116,6 +117,7 @@ describe('Team (with Embedded Repos)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       });
 
       expect(team.getRepoCount()).toBe(1);
@@ -139,6 +141,7 @@ describe('Team (with Embedded Repos)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       });
 
       expect(() =>
@@ -150,6 +153,7 @@ describe('Team (with Embedded Repos)', () => {
           defaultBranch: 'main',
           teamId: TeamId.create('team_test'),
           archived: false,
+          language: null,
         }),
       ).toThrow(BusinessRuleViolationError);
       expect(() =>
@@ -161,6 +165,7 @@ describe('Team (with Embedded Repos)', () => {
           defaultBranch: 'main',
           teamId: TeamId.create('team_test'),
           archived: false,
+          language: null,
         }),
       ).toThrow('Repo repo_1 is already part of team team_test');
     });
@@ -183,6 +188,7 @@ describe('Team (with Embedded Repos)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       });
 
       expect(team.updatedAt.getTime()).toBeGreaterThanOrEqual(originalUpdatedAt.getTime());
@@ -206,6 +212,7 @@ describe('Team (with Embedded Repos)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       });
 
       expect(team.getRepoCount()).toBe(1);
@@ -246,6 +253,7 @@ describe('Team (with Embedded Repos)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       });
 
       const originalUpdatedAt = team.updatedAt;
@@ -273,6 +281,7 @@ describe('Team (with Embedded Repos)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       });
 
       const repo = team.getRepo(RepoId.create('repo_1'));
@@ -312,6 +321,7 @@ describe('Team (with Embedded Repos)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       });
 
       const repo = team.getRepoByFullName(RepoFullName.create('test-org/repo1'));
@@ -351,6 +361,7 @@ describe('Team (with Embedded Repos)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       });
 
       team.addRepo({
@@ -361,6 +372,7 @@ describe('Team (with Embedded Repos)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: true,
+        language: null,
       });
 
       const activeRepos = team.getActiveRepos();
@@ -387,6 +399,7 @@ describe('Team (with Embedded Repos)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       });
 
       team.archiveRepo(RepoId.create('repo_1'));
@@ -426,6 +439,7 @@ describe('Team (with Embedded Repos)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       });
 
       expect(team.hasRepo(RepoId.create('repo_1'))).toBe(true);
@@ -462,6 +476,7 @@ describe('Team (with Embedded Repos)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       });
 
       expect(team.getRepoCount()).toBe(1);
@@ -474,6 +489,7 @@ describe('Team (with Embedded Repos)', () => {
         defaultBranch: 'main',
         teamId: TeamId.create('team_test'),
         archived: false,
+        language: null,
       });
 
       expect(team.getRepoCount()).toBe(2);

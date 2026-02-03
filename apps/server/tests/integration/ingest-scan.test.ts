@@ -347,4 +347,28 @@ describe('POST /api/ingest-scan - Integration Test', () => {
     const parsedBody = JSON.parse(response.body) as IngestScanResponseDto;
     expect(parsedBody).toBeDefined();
   });
+
+  it('should return 400 for unsupported programming language', async () => {
+    const reportWithUnsupportedLanguage = {
+      ...sampleReport,
+      metadata: {
+        ...sampleReport.metadata,
+        languages: {
+          primary: 'python',
+        },
+      },
+    };
+
+    const response = await server.inject({
+      method: 'POST',
+      url: '/api/ingest-scan',
+      payload: reportWithUnsupportedLanguage,
+    });
+
+    expect(response.statusCode).toBe(400);
+    const body = JSON.parse(response.body);
+    expect(body.error).toBe('Bad Request');
+    expect(body.message).toContain('Invalid programming language');
+    expect(body.message).toContain('python');
+  });
 });

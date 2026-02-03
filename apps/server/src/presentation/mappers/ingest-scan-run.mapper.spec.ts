@@ -129,4 +129,77 @@ describe('IngestScanRunMapper', () => {
     const prettierResult = result.questResults.get('formatters.javascript.prettier_present');
     expect(prettierResult?.data).toEqual({ present: false });
   });
+
+  describe('language extraction', () => {
+    it('should extract primary language when present', () => {
+      const request: IngestScanRequestDto = {
+        ...baseRequest,
+        metadata: {
+          ...baseRequest.metadata,
+          languages: {
+            detected: ['javascript', 'html'],
+            primary: 'javascript',
+          },
+        },
+      };
+
+      const result = toApplicationDto(request);
+
+      expect(result.metadata.primaryLanguage).toBe('javascript');
+    });
+
+    it('should handle null primary language when languages field is missing', () => {
+      const request: IngestScanRequestDto = {
+        ...baseRequest,
+        // No languages field
+      };
+
+      const result = toApplicationDto(request);
+
+      expect(result.metadata.primaryLanguage).toBeNull();
+    });
+
+    it('should extract different programming languages', () => {
+      const testCases = [
+        { primary: 'typescript', expected: 'typescript' },
+        { primary: 'java', expected: 'java' },
+        { primary: 'javascript', expected: 'javascript' },
+      ];
+
+      for (const { primary, expected } of testCases) {
+        const request: IngestScanRequestDto = {
+          ...baseRequest,
+          metadata: {
+            ...baseRequest.metadata,
+            languages: {
+              detected: [primary],
+              primary,
+            },
+          },
+        };
+
+        const result = toApplicationDto(request);
+
+        expect(result.metadata.primaryLanguage).toBe(expected);
+      }
+    });
+
+    it('should handle unsupported language gracefully (backward compatibility)', () => {
+      const request: IngestScanRequestDto = {
+        ...baseRequest,
+        metadata: {
+          ...baseRequest.metadata,
+          languages: {
+            detected: ['python', 'javascript'],
+            primary: 'python', // Unsupported language
+          },
+        },
+      };
+
+      const result = toApplicationDto(request);
+
+      // Should still extract the value - domain layer will handle validation
+      expect(result.metadata.primaryLanguage).toBe('python');
+    });
+  });
 });
