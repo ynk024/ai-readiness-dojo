@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { QuestId } from '../../../src/domain/quest/quest-value-objects.js';
+import { QuestId, QuestDetectionType } from '../../../src/domain/quest/quest-value-objects.js';
 import { Quest } from '../../../src/domain/quest/quest.js';
 import { ValidationError } from '../../../src/shared/errors/domain-errors.js';
 
@@ -241,6 +241,7 @@ describe('Quest Entity', () => {
         description: 'Checks if AGENTS.md file is present',
         active: true,
         levels: [],
+        detectionType: QuestDetectionType.both(),
         createdAt,
         updatedAt,
       });
@@ -388,6 +389,93 @@ describe('Quest Entity', () => {
       expect(() => {
         quest.updateDescription(longDescription);
       }).toThrow('Quest description must not exceed 500 characters');
+    });
+  });
+
+  describe('detectionType', () => {
+    it('should default to "both" if not specified', () => {
+      const quest = Quest.create({
+        id: QuestId.create('quest_123'),
+        key: 'test.key',
+        title: 'Test',
+        category: 'test',
+        description: 'Test description',
+        active: true,
+        levels: [],
+      });
+
+      expect(quest.detectionType.value).toBe('both');
+      expect(quest.canBeAutoDetected()).toBe(true);
+      expect(quest.canBeManuallyApproved()).toBe(true);
+    });
+
+    it('should accept auto-only detection type', () => {
+      const quest = Quest.create({
+        id: QuestId.create('quest_123'),
+        key: 'test.key',
+        title: 'Test',
+        category: 'test',
+        description: 'Test description',
+        active: true,
+        levels: [],
+        detectionType: QuestDetectionType.autoOnly(),
+      });
+
+      expect(quest.detectionType.value).toBe('auto-only');
+      expect(quest.canBeAutoDetected()).toBe(true);
+      expect(quest.canBeManuallyApproved()).toBe(false);
+    });
+
+    it('should accept manual-only detection type', () => {
+      const quest = Quest.create({
+        id: QuestId.create('quest_123'),
+        key: 'test.key',
+        title: 'Test',
+        category: 'test',
+        description: 'Test description',
+        active: true,
+        levels: [],
+        detectionType: QuestDetectionType.manualOnly(),
+      });
+
+      expect(quest.detectionType.value).toBe('manual-only');
+      expect(quest.canBeAutoDetected()).toBe(false);
+      expect(quest.canBeManuallyApproved()).toBe(true);
+    });
+
+    it('should accept both detection type', () => {
+      const quest = Quest.create({
+        id: QuestId.create('quest_123'),
+        key: 'test.key',
+        title: 'Test',
+        category: 'test',
+        description: 'Test description',
+        active: true,
+        levels: [],
+        detectionType: QuestDetectionType.both(),
+      });
+
+      expect(quest.detectionType.value).toBe('both');
+      expect(quest.canBeAutoDetected()).toBe(true);
+      expect(quest.canBeManuallyApproved()).toBe(true);
+    });
+
+    it('should preserve detectionType on reconstitute', () => {
+      const quest = Quest.reconstitute({
+        id: QuestId.create('quest_123'),
+        key: 'test.key',
+        title: 'Test',
+        category: 'test',
+        description: 'Test description',
+        active: true,
+        levels: [],
+        detectionType: QuestDetectionType.manualOnly(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      expect(quest.detectionType.value).toBe('manual-only');
+      expect(quest.canBeManuallyApproved()).toBe(true);
     });
   });
 });

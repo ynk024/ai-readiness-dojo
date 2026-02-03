@@ -99,6 +99,7 @@ describe('RepoReadinessMapper', () => {
             ReadinessStatus.complete(),
             1,
             new Date('2024-06-15T10:25:00.000Z'),
+            'automatic',
           ),
         ],
         [
@@ -107,6 +108,7 @@ describe('RepoReadinessMapper', () => {
             ReadinessStatus.incomplete(),
             1,
             new Date('2024-06-15T10:28:00.000Z'),
+            'automatic',
           ),
         ],
       ]);
@@ -170,7 +172,10 @@ describe('RepoReadinessMapper', () => {
         computedFromScanRunId: ScanRunId.create('scan-123'),
         updatedAt: new Date(),
         quests: new Map([
-          ['git-basics', createQuestReadinessEntry(ReadinessStatus.complete(), 3, new Date())],
+          [
+            'git-basics',
+            createQuestReadinessEntry(ReadinessStatus.complete(), 3, new Date(), 'automatic'),
+          ],
         ]),
       });
 
@@ -228,10 +233,36 @@ describe('RepoReadinessMapper', () => {
         ...convertedFirestoreData,
         updatedAt: Timestamp.fromDate(convertedFirestoreData.updatedAt),
         quests: Object.fromEntries(
-          Object.entries(convertedFirestoreData.quests).map(([key, value]) => [
-            key,
-            { ...value, lastSeenAt: Timestamp.fromDate(value.lastSeenAt) },
-          ]),
+          Object.entries(convertedFirestoreData.quests).map(([key, value]) => {
+            const entry: {
+              status: string;
+              level: number;
+              lastSeenAt: FirebaseFirestore.Timestamp;
+              completionSource?: string;
+              manualApproval?: {
+                approvedBy: string;
+                approvedAt: FirebaseFirestore.Timestamp;
+                revokedAt?: FirebaseFirestore.Timestamp;
+              };
+            } = {
+              status: value.status,
+              level: value.level,
+              lastSeenAt: Timestamp.fromDate(value.lastSeenAt),
+              completionSource: value.completionSource,
+            };
+
+            if (value.manualApproval) {
+              entry.manualApproval = {
+                approvedBy: value.manualApproval.approvedBy,
+                approvedAt: Timestamp.fromDate(value.manualApproval.approvedAt),
+                ...(value.manualApproval.revokedAt && {
+                  revokedAt: Timestamp.fromDate(value.manualApproval.revokedAt),
+                }),
+              };
+            }
+
+            return [key, entry];
+          }),
         ),
       });
 

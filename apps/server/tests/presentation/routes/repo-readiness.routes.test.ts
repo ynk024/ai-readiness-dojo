@@ -36,8 +36,11 @@ describe('RepoReadiness Routes', () => {
     const app = await createApp();
 
     const questsMap = new Map<string, ReturnType<typeof createQuestReadinessEntry>>([
-      ['git-basics', createQuestReadinessEntry(ReadinessStatus.complete(), 1, new Date())],
-      ['readme', createQuestReadinessEntry(ReadinessStatus.complete(), 2, new Date())],
+      [
+        'git-basics',
+        createQuestReadinessEntry(ReadinessStatus.complete(), 1, new Date(), 'automatic'),
+      ],
+      ['readme', createQuestReadinessEntry(ReadinessStatus.complete(), 2, new Date(), 'automatic')],
     ]);
 
     const readiness = RepoReadiness.reconstitute({
@@ -108,9 +111,15 @@ describe('RepoReadiness Routes', () => {
     const app = await createApp();
 
     const questsMap = new Map<string, ReturnType<typeof createQuestReadinessEntry>>([
-      ['git-basics', createQuestReadinessEntry(ReadinessStatus.complete(), 1, new Date())],
-      ['readme', createQuestReadinessEntry(ReadinessStatus.incomplete(), 1, new Date())],
-      ['tests', createQuestReadinessEntry(ReadinessStatus.complete(), 3, new Date())],
+      [
+        'git-basics',
+        createQuestReadinessEntry(ReadinessStatus.complete(), 1, new Date(), 'automatic'),
+      ],
+      [
+        'readme',
+        createQuestReadinessEntry(ReadinessStatus.incomplete(), 1, new Date(), 'automatic'),
+      ],
+      ['tests', createQuestReadinessEntry(ReadinessStatus.complete(), 3, new Date(), 'automatic')],
     ]);
 
     const readiness = RepoReadiness.reconstitute({

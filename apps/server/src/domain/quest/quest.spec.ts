@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { QuestId } from './quest-value-objects.js';
+import { QuestDetectionType, QuestId } from './quest-value-objects.js';
 import { Quest, QuestProps } from './quest.js';
 
 describe('Quest', () => {
@@ -12,6 +12,7 @@ describe('Quest', () => {
     description: 'A test quest',
     levels: [],
     active: true,
+    detectionType: QuestDetectionType.both(),
   };
 
   it('should create a valid quest', () => {

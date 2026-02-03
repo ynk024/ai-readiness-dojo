@@ -17,6 +17,12 @@ export interface RepoReadinessResponseDto {
       status: 'complete' | 'incomplete' | 'unknown';
       level: number;
       lastSeenAt: string;
+      completionSource: 'automatic' | 'manual';
+      manualApproval?: {
+        approvedBy: string;
+        approvedAt: string;
+        revokedAt?: string;
+      };
     }
   >;
 }

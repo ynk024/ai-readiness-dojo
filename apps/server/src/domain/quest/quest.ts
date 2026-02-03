@@ -1,7 +1,7 @@
 import { ValidationError } from '../../shared/errors/domain-errors.js';
 import { ProgrammingLanguage } from '../shared/programming-language.js';
 
-import { QuestId } from './quest-value-objects.js';
+import { QuestId, QuestDetectionType } from './quest-value-objects.js';
 
 const MAX_TITLE_LENGTH = 100;
 const MAX_DESCRIPTION_LENGTH = 500;
@@ -25,6 +25,7 @@ export interface QuestProps {
   category: string;
   description: string;
   levels: QuestLevel[];
+  detectionType: QuestDetectionType;
   languages?: ProgrammingLanguage[];
   active: boolean;
   createdAt: Date;
@@ -34,7 +35,11 @@ export interface QuestProps {
 export class Quest {
   private constructor(private props: QuestProps) {}
 
-  static create(input: Omit<QuestProps, 'createdAt' | 'updatedAt'>): Quest {
+  static create(
+    input: Omit<QuestProps, 'createdAt' | 'updatedAt' | 'detectionType'> & {
+      detectionType?: QuestDetectionType;
+    },
+  ): Quest {
     const trimmedKey = input.key.trim();
     const trimmedTitle = input.title.trim();
     const trimmedCategory = input.category.trim();
@@ -74,13 +79,21 @@ export class Quest {
       category: trimmedCategory,
       description: trimmedDescription,
       levels: input.levels,
+      detectionType: input.detectionType ?? QuestDetectionType.both(),
       createdAt: now,
       updatedAt: now,
     });
   }
 
-  static reconstitute(props: QuestProps): Quest {
-    return new Quest(props);
+  static reconstitute(
+    props: Omit<QuestProps, 'detectionType'> & { detectionType?: QuestDetectionType },
+  ): Quest {
+    // Ensure backward compatibility: default detectionType to 'both' if not present
+    const propsWithDefaults: QuestProps = {
+      ...props,
+      detectionType: props.detectionType ?? QuestDetectionType.both(),
+    };
+    return new Quest(propsWithDefaults);
   }
 
   get id(): QuestId {
@@ -105,6 +118,10 @@ export class Quest {
 
   get levels(): QuestLevel[] {
     return [...this.props.levels];
+  }
+
+  get detectionType(): QuestDetectionType {
+    return this.props.detectionType;
   }
 
   get languages(): ProgrammingLanguage[] | undefined {
@@ -148,6 +165,20 @@ export class Quest {
 
     this.props.description = trimmedDescription;
     this.props.updatedAt = new Date();
+  }
+
+  /**
+   * Check if this quest can be automatically detected via scans
+   */
+  canBeAutoDetected(): boolean {
+    return this.props.detectionType.canAutoDetect();
+  }
+
+  /**
+   * Check if this quest can be manually approved
+   */
+  canBeManuallyApproved(): boolean {
+    return this.props.detectionType.canManuallyApprove();
   }
 
   /**

@@ -9,9 +9,10 @@ import type { RepoReadinessRepository } from '../ports/repo-readiness-repository
  * Use case for computing repository readiness from scan runs
  *
  * Orchestrates:
- * 1. Fetch language-specific quest catalog for enrichment
- * 2. Compute readiness from scan results
- * 3. Persist readiness snapshot
+ * 1. Fetch existing readiness snapshot to preserve manual approvals
+ * 2. Fetch language-specific quest catalog (filtered to auto-detectable quests)
+ * 3. Compute readiness from scan results (merging with existing manual approvals)
+ * 4. Persist readiness snapshot
  */
 export class ComputeRepoReadinessUseCase {
   constructor(
@@ -27,11 +28,15 @@ export class ComputeRepoReadinessUseCase {
    * @returns The computed RepoReadiness entity
    */
   async execute(scanRun: ScanRun, language: ProgrammingLanguage | null): Promise<RepoReadiness> {
-    // Step 1: Fetch language-specific quest catalog to enrich readiness with levels
-    const quests = await this.questRepository.findActiveByLanguage(language);
+    // Step 1: Fetch existing readiness snapshot to preserve manual approvals
+    const existingReadiness = await this.repoReadinessRepository.findByRepoId(scanRun.repoId);
+
+    // Step 2: Fetch language-specific quest catalog and filter to auto-detectable quests only
+    const allQuests = await this.questRepository.findActiveByLanguage(language);
+    const autoDetectableQuests = allQuests.filter((q) => q.canBeAutoDetected());
 
     const questCatalog = new Map(
-      quests.map((q) => [
+      autoDetectableQuests.map((q) => [
         q.key,
         {
           key: q.key,
@@ -48,10 +53,14 @@ export class ComputeRepoReadinessUseCase {
       questResults: scanRun.questResults,
     };
 
-    // Step 2: Compute readiness from scan run
-    const readiness = RepoReadiness.computeFromScanRun(scanRunSummary, questCatalog);
+    // Step 3: Compute readiness from scan run, merging with existing manual approvals
+    const readiness = RepoReadiness.computeFromScanRun(
+      scanRunSummary,
+      questCatalog,
+      existingReadiness ?? undefined,
+    );
 
-    // Step 3: Persist readiness snapshot
+    // Step 4: Persist readiness snapshot
     await this.repoReadinessRepository.save(readiness);
 
     return readiness;

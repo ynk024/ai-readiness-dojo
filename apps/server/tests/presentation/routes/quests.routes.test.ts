@@ -99,6 +99,7 @@ describe('Quest Routes', () => {
       category: 'Architecture',
       description: 'Write clean code',
       active: true,
+      detectionType: 'both',
       levels: [],
       createdAt: expect.any(String),
       updatedAt: expect.any(String),

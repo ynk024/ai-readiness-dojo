@@ -1,3 +1,4 @@
+import { ApproveQuestManuallyUseCase } from '../../application/use-cases/approve-quest-manually.use-case.js';
 import { ComputeRepoReadinessUseCase } from '../../application/use-cases/compute-repo-readiness.use-case.js';
 import { IngestScanRunUseCase } from '../../application/use-cases/ingest-scan-run.use-case.js';
 import { FirebaseConfig } from '../config/firebase.config.js';
@@ -33,6 +34,7 @@ declare module 'fastify' {
     useCases: {
       ingestScanRun: () => IngestScanRunUseCase;
       computeRepoReadiness: () => ComputeRepoReadinessUseCase;
+      approveQuestManually: () => ApproveQuestManuallyUseCase;
     };
   }
 }
@@ -85,9 +87,16 @@ export function registerDependencies(
     repoReadinessRepository,
   );
 
+  const approveQuestManuallyUseCase = new ApproveQuestManuallyUseCase(
+    questRepository,
+    teamRepository,
+    repoReadinessRepository,
+  );
+
   fastify.decorate('useCases', {
     ingestScanRun: () =>
       new IngestScanRunUseCase(teamRepository, scanRunRepository, computeRepoReadinessUseCase),
     computeRepoReadiness: () => computeRepoReadinessUseCase,
+    approveQuestManually: () => approveQuestManuallyUseCase,
   });
 }

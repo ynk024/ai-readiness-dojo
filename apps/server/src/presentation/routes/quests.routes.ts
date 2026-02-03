@@ -15,6 +15,7 @@ export const questsRoutes: FastifyPluginAsync = async (fastify) => {
         category: quest.category,
         description: quest.description,
         active: quest.active,
+        detectionType: quest.detectionType.value,
         levels: quest.levels.map((l) => ({
           level: l.level,
           description: l.description,

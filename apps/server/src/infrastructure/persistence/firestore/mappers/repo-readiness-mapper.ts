@@ -4,7 +4,7 @@ import {
 } from '../../../../domain/repo-readiness/repo-readiness-value-objects.js';
 import { RepoReadiness } from '../../../../domain/repo-readiness/repo-readiness.js';
 import { ScanRunId } from '../../../../domain/scan-run/scan-value-objects.js';
-import { RepoId, TeamId } from '../../../../domain/shared/index.js';
+import { RepoId, TeamId, UserId } from '../../../../domain/shared/index.js';
 
 /**
  * Firestore Document Data for RepoReadiness
@@ -23,6 +23,12 @@ export interface RepoReadinessFirestoreData {
       status: string;
       level: number;
       lastSeenAt: FirebaseFirestore.Timestamp;
+      completionSource?: string; // Optional for backward compatibility
+      manualApproval?: {
+        approvedBy: string;
+        approvedAt: FirebaseFirestore.Timestamp;
+        revokedAt?: FirebaseFirestore.Timestamp;
+      };
     }
   >;
 }
@@ -40,10 +46,21 @@ export function repoReadinessToDomain(data: RepoReadinessFirestoreData): RepoRea
   // Convert Record to Map with proper value objects
   const questsMap = new Map();
   for (const [key, value] of Object.entries(data.quests)) {
+    const completionSource = value.completionSource ?? 'automatic'; // Default to automatic for backward compatibility
+    const manualApproval = value.manualApproval
+      ? {
+          approvedBy: UserId.create(value.manualApproval.approvedBy),
+          approvedAt: value.manualApproval.approvedAt.toDate(),
+          revokedAt: value.manualApproval.revokedAt?.toDate(),
+        }
+      : undefined;
+
     const entry = createQuestReadinessEntry(
       ReadinessStatus.create(value.status),
       value.level,
       value.lastSeenAt.toDate(),
+      completionSource as 'automatic' | 'manual',
+      manualApproval,
     );
     questsMap.set(key, entry);
   }
@@ -65,7 +82,20 @@ export function repoReadinessToFirestore(readiness: RepoReadiness): Omit<
   'updatedAt' | 'quests'
 > & {
   updatedAt: Date;
-  quests: Record<string, { status: string; level: number; lastSeenAt: Date }>;
+  quests: Record<
+    string,
+    {
+      status: string;
+      level: number;
+      lastSeenAt: Date;
+      completionSource: string;
+      manualApproval?: {
+        approvedBy: string;
+        approvedAt: Date;
+        revokedAt?: Date;
+      };
+    }
+  >;
 } {
   // Convert Map to Record for Firestore
   const questsRecord: Record<
@@ -74,6 +104,12 @@ export function repoReadinessToFirestore(readiness: RepoReadiness): Omit<
       status: string;
       level: number;
       lastSeenAt: Date;
+      completionSource: string;
+      manualApproval?: {
+        approvedBy: string;
+        approvedAt: Date;
+        revokedAt?: Date;
+      };
     }
   > = {};
 
@@ -82,6 +118,14 @@ export function repoReadinessToFirestore(readiness: RepoReadiness): Omit<
       status: entry.status.value,
       level: entry.level,
       lastSeenAt: entry.lastSeenAt,
+      completionSource: entry.completionSource,
+      ...(entry.manualApproval && {
+        manualApproval: {
+          approvedBy: entry.manualApproval.approvedBy.value,
+          approvedAt: entry.manualApproval.approvedAt,
+          ...(entry.manualApproval.revokedAt && { revokedAt: entry.manualApproval.revokedAt }),
+        },
+      }),
     };
   }
 

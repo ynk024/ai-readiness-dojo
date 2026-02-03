@@ -46,6 +46,12 @@ export const repoReadinessRoutes: FastifyPluginAsync = async (fastify) => {
             status: 'complete' | 'incomplete' | 'unknown';
             level: number;
             lastSeenAt: string;
+            completionSource: 'automatic' | 'manual';
+            manualApproval?: {
+              approvedBy: string;
+              approvedAt: string;
+              revokedAt?: string;
+            };
           }
         > = {};
 
@@ -54,6 +60,16 @@ export const repoReadinessRoutes: FastifyPluginAsync = async (fastify) => {
             status: entry.status.value as 'complete' | 'incomplete' | 'unknown',
             level: entry.level,
             lastSeenAt: entry.lastSeenAt.toISOString(),
+            completionSource: entry.completionSource,
+            ...(entry.manualApproval && {
+              manualApproval: {
+                approvedBy: entry.manualApproval.approvedBy.value,
+                approvedAt: entry.manualApproval.approvedAt.toISOString(),
+                ...(entry.manualApproval.revokedAt && {
+                  revokedAt: entry.manualApproval.revokedAt.toISOString(),
+                }),
+              },
+            }),
           };
         }
 

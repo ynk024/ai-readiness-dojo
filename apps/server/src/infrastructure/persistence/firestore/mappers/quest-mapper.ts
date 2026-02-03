@@ -1,4 +1,4 @@
-import { QuestId } from '../../../../domain/quest/quest-value-objects.js';
+import { QuestId, QuestDetectionType } from '../../../../domain/quest/quest-value-objects.js';
 import { Quest } from '../../../../domain/quest/quest.js';
 import { ProgrammingLanguage } from '../../../../domain/shared/programming-language.js';
 
@@ -15,6 +15,7 @@ export interface QuestFirestoreData {
   category: string;
   description: string;
   active: boolean;
+  detectionType?: string; // Optional for backward compatibility
   levels: {
     level: number;
     description: string;
@@ -43,6 +44,11 @@ export function questToDomain(data: QuestFirestoreData): Quest {
     ?.map((lang) => ProgrammingLanguage.fromString(lang))
     .filter((lang): lang is ProgrammingLanguage => lang !== null);
 
+  // Map detectionType with backward compatibility (defaults to 'both' in Quest.reconstitute if missing)
+  const detectionType = data.detectionType
+    ? QuestDetectionType.create(data.detectionType)
+    : undefined;
+
   return Quest.reconstitute({
     id: QuestId.create(data.id),
     key: data.key,
@@ -50,6 +56,7 @@ export function questToDomain(data: QuestFirestoreData): Quest {
     category: data.category,
     description: data.description,
     active: data.active,
+    detectionType,
     levels: data.levels.map((l) => ({
       level: l.level,
       description: l.description,
@@ -74,6 +81,7 @@ export function questToFirestore(quest: Quest): {
   category: string;
   description: string;
   active: boolean;
+  detectionType: string;
   levels: {
     level: number;
     description: string;
@@ -93,6 +101,7 @@ export function questToFirestore(quest: Quest): {
     category: quest.category,
     description: quest.description,
     active: quest.active,
+    detectionType: quest.detectionType.value,
     levels: quest.levels,
     ...(languages && languages.length > 0 && { languages }),
     createdAt: quest.createdAt,

@@ -6,6 +6,7 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import { loadEnvironmentConfig } from './infrastructure/config/environment.js';
 import { registerDependencies } from './infrastructure/di/container.js';
 import { FirestoreClient } from './infrastructure/persistence/firestore/firestore-client.js';
+import { approveQuestRoutes } from './presentation/routes/approve-quest.routes.js';
 import { healthRoutes } from './presentation/routes/health.js';
 import { ingestRoutes } from './presentation/routes/ingest.routes.js';
 import { questsRoutes } from './presentation/routes/quests.routes.js';
@@ -43,6 +44,7 @@ export async function buildServer(testFirestoreClient?: FirestoreClient): Promis
   await fastify.register(questsRoutes, { prefix: '/api' });
   await fastify.register(ingestRoutes, { prefix: '/api' });
   await fastify.register(repoReadinessRoutes, { prefix: '/api' });
+  await fastify.register(approveQuestRoutes, { prefix: '/api' });
 
   return fastify;
 }

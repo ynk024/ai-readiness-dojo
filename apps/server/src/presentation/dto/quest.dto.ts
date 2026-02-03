@@ -18,6 +18,7 @@ export interface QuestResponseDto {
   category: string;
   description: string;
   active: boolean;
+  detectionType: 'auto-only' | 'manual-only' | 'both';
   levels: QuestLevelDto[];
   createdAt: string;
   updatedAt: string;

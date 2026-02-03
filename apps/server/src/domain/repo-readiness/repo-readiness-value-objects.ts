@@ -1,4 +1,5 @@
 import { ValidationError } from '../../shared/errors/domain-errors.js';
+import { UserId } from '../shared/user-types.js';
 
 /**
  * Readiness status for a single quest
@@ -58,29 +59,58 @@ export class ReadinessStatus {
 }
 
 /**
+ * Completion source for a quest
+ */
+export type CompletionSource = 'automatic' | 'manual';
+
+/**
+ * Manual approval metadata for a quest
+ */
+export interface ManualApprovalMetadata {
+  readonly approvedBy: UserId;
+  readonly approvedAt: Date;
+  readonly revokedAt?: Date; // For audit trail
+}
+
+/**
  * Readiness information for a single quest
  */
 export interface QuestReadinessEntry {
   readonly status: ReadinessStatus;
   readonly level: number;
   readonly lastSeenAt: Date;
+  readonly completionSource: CompletionSource;
+  readonly manualApproval?: ManualApprovalMetadata;
 }
 
 /**
  * Factory for creating QuestReadinessEntry
  */
+// eslint-disable-next-line max-params -- Factory function requires all parameters for clarity
 export function createQuestReadinessEntry(
   status: ReadinessStatus,
   level: number,
   lastSeenAt: Date,
+  completionSource: CompletionSource,
+  manualApproval?: ManualApprovalMetadata,
 ): QuestReadinessEntry {
   if (level < 1) {
     throw new ValidationError('Quest level must be at least 1');
+  }
+
+  if (completionSource === 'manual' && !manualApproval) {
+    throw new ValidationError('Manual approval metadata is required for manual completion source');
+  }
+
+  if (completionSource === 'automatic' && manualApproval) {
+    throw new ValidationError('Automatic completion source cannot have manual approval metadata');
   }
 
   return {
     status,
     level,
     lastSeenAt,
+    completionSource,
+    manualApproval,
   };
 }
